@@ -1,9 +1,12 @@
-import Homey from 'homey';
+import Homey, { FlowCardTriggerDevice } from 'homey';
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 
 module.exports = class NetworkDock extends Homey.Device {
 
-  connectionManager = new StreamDeckTcpConnectionManager()
+  private connectionManager = new StreamDeckTcpConnectionManager()
+  private streamDeck: StreamDeckTcp | undefined
+  private onButtonPress: FlowCardTriggerDevice | undefined;
+  private onButtonRelease: FlowCardTriggerDevice | undefined;
 
   /**
    * onInit is called when the device is initialized.
@@ -12,74 +15,74 @@ module.exports = class NetworkDock extends Homey.Device {
     const ipAddress = this.getSetting("ipAddress");
     this.log("NetworkDock has been initialized for ip: " + ipAddress);
 
+    this.onButtonPress = this.homey.flow.getDeviceTriggerCard('on_button_press');
+    this.onButtonRelease = this.homey.flow.getDeviceTriggerCard('on_button_release');
+
     this.connectionManager.connectTo(ipAddress)
 
-    this.connectionManager.on('error', this.connectionError)
+    this.connectionManager.on('error', async (message) => {
+        await this.setUnavailable(message);
+    });
 
     this.connectionManager.on('connected', async (streamDeck) => {
-      streamDeck.tcpEvents.on('disconnected', () => {
-        this.streamDeckDidDisconnect(streamDeck);
+      this.streamDeck = streamDeck
+      streamDeck.tcpEvents.on('disconnected', async () => {
+        await this.setUnavailable("Stream Deck Disconnected");
+        this.streamDeck = undefined;
       });
-      streamDeck.on('error', (error) => {
-        this.streamDeckDidError(streamDeck, error);
+      streamDeck.on('error', async (error) => {
+        const message = typeof error === 'string' ? error : undefined;
+        await this.setUnavailable(message);
       });
       streamDeck.on('down', (control) => {
         if (control.type === 'button') {
-          this.log("down " + control.column + "x" + control.row);
+          this.onButtonPress?.trigger(this, { column: control.column, row: control.row, item: control.index + 1 });
+          this.log("press " + control.column + "x" + control.row);
         }
       });
       streamDeck.on('up', (control) => {
         if (control.type === 'button') {
-          this.log("up " + control.column + "x" + control.row);
+          this.onButtonRelease?.trigger(this, { column: control.column, row: control.row, item: control.index + 1 });
+          this.log("release " + control.column + "x" + control.row);
         }
       });
-      this.streamDeckDidConnect(streamDeck);
 
-        // streamDeck
-        //   .setBrightness(100)
-
-      // streamDeck.clearPanel().catch((e) => this.error('clear panel failed:', e))
+      if (streamDeck.CONTROLS.length > 0) {
+        await this.setAvailable();
+        this.streamDeckDidConnect(streamDeck);
+      } else {
+        await this.setUnavailable("No Stream Deck connected to Network Dock");
+      }
     });
 
-  }
+    this.registerCapabilityListener('onoff', async (value) => {
+      this.log("onoff: " + value)
+    });
 
-  async connectionError(error: String) {
-
+    this.registerCapabilityListener('dim', async (value) => {
+      await this.streamDeck?.setBrightness(value * 100)
+    });
   }
 
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
 
-      if (streamDeck.CONTROLS.length === 0) {
-        // Empty Network dock, skip the rest.
-        return
-      }
-
       const size = streamDeck.CONTROLS.reduce((result, control) => {
-        if (result.colomns < (control.column + 1)) {
-          result.colomns = control.column + 1
+        if (result.columns < (control.column + 1)) {
+          result.columns = control.column + 1
         }
         if (result.rows < (control.row + 1)) {
           result.rows = control.row + 1
         }
         return result
-      }, {colomns: 0, rows: 0});
+      }, {columns: 0, rows: 0});
 
       await this.setSettings({
         name: streamDeck.PRODUCT_NAME,
         serial: await streamDeck.getSerialNumber(),
         firmware: await streamDeck.getFirmwareVersion(),
-        colomns: size.colomns,
+        columns: size.columns,
         rows: size.rows
       });
-
-  }
-
-  async streamDeckDidDisconnect(streamDeck: StreamDeckTcp) {
-    
-  }
-
-  async streamDeckDidError(streamDeck: StreamDeckTcp, error: unknown) {
-    
   }
 
   /**

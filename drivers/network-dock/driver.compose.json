@@ -4,7 +4,8 @@
   },
   "class": "button",
   "capabilities": [
-    "onoff"
+    "onoff",
+    "dim"
   ],
   "platforms": [
     "local"
@@ -22,7 +23,9 @@
     {
       "id": "list_devices",
       "template": "list_devices",
-      "navigation": { "next": "add_devices" }
+      "navigation": {
+        "next": "add_devices" 
+      }
     },
     {
       "id": "add_devices",

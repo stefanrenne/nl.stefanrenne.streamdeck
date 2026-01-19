@@ -27,6 +27,88 @@
     "email": "srenne1@gmail.com"
   },
   "brandColor": "#000063",
+  "flow": {
+    "triggers": [
+      {
+        "id": "on_button_press",
+        "title": {
+          "en": "Button press"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          }
+        ],
+        "tokens": [
+          {
+            "type": "number",
+            "name": "column",
+            "title": {
+              "en": "Column",
+              "nl": "Kolom"
+            }
+          },
+          {
+            "type": "number",
+            "name": "row",
+            "title": {
+              "en": "Row",
+              "nl": "Rij"
+            }
+          },
+          {
+            "type": "number",
+            "name": "item",
+            "title": {
+              "en": "Item",
+              "nl": "Item"
+            }
+          }
+        ]
+      },
+      {
+        "id": "on_button_release",
+        "title": {
+          "en": "Button release"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          }
+        ],
+        "tokens": [
+          {
+            "type": "number",
+            "name": "column",
+            "title": {
+              "en": "Column",
+              "nl": "Kolom"
+            }
+          },
+          {
+            "type": "number",
+            "name": "row",
+            "title": {
+              "en": "Row",
+              "nl": "Rij"
+            }
+          },
+          {
+            "type": "number",
+            "name": "item",
+            "title": {
+              "en": "Item",
+              "nl": "Item"
+            }
+          }
+        ]
+      }
+    ]
+  },
   "drivers": [
     {
       "name": {
@@ -34,7 +116,8 @@
       },
       "class": "button",
       "capabilities": [
-        "onoff"
+        "onoff",
+        "dim"
       ],
       "platforms": [
         "local"
@@ -107,7 +190,7 @@
               "value": ""
             },
             {
-              "id": "colomns",
+              "id": "columns",
               "type": "number",
               "label": {
                 "en": "Columns",

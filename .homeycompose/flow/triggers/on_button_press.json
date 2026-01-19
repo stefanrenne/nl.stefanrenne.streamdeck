@@ -1,0 +1,39 @@
+{
+  "id": "on_button_press",
+  "title": {
+    "en": "Button press"
+  },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=network-dock"
+    }
+  ],
+  "tokens": [
+    {
+      "type": "number",
+      "name": "column",
+      "title": {
+        "en": "Column",
+        "nl": "Kolom"
+      }
+    },
+    {
+      "type": "number",
+      "name": "row",
+      "title": {
+        "en": "Row",
+        "nl": "Rij"
+      }
+    },
+    {
+      "type": "number",
+      "name": "item",
+      "title": {
+        "en": "Item",
+        "nl": "Item"
+      }
+    }
+  ]
+}

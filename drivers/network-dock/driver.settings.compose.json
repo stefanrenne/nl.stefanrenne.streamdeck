@@ -1,0 +1,67 @@
+[
+  {
+    "type": "group",
+    "label": {
+      "en": "Device information",
+      "nl": "Apparaatinformatie"
+    },
+    "children": [
+      {
+        "id": "ipAddress",
+        "type": "text",
+        "label": {
+          "en": "IP Address",
+          "nl": "IP-adres"
+        },
+        "value": ""
+      },
+      {
+        "id": "name",
+        "type": "label",
+        "label": {
+          "en": "Connected Device",
+          "nl": "Aangesloten Apparaat"
+        },
+        "value": ""
+      },
+      {
+        "id": "serial",
+        "type": "label",
+        "label": {
+          "en": "Serial number",
+          "nl": "Serienummer"
+        },
+        "value": ""
+      },
+      {
+        "id": "firmware",
+        "type": "label",
+        "label": {
+          "en": "Firmware Version",
+          "nl": "Firmwareversie"
+        },
+        "value": ""
+      },
+      {
+        "id": "colomns",
+        "type": "number",
+        "label": {
+          "en": "Columns",
+          "nl": "Kolommen"
+        },
+        "value": 0,
+        "min": 0
+      },
+      {
+        "id": "rows",
+        "type": "number",
+        "label": {
+          "en": "Rows",
+          "nl": "Rijen"
+        },
+        "value": 0,
+        "min": 0
+      }
+    ]
+  }
+]

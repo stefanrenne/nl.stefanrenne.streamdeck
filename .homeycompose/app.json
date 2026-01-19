@@ -1,0 +1,29 @@
+{
+  "id": "nl.stefanrenne.streamdeck",
+  "version": "0.0.1",
+  "compatibility": ">=12.9.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Elgato Stream Deck"
+  },
+  "description": {
+    "en": "Control Homey from your Stream Deck"
+  },
+  "category": [
+    "tools"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Stefan Renne",
+    "email": "srenne1@gmail.com"
+  },
+  "brandColor": "#000063"
+}

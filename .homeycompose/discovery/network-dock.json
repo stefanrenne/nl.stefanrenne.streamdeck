@@ -1,0 +1,19 @@
+{
+  "type": "mdns-sd",
+  "mdns-sd": {
+    "name": "elg",
+    "protocol": "tcp"
+  },
+  "id": "{{txt.md}}",
+  "conditions": [
+    [
+      {
+        "field": "txt.md",
+        "match": {
+          "type": "regex",
+          "value": ".*Network Dock.*"
+        }
+      }
+    ]
+  ]
+}

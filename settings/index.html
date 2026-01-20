@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="./bootstrap.min.css" />
+    <script src="./bootstrap.min.js"></script>
+    <style>
+      td a {
+        display: inherit;
+        height: 35px;
+        width: 35px;
+        border-radius: 17.5px;
+        padding: 7.5px;
+      }
+      td span.spacer {
+        display: inherit;
+        width: 5px;
+      }
+      td a span {
+        display: block;
+        mask-size: 20px;
+        mask-repeat: no-repeat;
+        mask-position: center;
+        min-height: 20px;
+        min-width: 20px;
+      }
+      td a.edit {
+        background-color: darkcyan;
+      }
+      td a.edit span {
+        -webkit-mask-image: url('./pencil.svg');
+        mask-image: url('./pencil.svg');
+        background-color: white;
+      }
+      td a.delete {
+        background-color: darkred;
+      }
+      td a.delete span {
+        -webkit-mask-image: url('./trash.svg');
+        mask-image: url('./trash.svg');
+        background-color: white;
+      }
+      td.action {
+        width: 50px;
+      }
+      td.center {
+        text-align: center
+      }
+      .hidden {
+          display: none !important;
+      }
+      .section {
+        padding-top: 20px;
+        margin: 0;
+      }
+      .linebreak {
+        margin: 0;
+      }
+      .card p {
+        font-weight: bold;
+        padding-bottom: 20px;
+      }
+      .card {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: lightgray;
+        display: block;
+        border-radius: 10px;
+      }
+      .homey-button-danger-shadow.full {
+        width: 100%;
+      }
+    </style>
+    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  </head>
+  <body>
+
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link" data-page="page-about" href="#" data-i18n="settings.tab.about"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-page="page-dashboards" href="#" data-i18n="settings.tab.dashboards"></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" data-page="page-buttons" href="#" data-i18n="settings.tab.buttons"></a>
+      </li>
+    </ul>
+
+    <!-- Page About -->
+    <div class="page hidden" id="page-about">
+      about
+    </div>
+
+    <!-- Page Dashboards -->
+    <div class="page hidden" id="page-dashboards">
+      <table class="table table-striped homey-form-group">
+        <thead>
+        <tr>
+          <th data-i18n="settings.dashboard.name"></th>
+          <th data-i18n="settings.dashboard.action" style="width: 50px"></th>
+        </tr>
+        </thead>
+        <tbody id="dashboardContainer"></tbody>
+      </table>
+      <hr/>
+      <button id="addDashboard" class="homey-button-primary-full" data-i18n="settings.dashboard.add"></button>
+    </div>
+
+    <!-- Page Buttons -->
+    <div class="page" id="page-buttons">
+      <table class="table table-striped homey-form-group">
+        <thead>
+        <tr>
+          <th data-i18n="settings.button.image" style="width: 50px"></th>
+          <th data-i18n="settings.button.name"></th>
+          <th data-i18n="settings.button.action" style="width: 100px"></th>
+        </tr>
+        </thead>
+        <tbody id="buttonContainer"></tbody>
+      </table>
+      <hr/>
+      <input class="hidden" id="addButtonInput" type="file" accept="image/png">
+      <button id="addButton" class="homey-button-primary-full" data-i18n="settings.button.add"></button>
+    </div>
+
+    <script type="text/javascript">
+      function observeMenuItems() {
+        const $navLinks = document.getElementsByClassName("nav-link");
+        for (var i = 0; i < $navLinks.length; i ++) {
+          const $navLink = $navLinks[i]
+          $navLink.addEventListener("click", () => {
+
+            Array.from(document.getElementsByClassName("nav-link active")).forEach(
+                function($oldActiveNavLink, index, array) {
+                  $oldActiveNavLink.classList.remove("active"); 
+                }
+            );
+            $navLink.classList.add("active");
+
+            Array.from(document.getElementsByClassName("page")).forEach(
+                function($page, index, array) {
+                  if ($page.id == $navLink.dataset.page) {
+                    $page.classList.remove("hidden")
+                  } else {
+                    $page.classList.add("hidden")
+                  }
+                }
+            );
+          });
+        }
+      }
+
+      function observeFileUploadButton() {
+        const clickEvent = new MouseEvent("click", {
+            "view": window,
+            "bubbles": true,
+            "cancelable": false
+        });
+        const $button = document.getElementById("addButton");
+        const $input = document.getElementById("addButtonInput");
+        $button.addEventListener("click", () => {
+          if (!$button.classList.contains('is-loading')) {
+            $input.dispatchEvent(clickEvent);
+          }
+        });
+      }
+
+      async function validateButtonName(name) {
+        const buttons = await Homey.get('buttons') ?? []
+        const existingNames = buttons.map(item => item.name);
+        const validatedName = name.replace(/\.[^/.]+$/, "").trim();
+        var i = -1;
+        do {
+          i++;
+        } while (existingNames.includes((i === 0) ? validatedName : validatedName + "-" + i));
+        return (i === 0) ? validatedName : validatedName + "-" + i;
+      }
+
+      function getBase64(file) {
+        var fileReader = new FileReader();
+        if (file) {
+            fileReader.readAsDataURL(file);
+        }
+        return new Promise((resolve, reject) => {
+          fileReader.onload = function(event) {
+            resolve(event.target.result);
+          };
+        })
+      }
+
+      function observeFileUpload() {
+        const $button = document.getElementById("addButton");
+        const $input = document.getElementById("addButtonInput");
+        $input.addEventListener('change', async () => {
+          $button.classList.add('is-loading');
+          const fileId = crypto.randomUUID();
+          const file = $input.files[0];
+          const data = await getBase64(file);
+          const name = await validateButtonName(file.name);
+          console.log(fileId);
+          await Homey.set(fileId, data);
+          var buttons = await Homey.get('buttons') ?? [];
+          buttons.push({'id': fileId, 'name': name});
+          await Homey.set('buttons', buttons);
+          await loadButtons();
+          $button.classList.remove('is-loading');
+        });
+      }
+
+      async function loadButtons() {
+          const $container = document.getElementById("buttonContainer");
+          $container.innerHTML = '';
+          const buttons = await Homey.get('buttons') ?? [];
+
+          for (const button of Object.values(buttons)) {
+            const $row = document.createElement('tr');
+
+            $imageColumn = document.createElement('td');
+            $row.appendChild($imageColumn);
+
+            $image = document.createElement('img');
+            $image.src = await Homey.get(button.id);
+            $image.width = 50;
+            $image.height = 50;
+            $imageColumn.appendChild($image);
+
+            $nameColumn = document.createElement('td');
+            $row.appendChild($nameColumn);
+
+            $nameInput = document.createElement('input');
+            $nameInput.value = button.name;
+            $nameInput.id = "input-" + button.id;
+            $nameInput.classList.add('homey-form-input');
+            const $oldNameValue = document.createAttribute("data-oldValue");
+            $oldNameValue.value = button.name;
+            $nameInput.setAttributeNode($oldNameValue);
+            $nameColumn.appendChild($nameInput);
+
+            $actionColumn = document.createElement('td');
+            $row.appendChild($actionColumn);
+
+            $edit = document.createElement('a');
+            $edit.classList.add('edit');
+            $editMask = document.createElement('span');
+            $edit.addEventListener('click', async () => {
+              await editButton(button.id);
+            });
+            $edit.appendChild($editMask);
+            $actionColumn.appendChild($edit);
+
+            $spacer = document.createElement('span');
+            $spacer.classList.add('spacer');
+            $actionColumn.appendChild($spacer);
+
+            $delete = document.createElement('a');
+            $delete.classList.add('delete');
+            $deleteMask = document.createElement('span');
+            $delete.addEventListener('click', async () => {
+              await deleteButton(button.id);
+            });
+            $delete.appendChild($deleteMask);
+            $actionColumn.appendChild($delete);
+            
+            $container.appendChild($row);
+          }
+      }
+
+      async function editButton(id) {
+        const $input = document.getElementById("input-" + id);
+          if ($input.dataset.oldValue !== $input.value.trim()) {
+            const newValue = await validateButtonName($input.value);
+
+            const buttons = await Homey.get('buttons') ?? [];
+            const newButtons = buttons.map(item => {
+              return {'id': item.id, 'name': (item.id === id) ? newValue : item.name}
+            });
+            await Homey.set('buttons', newButtons);
+            await loadButtons();
+          }
+      }
+
+      async function deleteButton(id) {
+        await Homey.unset(id);
+        const buttons = await Homey.get('buttons') ?? [];
+        const newButtons = buttons.filter(item => item.id !== id);
+        await Homey.set('buttons', newButtons);
+        await loadButtons();
+      }
+      
+      function onHomeyReady(Homey) {
+        observeMenuItems();
+        observeFileUploadButton();
+        observeFileUpload();
+
+        Promise.resolve().then(async () => {
+          await loadButtons();
+        })
+        .catch(err => {
+          console.log(err);
+        })
+        .finally();
+        
+        Homey.ready();
+      }
+    </script>
+  </body>
+</html>

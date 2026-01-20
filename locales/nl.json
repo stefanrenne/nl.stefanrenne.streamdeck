@@ -1,0 +1,20 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Over",
+            "dashboards": "Dashboards",
+            "buttons": "Knoppen"
+        },
+        "dashboard": {
+            "name": "Naam",
+            "action": "Actie",
+            "add": "Toevoegen"
+        },
+        "button": {
+            "image": "Afbeelding",
+            "name": "Naam",
+            "action": "Actie",
+            "add": "Afbeelding Uploaden"
+        }
+    }
+}

@@ -36,14 +36,14 @@ module.exports = class NetworkDock extends Homey.Device {
       });
       streamDeck.on('down', (control) => {
         if (control.type === 'button') {
-          this.onButtonPress?.trigger(this, { column: control.column, row: control.row, item: control.index + 1 });
-          this.log("press " + control.column + "x" + control.row);
+          this.onButtonPress?.trigger(this, { column: control.column + 1, row: control.row + 1, item: control.index + 1 });
+          this.log("press " + control.column + 1 + "x" + control.row + 1);
         }
       });
       streamDeck.on('up', (control) => {
         if (control.type === 'button') {
-          this.onButtonRelease?.trigger(this, { column: control.column, row: control.row, item: control.index + 1 });
-          this.log("release " + control.column + "x" + control.row);
+          this.onButtonRelease?.trigger(this, { column: control.column + 1, row: control.row + 1, item: control.index + 1 });
+          this.log("release " + control.column + 1 + "x" + control.row + 1);
         }
       });
 

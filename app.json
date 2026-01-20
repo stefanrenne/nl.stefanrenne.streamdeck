@@ -8,7 +8,7 @@
     "local"
   ],
   "name": {
-    "en": "Elgato Stream Deck"
+    "en": "Stream Deck"
   },
   "description": {
     "en": "Control Homey from your Stream Deck"
@@ -104,6 +104,27 @@
               "en": "Item",
               "nl": "Item"
             }
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "update_button",
+        "title": {
+          "en": "Set Button Image"
+        },
+        "titleFormatted": {
+          "en": "Set Button [[droptoken]]"
+        },
+        "droptoken": [
+          "image"
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
           }
         ]
       }

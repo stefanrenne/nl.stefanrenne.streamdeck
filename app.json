@@ -116,6 +116,7 @@
       },
       "class": "button",
       "capabilities": [
+        "onoff",
         "dim"
       ],
       "platforms": [

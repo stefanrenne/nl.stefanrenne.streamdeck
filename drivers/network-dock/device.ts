@@ -36,15 +36,20 @@ module.exports = class NetworkDock extends Homey.Device {
       }
     });
 
-    this.registerCapabilityListener('dim', async (value) => {
-      await this.streamDeck?.setBrightness(value * 100)
+    this.registerCapabilityListener('onoff', async (value: boolean) => {
+      const number: number = value ? 100 : 0;
+      await this.streamDeck?.setBrightness(number);
+      this.setCapabilityValue('dim', number);
+    });
+
+    this.registerCapabilityListener('dim', async (value: number) => {
+      await this.streamDeck?.setBrightness(value * 100);
+      this.setCapabilityValue('onoff', value > 0);
     });
   }
 
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
       this.log("device - connected");
-      
-      await this.setCapabilityValue('dim', 1.0);
 
       streamDeck.tcpEvents.on('disconnected', async () => {
         this.log("device - disconnected");
@@ -93,6 +98,8 @@ module.exports = class NetworkDock extends Homey.Device {
    */
   async onAdded() {
     this.log('NetworkDock has been added');
+      await this.setCapabilityValue('dim', 1.0);
+      await this.setCapabilityValue('onoff', true);
   }
 
   /**

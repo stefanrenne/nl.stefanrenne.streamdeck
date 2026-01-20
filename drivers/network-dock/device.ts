@@ -13,7 +13,7 @@ module.exports = class NetworkDock extends Homey.Device {
    */
   async onInit() {
     const ipAddress = this.getSetting("ipAddress");
-    this.log("NetworkDock has been initialized for ip: " + ipAddress);
+    this.log("NetworkDock has been initialized");
 
     this.onButtonPress = this.homey.flow.getDeviceTriggerCard('on_button_press');
     this.onButtonRelease = this.homey.flow.getDeviceTriggerCard('on_button_release');
@@ -25,12 +25,34 @@ module.exports = class NetworkDock extends Homey.Device {
     });
 
     this.connectionManager.on('connected', async (streamDeck) => {
-      this.streamDeck = streamDeck
+      this.log("connectionManager - connected");
+
+      if (streamDeck.CONTROLS.length > 0) {
+        this.streamDeck = streamDeck
+        await this.setAvailable();
+        this.streamDeckDidConnect(streamDeck);
+      } else if (this.streamDeck == undefined) {
+        await this.setUnavailable("No Stream Deck connected to Network Dock");
+      }
+    });
+
+    this.registerCapabilityListener('dim', async (value) => {
+      await this.streamDeck?.setBrightness(value * 100)
+    });
+  }
+
+  async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
+      this.log("device - connected");
+      
+      await this.setCapabilityValue('dim', 1.0);
+
       streamDeck.tcpEvents.on('disconnected', async () => {
+        this.log("device - disconnected");
         await this.setUnavailable("Stream Deck Disconnected");
         this.streamDeck = undefined;
       });
       streamDeck.on('error', async (error) => {
+        this.log("device - error " + error);
         const message = typeof error === 'string' ? error : undefined;
         await this.setUnavailable(message);
       });
@@ -46,25 +68,6 @@ module.exports = class NetworkDock extends Homey.Device {
           this.log("release " + control.column + 1 + "x" + control.row + 1);
         }
       });
-
-      if (streamDeck.CONTROLS.length > 0) {
-        await this.setAvailable();
-        this.streamDeckDidConnect(streamDeck);
-      } else {
-        await this.setUnavailable("No Stream Deck connected to Network Dock");
-      }
-    });
-
-    this.registerCapabilityListener('onoff', async (value) => {
-      this.log("onoff: " + value)
-    });
-
-    this.registerCapabilityListener('dim', async (value) => {
-      await this.streamDeck?.setBrightness(value * 100)
-    });
-  }
-
-  async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
 
       const size = streamDeck.CONTROLS.reduce((result, control) => {
         if (result.columns < (control.column + 1)) {
@@ -109,23 +112,21 @@ module.exports = class NetworkDock extends Homey.Device {
     newSettings: { [key: string]: boolean | string | number | undefined | null };
     changedKeys: string[];
   }): Promise<string | void> {
-    this.log("NetworkDock settings where changed");
-  }
-
-  /**
-   * onRenamed is called when the user updates the device's name.
-   * This method can be used this to synchronise the name to the device.
-   * @param {string} name The new name
-   */
-  async onRenamed(name: string) {
-    this.log('NetworkDock was renamed');
-  }
-
-  /**
-   * onDeleted is called when the user deleted the device.
-   */
+    const oldIp = oldSettings["ipAddress"] as string;
+    const newIp = newSettings["ipAddress"] as string;
+    if (oldIp !== newIp) {
+      this.connectionManager.disconnectFrom(oldIp);
+      this.connectionManager.connectTo(newIp);
+    }
+  }  
+  
   async onDeleted() {
     this.log('NetworkDock has been deleted');
+    this.streamDeck?.tcpEvents.removeAllListeners()
+    const ipAddress = this.streamDeck?.remoteAddress
+    if (ipAddress !== undefined) {
+      this.log("disconnect from " + ipAddress);
+      this.connectionManager.disconnectFrom(ipAddress);
+    }
   }
-
 };

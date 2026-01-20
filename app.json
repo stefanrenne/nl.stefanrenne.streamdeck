@@ -107,27 +107,6 @@
           }
         ]
       }
-    ],
-    "actions": [
-      {
-        "id": "update_button",
-        "title": {
-          "en": "Set Button Image"
-        },
-        "titleFormatted": {
-          "en": "Set Button [[droptoken]]"
-        },
-        "droptoken": [
-          "image"
-        ],
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=network-dock"
-          }
-        ]
-      }
     ]
   },
   "drivers": [
@@ -137,7 +116,6 @@
       },
       "class": "button",
       "capabilities": [
-        "onoff",
         "dim"
       ],
       "platforms": [

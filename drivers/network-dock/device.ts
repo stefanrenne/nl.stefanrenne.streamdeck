@@ -1,10 +1,14 @@
 import Homey, { FlowCardTriggerDevice } from 'homey';
+import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
+import { Button, Store } from '../../lib/storage';
+import { Jimp } from 'jimp';
 
 module.exports = class NetworkDock extends Homey.Device {
 
-  private connectionManager = new StreamDeckTcpConnectionManager()
-  private streamDeck: StreamDeckTcp | undefined
+  private store = new Store(this.homey);
+  private connectionManager = new StreamDeckTcpConnectionManager();
+  private streamDeck: StreamDeckTcp | undefined;
   private onButtonPress: FlowCardTriggerDevice | undefined;
   private onButtonRelease: FlowCardTriggerDevice | undefined;
 
@@ -31,6 +35,7 @@ module.exports = class NetworkDock extends Homey.Device {
         this.streamDeck = streamDeck
         await this.setAvailable();
         this.streamDeckDidConnect(streamDeck);
+        this.streamDeckLoadDashboard(streamDeck);
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable("No Stream Deck connected to Network Dock");
       }
@@ -75,11 +80,13 @@ module.exports = class NetworkDock extends Homey.Device {
       });
 
       const size = streamDeck.CONTROLS.reduce((result, control) => {
-        if (result.columns < (control.column + 1)) {
-          result.columns = control.column + 1
-        }
-        if (result.rows < (control.row + 1)) {
-          result.rows = control.row + 1
+        if (control as StreamDeckButtonControlDefinitionLcdFeedback) {
+          if (result.columns < (control.column + 1)) {
+            result.columns = control.column + 1
+          }
+          if (result.rows < (control.row + 1)) {
+            result.rows = control.row + 1
+          }
         }
         return result
       }, {columns: 0, rows: 0});
@@ -93,6 +100,28 @@ module.exports = class NetworkDock extends Homey.Device {
       });
   }
 
+  async streamDeckLoadDashboard(streamDeck: StreamDeckTcp) {
+    await streamDeck.clearPanel();
+
+    const images = this.store.getButtons();
+    const buttons = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    
+    for (const [i, button] of buttons.entries()) {
+      if (typeof images[i] !== "undefined") {
+        await this.streamDeckSetImage(streamDeck, button, images[i].id);
+      }
+    }
+  }
+
+  async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageId: string) {
+    const base64ImageString = this.homey.settings.get(imageId).slice("data:image/png;base64,".length).toString();
+    const jimp = await Jimp.fromBuffer(Buffer.from(base64ImageString, 'base64'));
+    const img = await jimp
+      .normalize()
+      .scaleToFit({w: control.pixelSize.width, h: control.pixelSize.height});
+    await streamDeck.fillKeyBuffer(control.index, img.bitmap.data, { format: 'rgba' });
+  }
+
   /**
    * onAdded is called when the user adds the device, called just after pairing.
    */
@@ -100,7 +129,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.log('NetworkDock has been added');
       await this.setCapabilityValue('dim', 1.0);
       await this.setCapabilityValue('onoff', true);
-  }
+  } 
 
   /**
    * onSettings is called when the user updates the device's settings.

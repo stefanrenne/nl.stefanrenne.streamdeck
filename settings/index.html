@@ -5,6 +5,7 @@
     <script src="./bootstrap.min.js"></script>
     <style>
       td a {
+        cursor: pointer;
         display: inherit;
         height: 35px;
         width: 35px;
@@ -40,7 +41,7 @@
         background-color: white;
       }
       td.action {
-        width: 50px;
+        width: 100px;
       }
       td.center {
         text-align: center
@@ -66,61 +67,210 @@
         display: block;
         border-radius: 10px;
       }
+      .homey-button-danger-shadow.marginTop {
+        margin-top: 10px;
+      }
       .homey-button-danger-shadow.full {
         width: 100%;
+      }
+      .allignedradio label.homey-form-radio {
+        margin: 0 0 0 20px !important; 
+        padding: 0 !important; 
+        float: left !important;
+      }
+      .allignedradio label.homey-form-radio:first-child {
+        margin-left: 0 !important;
+      }
+      .deck1, .deck3, .deck5, .deck6, .deck8 {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        display: grid;
+        column-gap: 5px;
+        row-gap: 5px;
+        background-color: #222;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .deck1 {
+        grid-template-columns: 90px;
+        grid-auto-rows: 90px;
+        width: calc(20px + 90px);
+        margin: 0;
+      }
+      .deck3 {
+        grid-template-columns: repeat(3, 90px);
+        grid-auto-rows: 90px;
+        width: calc(20px + (3 * 90px) + (2 * 5px));
+      }
+      .deck5 {
+        grid-template-columns: repeat(5, 70px);
+        grid-auto-rows: 70px;
+        width: calc(20px + (5 * 70px) + (4 * 5px));
+      }
+      .deck6 {
+        grid-template-columns: repeat(6, 50px);
+        grid-auto-rows: 50px;
+        width: calc(20px + (6 * 50px) + (5 * 5px));
+      }
+      .deck8 {
+        grid-template-columns: repeat(8, 50px);
+        grid-auto-rows: 50px;
+        width: calc(20px + (8 * 50px) + (7 * 5px));
+      }
+      .deck3 .deck-item, .deck5 .deck-item, .deck6 .deck-item, .deck8 .deck-item {
+        cursor: pointer;
+      }
+      .deck-item {
+        background-color: black;
+        border-radius: 5px;
+      }
+      .deck-item.actionButton p {
+        display: none;
+      }
+      .deck-item.actionNone img {
+        display: none;
+      }
+      .deck-item img {
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+      }
+      .deck-item p {
+        color: #444;
+        position: relative;
+        transform: translateY(-50%);
+        top: 50%;
+        margin: 0 !important;
+        font-size: 25px;
+        text-align: center;
+        font-weight: bold;
       }
     </style>
     <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
   </head>
   <body>
+    <div id="main">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" data-page="page-about" href="#" data-i18n="settings.tab.about"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" data-page="page-dashboards" href="#" data-i18n="settings.tab.dashboards"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-page="page-buttons" href="#" data-i18n="settings.tab.buttons"></a>
+        </li>
+      </ul>
 
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a class="nav-link" data-page="page-about" href="#" data-i18n="settings.tab.about"></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-page="page-dashboards" href="#" data-i18n="settings.tab.dashboards"></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" data-page="page-buttons" href="#" data-i18n="settings.tab.buttons"></a>
-      </li>
-    </ul>
+      <!-- Page About -->
+      <div class="page hidden" id="page-about">
+        about
+      </div>
 
-    <!-- Page About -->
-    <div class="page hidden" id="page-about">
-      about
+      <!-- Page Dashboards -->
+      <div class="page" id="page-dashboards">
+        <table class="table table-striped homey-form-group">
+          <thead>
+          <tr>
+            <th data-i18n="settings.dashboard.name"></th>
+            <th data-i18n="settings.dashboard.action" style="width: 50px"></th>
+          </tr>
+          </thead>
+          <tbody id="dashboardContainer"></tbody>
+        </table>
+        <hr/>
+        <button id="addDashboard" class="homey-button-primary-full" data-i18n="settings.dashboard.add"></button>
+      </div>
+
+      <!-- Page Buttons -->
+      <div class="page hidden" id="page-buttons">
+        <table class="table table-striped homey-form-group">
+          <thead>
+          <tr>
+            <th data-i18n="settings.button.image" style="width: 50px"></th>
+            <th data-i18n="settings.button.name"></th>
+            <th data-i18n="settings.button.action" style="width: 100px"></th>
+          </tr>
+          </thead>
+          <tbody id="buttonContainer"></tbody>
+        </table>
+        <hr/>
+        <input class="hidden" id="addButtonInput" type="file" accept="image/png">
+        <button id="addButton" class="homey-button-primary-full" data-i18n="settings.button.add"></button>
+      </div>
     </div>
 
-    <!-- Page Dashboards -->
-    <div class="page hidden" id="page-dashboards">
-      <table class="table table-striped homey-form-group">
-        <thead>
-        <tr>
-          <th data-i18n="settings.dashboard.name"></th>
-          <th data-i18n="settings.dashboard.action" style="width: 50px"></th>
-        </tr>
-        </thead>
-        <tbody id="dashboardContainer"></tbody>
-      </table>
-      <hr/>
-      <button id="addDashboard" class="homey-button-primary-full" data-i18n="settings.dashboard.add"></button>
+    <!-- Manage Dashboard -->
+    <div class="hidden" id="manage-dashboard">
+      <header class="homey-header">
+        <h1 class="homey-title" data-i18n="settings.dashboard.manage.title"></h1>
+      </header>
+      <fieldset class="homey-form-fieldset" style="margin-top: 0">
+        <label class="homey-form-label" for="dashboardName" data-i18n="settings.dashboard.manage.name"></label>
+        <input class="homey-form-input" id="dashboardName" type="text" value=""/>
+      </fieldset>
+      <fieldset class="homey-form-radio-set">
+        <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.manage.displayMode"></legend>
+        <div class="allignedradio">
+          <label class="homey-form-radio">
+            <input class="homey-form-radio-input" id="displayMode6" type="radio" name="display-mode" value="6"/>
+            <span class="homey-form-radio-checkmark"></span>
+            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.6Buttons"></span>
+          </label>
+          <label class="homey-form-radio">
+            <input class="homey-form-radio-input" id="displayMode15" type="radio" name="display-mode" value="15"/>
+            <span class="homey-form-radio-checkmark"></span>
+            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.15Buttons"></span>
+          </label>
+          <label class="homey-form-radio">
+            <input class="homey-form-radio-input" id="displayMode32" type="radio" name="display-mode" value="32"/>
+            <span class="homey-form-radio-checkmark"></span>
+            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.32Buttons"></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div id="deck"></div>
+
+      <button id="saveDashboard" class="homey-button-primary-full" data-i18n="settings.dashboard.manage.save"></button>
+      <button id="cancelDashboard" class="homey-button-danger-shadow marginTop full" data-i18n="settings.dashboard.manage.cancel"></button>
     </div>
 
-    <!-- Page Buttons -->
-    <div class="page" id="page-buttons">
-      <table class="table table-striped homey-form-group">
-        <thead>
-        <tr>
-          <th data-i18n="settings.button.image" style="width: 50px"></th>
-          <th data-i18n="settings.button.name"></th>
-          <th data-i18n="settings.button.action" style="width: 100px"></th>
-        </tr>
-        </thead>
-        <tbody id="buttonContainer"></tbody>
-      </table>
-      <hr/>
-      <input class="hidden" id="addButtonInput" type="file" accept="image/png">
-      <button id="addButton" class="homey-button-primary-full" data-i18n="settings.button.add"></button>
+    <!-- Manage Dashboard -->
+    <div class="hidden" id="manage-dashboardItem">
+      <header class="homey-header">
+        <h1 class="homey-title" data-i18n="settings.dashboard.item.title"></h1>
+      </header>
+      <div style="display: inline-block; margin-bottom: 30px;">
+        <div class="deck1" style="float: left">
+          <div class="deck-item" id="manage-dashboardItem-display">
+            <p></p>
+            <img />
+          </div>
+        </div>
+        <fieldset class="homey-form-radio-set" style="float: left; margin-top: 30px; margin-left: 20px;">
+          <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.displayMode"></legend>
+          <div class="allignedradio">
+            <label class="homey-form-radio">
+              <input class="homey-form-radio-input" id="displayItemMode0" type="radio" name="item-mode" value="0" checked="checked"/>
+              <span class="homey-form-radio-checkmark"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.none"></span>
+            </label>
+            <label class="homey-form-radio">
+              <input class="homey-form-radio-input" id="displayItemMode1" type="radio" name="item-mode" value="1"/>
+              <span class="homey-form-radio-checkmark"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.button"></span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div id="manage-dashboardItem-button" style="margin-bottom: 30px" class="hidden">
+        <div id="manage-dashboardItem-buttonItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
+      </div>
+
+      <button id="saveDashboardItem" class="homey-button-primary-full" data-i18n="settings.dashboard.item.save"></button>
+      <button id="cancelDashboardItem" class="homey-button-danger-shadow marginTop full" data-i18n="settings.dashboard.item.cancel"></button>
     </div>
 
     <script type="text/javascript">
@@ -165,6 +315,254 @@
         });
       }
 
+      function observeDashboardButtons() {
+        const $mainView = document.getElementById("main");
+        const $createDashboardView = document.getElementById("manage-dashboard");
+        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
+        const $deck = document.getElementById("deck");
+
+        const $input = document.getElementById("dashboardName");
+        const $startButton = document.getElementById("addDashboard");
+        const $saveButton = document.getElementById("saveDashboard");
+        const $cancelButton = document.getElementById("cancelDashboard");
+        const $cancelItemButton = document.getElementById("cancelDashboardItem");
+
+        $startButton.addEventListener("click", async () => {
+          await this.createDeckItems(15);
+        });
+        $cancelButton.addEventListener("click", () => {
+          $mainView.classList.remove("hidden");
+          $createDashboardView.classList.add("hidden");
+          $createDashboardItemView.classList.add("hidden");
+        });
+        $cancelItemButton.addEventListener("click", () => {
+          $mainView.classList.add("hidden");
+          $createDashboardView.classList.remove("hidden");
+          $createDashboardItemView.classList.add("hidden");
+        });
+        $saveButton.addEventListener("click", async () => {
+          $saveButton.classList.add('is-loading');
+          
+          var dashboardItems = [];
+          for (var i = 0; i < $deck.children.length; i++) {
+            const item = $deck.children[i];
+            if (item.classList.contains("actionButton")) {
+              dashboardItems.push({type: "button", buttonId: item.dataset.buttonId, item: i + 1});
+            }
+          }
+          var displayMode = 15;
+          if (document.getElementById("displayMode6").checked) {
+            displayMode = 6
+          } else if (document.getElementById("displayMode32").checked) {
+            displayMode = 32;
+          }
+          await insertDashboard({id: $deck.dataset.id, name: await validateDashboardName($deck.dataset.id, $input.value), displayMode: displayMode, items: dashboardItems});
+          await loadDashboards();
+
+          $saveButton.classList.remove('is-loading');
+          $mainView.classList.remove("hidden");
+          $createDashboardView.classList.add("hidden");
+          $createDashboardItemView.classList.add("hidden");
+        });
+      }
+
+      async function observeDashboardItemButtons() {
+        const $mainView = document.getElementById("main");
+        const $createDashboardView = document.getElementById("manage-dashboard");
+        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
+        const buttons = await Homey.get('buttons') ?? []
+        const $saveItemButton = document.getElementById("saveDashboardItem");
+        const $deck = document.getElementById("manage-dashboardItem-buttonItems");
+        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
+        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-button");
+        const $noneRadio = document.getElementById("displayItemMode0");
+        const $buttonRadio = document.getElementById("displayItemMode1");
+        $noneRadio.addEventListener('change', async () => {
+          $createDashboardItemButtonView.classList.add("hidden");
+          $createDashboardItemDisplay.classList.remove("actionButton");
+          $createDashboardItemDisplay.classList.add("actionNone");
+        });
+        $buttonRadio.addEventListener('change', async () => {
+          $createDashboardItemButtonView.classList.remove("hidden");
+          if ($createDashboardItemDisplay.dataset.buttonId !== "") {
+            $createDashboardItemDisplay.classList.add("actionButton");
+            $createDashboardItemDisplay.classList.remove("actionNone");
+          }
+        });
+        $saveItemButton.addEventListener("click", async () => {
+          const $dashboardItem = document.getElementById("deckItem" + $createDashboardItemDisplay.dataset.id);
+          if ($createDashboardItemDisplay.classList.contains("actionButton")) {
+            $dashboardItem.classList.add("actionButton");
+            $dashboardItem.classList.remove("actionNone");
+            $dashboardItem.dataset.buttonId = $createDashboardItemDisplay.dataset.buttonId
+            $dashboardItem.querySelector('img').src = await Homey.get($createDashboardItemDisplay.dataset.buttonId);
+          } else {
+            $dashboardItem.classList.add("actionNone");
+            $dashboardItem.classList.remove("actionButton");
+          }
+
+          $mainView.classList.add("hidden");
+          $createDashboardView.classList.remove("hidden");
+          $createDashboardItemView.classList.add("hidden");
+        });
+        
+        for (const button of Object.values(buttons)) {
+          const $item = document.createElement('div');
+          $item.classList.add("deck-item");
+          $item.title = button.name;
+          const $id = document.createAttribute("data-id");
+          $id.value = button.id;
+          $item.setAttributeNode($id);
+          $deck.appendChild($item);
+
+          $image = document.createElement('img');
+          $image.src = await Homey.get(button.id);
+          $item.appendChild($image);
+
+          $item.addEventListener('click', async () => {
+            $createDashboardItemDisplay.classList.remove("actionNone");
+            $createDashboardItemDisplay.classList.add("actionButton");
+            $createDashboardItemDisplay.querySelector('img').src = await Homey.get(button.id);
+            $createDashboardItemDisplay.dataset.buttonId = button.id;
+          });
+        }
+      }
+
+      function deckDefaultText(i, columns) {
+        const row = (i % columns) + 1;
+        const column = Math.floor(i / columns) + 1;
+        return column + "/" + row;
+      }
+
+      async function createDeckItems(numberItems, id = undefined, name = undefined, items = []) {
+        const $deck = document.getElementById("deck");
+        const $mainView = document.getElementById("main");
+        const $createDashboardView = document.getElementById("manage-dashboard");
+        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
+        document.getElementById("dashboardName").value = name ?? ""
+
+        $mainView.classList.add("hidden");
+        $createDashboardView.classList.remove("hidden");
+        $createDashboardItemView.classList.add("hidden");
+
+        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : 3;
+        document.getElementById("displayMode6").checked = (numberItems == 6);
+        document.getElementById("displayMode15").checked = (numberItems == 15);
+        document.getElementById("displayMode32").checked = (numberItems == 32);
+        $deck.classList.remove(...$deck.classList);
+        $deck.classList.add("deck" + columns);
+        $deck.dataset.id = id ?? ""
+
+        $deck.innerHTML = "";
+        for (var i = 0; i < 32; i++) {
+          const id = i + 1;
+          const cache = items.find((row) => row.item === id);
+          const $item = document.createElement('div');
+          $item.classList.add("deck-item");
+          $item.id = "deckItem" + id;
+          if (i >= numberItems) {
+            $item.classList.add("hidden");
+          }
+          $deck.appendChild($item);
+
+          const $text = document.createElement('p');
+          $text.innerHTML = deckDefaultText(i, columns);
+          $item.appendChild($text);
+
+          const $img = document.createElement('img');
+          $item.appendChild($img);
+
+          if (cache?.type == "button" && cache.buttonId !== undefined) {
+            $item.classList.add("actionButton");
+            $item.dataset.buttonId = cache.buttonId 
+            $img.src = await Homey.get(cache.buttonId); 
+          } else {
+            $item.classList.add("actionNone");
+            $item.dataset.buttonId = ""
+          }
+
+          $item.addEventListener('click', async () => {
+            const buttonId = $item.classList.contains("actionButton") ? $item.dataset.buttonId : undefined;
+            await this.selectDashboardItem(id, $text.innerHTML, buttonId);
+          });
+        }
+      }
+
+      function changeDisplayModeManageDeck(numberItems) {
+        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : 3;
+        const $deck = document.getElementById("deck");
+        $deck.classList.remove(...$deck.classList);
+        $deck.classList.add("deck" + columns);
+        for (var i = 0; i < $deck.children.length; i++) {
+          const item = $deck.children[i];
+          if (i < numberItems) {
+            item.querySelector('p').innerHTML = deckDefaultText(i, columns);
+            item.classList.remove("hidden");
+          } else {
+            item.classList.add("hidden");
+          }
+        }
+      }
+
+      async function selectDashboardItem(id, defaultText, buttonId) {
+        const $createDashboardView = document.getElementById("manage-dashboard");
+        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
+        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
+        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-button");
+        const $noneRadio = document.getElementById("displayItemMode0");
+        const $buttonRadio = document.getElementById("displayItemMode1");
+
+        $createDashboardView.classList.add("hidden");
+        $createDashboardItemView.classList.remove("hidden");
+        $createDashboardItemDisplay.dataset.id = id;
+        $createDashboardItemDisplay.dataset.buttonId = buttonId ?? "";
+
+        $createDashboardItemDisplay.querySelector('p').innerHTML = defaultText;
+        if (buttonId !== undefined) {
+          $createDashboardItemDisplay.querySelector('img').src = await Homey.get(buttonId);
+          $createDashboardItemDisplay.classList.remove("actionNone");
+          $createDashboardItemDisplay.classList.add("actionButton");
+          $createDashboardItemButtonView.classList.remove("hidden");
+        } else {
+          $createDashboardItemDisplay.querySelector('img').src = "";
+          $createDashboardItemDisplay.classList.add("actionNone");
+          $createDashboardItemDisplay.classList.remove("actionButton");
+          $createDashboardItemButtonView.classList.add("hidden");
+        }
+        $noneRadio.checked = buttonId == undefined;
+        $buttonRadio.checked = buttonId !== undefined;
+      }
+
+      function observeCreateDashboardDisplayMode() {
+        const $mode6 = document.getElementById("displayMode6");
+        const $mode15 = document.getElementById("displayMode15");
+        const $mode32 = document.getElementById("displayMode32");
+
+        $mode6.addEventListener("change", () => {
+          changeDisplayModeManageDeck($mode6.value);
+        });
+
+        $mode15.addEventListener("change", () => {
+          changeDisplayModeManageDeck($mode15.value);
+        });
+
+        $mode32.addEventListener("change", () => {
+          changeDisplayModeManageDeck($mode32.value);
+        });
+      }
+
+      async function validateDashboardName(id, name) {
+        const cleanName = (name.trim() !== "") ? name.trim() : "dashboard";
+        const dashboards = await Homey.get('dashboards') ?? []
+        const existingNames = dashboards.filter((item) => item.id !== id).map(item => item.name);
+        const validatedName = cleanName.replace(/\.[^/.]+$/, "").trim();
+        var i = -1;
+        do {
+          i++;
+        } while (existingNames.includes((i === 0) ? validatedName : validatedName + "-" + i));
+        return (i === 0) ? validatedName : validatedName + "-" + i;
+      }
+
       async function validateButtonName(name) {
         const buttons = await Homey.get('buttons') ?? []
         const existingNames = buttons.map(item => item.name);
@@ -174,6 +572,22 @@
           i++;
         } while (existingNames.includes((i === 0) ? validatedName : validatedName + "-" + i));
         return (i === 0) ? validatedName : validatedName + "-" + i;
+      }
+
+      async function insertDashboard(dashboard) {
+        if (dashboard.id === undefined || dashboard.id === "") {
+          dashboard.id = crypto.randomUUID();
+        }
+        const oldDashboards = await Homey.get('dashboards') ?? [];
+        var dashboards = oldDashboards.filter((row) => row.id !== dashboard.id);
+        dashboards.push(dashboard);
+        await Homey.set('dashboards', dashboards);
+      }
+
+      async function insertButton(button) {
+        var buttons = await Homey.get('buttons') ?? [];
+        buttons.push(button);
+        await Homey.set('buttons', buttons);
       }
 
       function getBase64(file) {
@@ -197,72 +611,118 @@
           const file = $input.files[0];
           const data = await getBase64(file);
           const name = await validateButtonName(file.name);
-          console.log(fileId);
           await Homey.set(fileId, data);
-          var buttons = await Homey.get('buttons') ?? [];
-          buttons.push({'id': fileId, 'name': name});
-          await Homey.set('buttons', buttons);
+          await insertButton({id: fileId, name: name});
           await loadButtons();
           $button.classList.remove('is-loading');
         });
       }
 
       async function loadButtons() {
-          const $container = document.getElementById("buttonContainer");
-          $container.innerHTML = '';
-          const buttons = await Homey.get('buttons') ?? [];
+        const $container = document.getElementById("buttonContainer");
+        $container.innerHTML = '';
+        const buttons = await Homey.get('buttons') ?? [];
 
-          for (const button of Object.values(buttons)) {
-            const $row = document.createElement('tr');
+        for (const button of Object.values(buttons)) {
+          const $row = document.createElement('tr');
 
-            $imageColumn = document.createElement('td');
-            $row.appendChild($imageColumn);
+          $imageColumn = document.createElement('td');
+          $row.appendChild($imageColumn);
 
-            $image = document.createElement('img');
-            $image.src = await Homey.get(button.id);
-            $image.width = 50;
-            $image.height = 50;
-            $imageColumn.appendChild($image);
+          $image = document.createElement('img');
+          $image.src = await Homey.get(button.id);
+          $image.width = 50;
+          $image.height = 50;
+          $imageColumn.appendChild($image);
 
-            $nameColumn = document.createElement('td');
-            $row.appendChild($nameColumn);
+          $nameColumn = document.createElement('td');
+          $row.appendChild($nameColumn);
 
-            $nameInput = document.createElement('input');
-            $nameInput.value = button.name;
-            $nameInput.id = "input-" + button.id;
-            $nameInput.classList.add('homey-form-input');
-            const $oldNameValue = document.createAttribute("data-oldValue");
-            $oldNameValue.value = button.name;
-            $nameInput.setAttributeNode($oldNameValue);
-            $nameColumn.appendChild($nameInput);
+          $nameInput = document.createElement('input');
+          $nameInput.type = "text";
+          $nameInput.value = button.name;
+          $nameInput.id = "input-" + button.id;
+          $nameInput.classList.add('homey-form-input');
+          const $oldNameValue = document.createAttribute("data-oldValue");
+          $oldNameValue.value = button.name;
+          $nameInput.setAttributeNode($oldNameValue);
+          $nameColumn.appendChild($nameInput);
 
-            $actionColumn = document.createElement('td');
-            $row.appendChild($actionColumn);
+          $actionColumn = document.createElement('td');
+          $actionColumn.classList.add('action');
+          $row.appendChild($actionColumn);
 
-            $edit = document.createElement('a');
-            $edit.classList.add('edit');
-            $editMask = document.createElement('span');
-            $edit.addEventListener('click', async () => {
-              await editButton(button.id);
-            });
-            $edit.appendChild($editMask);
-            $actionColumn.appendChild($edit);
+          $edit = document.createElement('a');
+          $edit.classList.add('edit');
+          $editMask = document.createElement('span');
+          $edit.addEventListener('click', async () => {
+            await editButton(button.id);
+          });
+          $edit.appendChild($editMask);
+          $actionColumn.appendChild($edit);
 
-            $spacer = document.createElement('span');
-            $spacer.classList.add('spacer');
-            $actionColumn.appendChild($spacer);
+          $spacer = document.createElement('span');
+          $spacer.classList.add('spacer');
+          $actionColumn.appendChild($spacer);
 
-            $delete = document.createElement('a');
-            $delete.classList.add('delete');
-            $deleteMask = document.createElement('span');
-            $delete.addEventListener('click', async () => {
+          $delete = document.createElement('a');
+          $delete.classList.add('delete');
+          $deleteMask = document.createElement('span');
+          $delete.addEventListener('click', async () => {
+            if (await Homey.confirm(Homey.__("settings.button.confirmDelete", {name: button.name}))) {
               await deleteButton(button.id);
-            });
-            $delete.appendChild($deleteMask);
-            $actionColumn.appendChild($delete);
-            
-            $container.appendChild($row);
+            }
+          });
+          $delete.appendChild($deleteMask);
+          $actionColumn.appendChild($delete);
+          
+          $container.appendChild($row);
+        }
+      }
+
+      async function loadDashboards() {
+        const $container = document.getElementById("dashboardContainer");
+        $container.innerHTML = '';
+        const dashboards = await Homey.get('dashboards') ?? [];
+
+        for (const dashboard of Object.values(dashboards)) {
+          console.log(dashboard);
+          const $row = document.createElement('tr');
+
+          $nameColumn = document.createElement('td');
+          $nameColumn.innerHTML = dashboard.name;
+          $row.appendChild($nameColumn);
+
+          $actionColumn = document.createElement('td');
+          $actionColumn.classList.add('action');
+          $row.appendChild($actionColumn);
+
+          $edit = document.createElement('a');
+          $edit.classList.add('edit');
+          $editMask = document.createElement('span');
+          $edit.addEventListener('click', async () => {
+            await createDeckItems(dashboard.displayMode, dashboard.id, dashboard.name, dashboard.items);
+          });
+          $edit.appendChild($editMask);
+          $actionColumn.appendChild($edit);
+
+          $spacer = document.createElement('span');
+          $spacer.classList.add('spacer');
+          $actionColumn.appendChild($spacer);
+
+          $delete = document.createElement('a');
+          $delete.classList.add('delete');
+          $deleteMask = document.createElement('span');
+          $delete.addEventListener('click', async () => {
+          if (await Homey.confirm(Homey.__("settings.dashboard.confirmDelete", {name: dashboard.name}))) {
+            await deleteDashboard(dashboard.id);
           }
+          });
+          $delete.appendChild($deleteMask);
+          $actionColumn.appendChild($delete);
+          
+          $container.appendChild($row);
+        }
       }
 
       async function editButton(id) {
@@ -286,14 +746,25 @@
         await Homey.set('buttons', newButtons);
         await loadButtons();
       }
+
+      async function deleteDashboard(id) {
+        const dashboards = await Homey.get('dashboards') ?? [];
+        const newDashboards = dashboards.filter(item => item.id !== id);
+        await Homey.set('dashboards', newDashboards);
+        await loadDashboards();
+      }
       
       function onHomeyReady(Homey) {
         observeMenuItems();
         observeFileUploadButton();
         observeFileUpload();
+        observeDashboardButtons();
+        observeCreateDashboardDisplayMode();
 
         Promise.resolve().then(async () => {
+          await loadDashboards();
           await loadButtons();
+          await observeDashboardItemButtons();
         })
         .catch(err => {
           console.log(err);

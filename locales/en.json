@@ -8,13 +8,33 @@
         "dashboard": {
             "name": "Name",
             "action": "Action",
-            "add": "Add"
+            "add": "Create Dashboard",
+            "confirmDelete": "Are you sure you want to delete dashboard '__name__'?",
+            "manage": {
+                "title": "Create Dashboard",
+                "name": "Name",
+                "displayMode": "Display Mode",
+                "6Buttons": "6 buttons",
+                "15Buttons": "15 buttons",
+                "32Buttons": "32 buttons",
+                "save": "Save",
+                "cancel": "Cancel"
+            },
+            "item": {
+                "title": "Select Item",
+                "displayMode": "Action",
+                "none": "None",
+                "button": "Button",
+                "save": "Save",
+                "cancel": "Cancel"
+            }
         },
         "button": {
             "image": "Image",
             "name": "Name",
             "action": "Action",
-            "add": "Upload Image"
+            "add": "Upload Image",
+            "confirmDelete": "Are you sure you want to delete button '__name__'?"
         }
     }
 }

@@ -8,13 +8,33 @@
         "dashboard": {
             "name": "Naam",
             "action": "Actie",
-            "add": "Toevoegen"
+            "add": "Dashboard Aanmaken",
+            "confirmDelete": "Weet je zeker dat je dashboard '__name__' wilt verwijderen?",
+            "manage": {
+                "title": "Dashboard Aanmaken",
+                "name": "Naam",
+                "displayMode": "Weergavemodus",
+                "6Buttons": "6 knoppen",
+                "15Buttons": "15 knoppen",
+                "32Buttons": "32 knoppen",
+                "save": "Opslaan",
+                "cancel": "Annuleren"
+            },
+            "item": {
+                "title": "Kies Item",
+                "displayMode": "Actie",
+                "none": "Niks",
+                "button": "Knop",
+                "save": "Opslaan",
+                "cancel": "Annuleren"
+            }
         },
         "button": {
             "image": "Afbeelding",
             "name": "Naam",
             "action": "Actie",
-            "add": "Afbeelding Uploaden"
+            "add": "Afbeelding Uploaden",
+            "confirmDelete": "Weet je zeker dat je knop '__name__' wilt verwijderen?"
         }
     }
 }

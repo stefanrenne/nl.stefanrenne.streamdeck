@@ -21,10 +21,10 @@ module.exports = class NetworkDock extends Homey.Device {
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.registerIdentifierAutocompleteListenerForCard(this.onGenericButtonPressed);
-    this.registerIdentifierAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
-    this.registerIdentifierAutocompleteListenerForCard(this.onGenericButtonReleased);
-    this.registerIdentifierAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
+    this.registerButtonAutocompleteListenerForCard(this.onGenericButtonPressed);
+    this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
+    this.registerButtonAutocompleteListenerForCard(this.onGenericButtonReleased);
+    this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
 
     const ipAddress = this.getSetting("ipAddress");
     this.log("NetworkDock has been initialized");
@@ -78,10 +78,10 @@ module.exports = class NetworkDock extends Homey.Device {
           const column = control.column + 1;
           const row = control.row + 1;
           const button = this.store.getButtons()[control.index]; // todo update when dashboards can be configured
-          this.onGenericButtonPressed.trigger({ column: column, row: row }, { button: { id: button.id } });
-          this.onNetworkDockButtonPressed.trigger(this, { column: column, row: row }, { button: { id: button.id } });
+          this.onGenericButtonPressed.trigger({ column: column, row: row }, { button: button.name });
+          this.onNetworkDockButtonPressed.trigger(this, { column: column, row: row }, { button: button.name });
           this.onNetworkDockAnyButtonPressed.trigger(this, { button: { id: button.name }, column: column, row: row });
-          this.log("press " + control.column + 1 + "x" + control.row + 1);
+          this.log("press button " + button.name + " on " + column + "x" + row);
         }
       });
       streamDeck.on('up', (control) => {
@@ -89,10 +89,10 @@ module.exports = class NetworkDock extends Homey.Device {
           const column = control.column + 1;
           const row = control.row + 1;
           const button = this.store.getButtons()[control.index]; // todo update when dashboards can be configured
-          this.onGenericButtonReleased.trigger({ column: column, row: row }, { button: { id: button.id } });
-          this.onNetworkDockButtonReleased.trigger(this, { column: column, row: row }, { button: { id: button.id } });
+          this.onGenericButtonReleased.trigger({ column: column, row: row }, { button: button.name });
+          this.onNetworkDockButtonReleased.trigger(this, { column: column, row: row }, { button: button.name });
           this.onNetworkDockAnyButtonReleased.trigger(this, { button: button.name, column: column, row: row });
-          this.log("release " + control.column + 1 + "x" + control.row + 1);
+          this.log("release button " + button.name + " on " + column + "x" + row);
         }
       });
 
@@ -185,7 +185,7 @@ module.exports = class NetworkDock extends Homey.Device {
     }
   }
   
-  registerIdentifierAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
+  registerButtonAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
     card.registerArgumentAutocompleteListener('button', (query: string, args: any) => {
       return this.store
       .getButtons()

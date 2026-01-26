@@ -1,7 +1,8 @@
 {
-  "id": "on_button_press",
+  "id": "network_dock_any_button_released",
   "title": {
-    "en": "Button press"
+    "en": "Button released",
+    "nl": "Knop losgelaten"
   },
   "args": [
     {
@@ -11,6 +12,14 @@
     }
   ],
   "tokens": [
+    {
+      "type": "string",
+      "name": "button",
+      "title": {
+        "en": "Button",
+        "nl": "Knop"
+      }
+    },
     {
       "type": "number",
       "name": "column",
@@ -25,14 +34,6 @@
       "title": {
         "en": "Row",
         "nl": "Rij"
-      }
-    },
-    {
-      "type": "number",
-      "name": "item",
-      "title": {
-        "en": "Item",
-        "nl": "Item"
       }
     }
   ]

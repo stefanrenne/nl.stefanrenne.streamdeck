@@ -1,0 +1,40 @@
+{
+  "id": "generic_button_released",
+  "title": {
+    "en": "Button released",
+    "nl": "Knop losgelaten"
+  },
+	"titleFormatted":{
+    "en": "Button [[button]] released",
+    "nl": "Knop [[button]] losgelaten"
+	},
+  "args": [
+    {
+      "name":"button",
+      "required":true,
+      "type":"autocomplete",
+      "title":{
+        "en":"Button",
+        "nl":"Knop"
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "number",
+      "name": "column",
+      "title": {
+        "en": "Column",
+        "nl": "Kolom"
+      }
+    },
+    {
+      "type": "number",
+      "name": "row",
+      "title": {
+        "en": "Row",
+        "nl": "Rij"
+      }
+    }
+  ]
+}

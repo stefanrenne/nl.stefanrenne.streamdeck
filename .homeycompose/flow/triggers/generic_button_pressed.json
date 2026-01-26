@@ -1,0 +1,40 @@
+{
+  "id": "generic_button_pressed",
+	"title":{
+    "en": "Button pressed",
+    "nl": "Knop ingedrukt"
+	},
+	"titleFormatted":{
+    "en": "Button [[button]] pressed",
+    "nl": "Knop [[button]] ingedrukt"
+	},
+  "args": [
+    {
+      "name":"button",
+      "required":true,
+      "type":"autocomplete",
+      "title":{
+        "en":"Button",
+        "nl":"Knop"
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "number",
+      "name": "column",
+      "title": {
+        "en": "Column",
+        "nl": "Kolom"
+      }
+    },
+    {
+      "type": "number",
+      "name": "row",
+      "title": {
+        "en": "Row",
+        "nl": "Rij"
+      }
+    }
+  ]
+}

@@ -52,6 +52,22 @@
         ],
         "tokens": [
           {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
+          {
+            "type": "string",
+            "name": "button",
+            "title": {
+              "en": "Button",
+              "nl": "Knop"
+            }
+          },
+          {
             "type": "number",
             "name": "column",
             "title": {
@@ -92,6 +108,22 @@
         ],
         "tokens": [
           {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
+          {
+            "type": "string",
+            "name": "button",
+            "title": {
+              "en": "Button",
+              "nl": "Knop"
+            }
+          },
+          {
             "type": "number",
             "name": "column",
             "title": {
@@ -123,6 +155,14 @@
           }
         ],
         "tokens": [
+          {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
           {
             "type": "string",
             "name": "button",
@@ -163,6 +203,14 @@
           }
         ],
         "tokens": [
+          {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
           {
             "type": "string",
             "name": "button",
@@ -217,6 +265,22 @@
         ],
         "tokens": [
           {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
+          {
+            "type": "string",
+            "name": "button",
+            "title": {
+              "en": "Button",
+              "nl": "Knop"
+            }
+          },
+          {
             "type": "number",
             "name": "column",
             "title": {
@@ -262,6 +326,22 @@
         ],
         "tokens": [
           {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          },
+          {
+            "type": "string",
+            "name": "button",
+            "title": {
+              "en": "Button",
+              "nl": "Knop"
+            }
+          },
+          {
             "type": "number",
             "name": "column",
             "title": {
@@ -289,7 +369,8 @@
       "class": "button",
       "capabilities": [
         "onoff",
-        "dim"
+        "dim",
+        "dashboard"
       ],
       "platforms": [
         "local"
@@ -386,6 +467,20 @@
       ]
     }
   ],
+  "capabilities": {
+    "dashboard": {
+      "type": "enum",
+      "title": {
+        "en": "Dashboard",
+        "nl": "Dashboard"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "uiQuickAction": false,
+      "values": []
+    }
+  },
   "discovery": {
     "network-dock": {
       "type": "mdns-sd",

@@ -1,7 +1,7 @@
 import Homey, { FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
-import { Button, Store } from '../../lib/storage';
+import { Button, Dashboard, DashboardButton, Store } from '../../lib/storage';
 import { Jimp } from 'jimp';
 
 module.exports = class NetworkDock extends Homey.Device {
@@ -9,6 +9,7 @@ module.exports = class NetworkDock extends Homey.Device {
   private store = new Store(this.homey);
   private connectionManager = new StreamDeckTcpConnectionManager();
   private streamDeck: StreamDeckTcp | undefined;
+  private dashboard: Dashboard | undefined;
 
   private onGenericButtonPressed: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_pressed');
   private onNetworkDockButtonPressed: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_pressed');
@@ -25,6 +26,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
     this.registerButtonAutocompleteListenerForCard(this.onGenericButtonReleased);
     this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
+    await this.updateDashboardOptions();
 
     const ipAddress = this.getSetting("ipAddress");
     this.log("NetworkDock has been initialized");
@@ -42,9 +44,17 @@ module.exports = class NetworkDock extends Homey.Device {
         this.streamDeck = streamDeck
         await this.setAvailable();
         this.streamDeckDidConnect(streamDeck);
-        this.streamDeckLoadDashboard(streamDeck);
+
+        const dashboard: Dashboard | undefined = this.map(await this.getCapabilityValue('dashboard'), id => this.store.getDashboard(id));
+        this.streamDeckLoadDashboard(streamDeck, dashboard);
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable("No Stream Deck connected to Network Dock");
+      }
+    });
+
+    this.homey.settings.on('set', async (key: string) => {
+      if (key === "dashboards") {
+        await this.updateDashboardOptions();
       }
     });
 
@@ -58,6 +68,11 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.streamDeck?.setBrightness(value * 100);
       this.setCapabilityValue('onoff', value > 0);
     });
+
+    this.registerCapabilityListener('dashboard', async (value: string) => {
+      const dashboard: Dashboard | undefined = this.store.getDashboard(value);
+      this.streamDeckLoadDashboard(this.streamDeck, dashboard);
+    });
   }
 
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
@@ -68,31 +83,38 @@ module.exports = class NetworkDock extends Homey.Device {
         await this.setUnavailable("Stream Deck Disconnected");
         this.streamDeck = undefined;
       });
+
       streamDeck.on('error', async (error) => {
         this.log("device - error " + error);
         const message = typeof error === 'string' ? error : undefined;
         await this.setUnavailable(message);
       });
-      streamDeck.on('down', (control) => {
+
+      streamDeck.on('down', async (control) => {
         if (control.type === 'button') {
-          const column = control.column + 1;
-          const row = control.row + 1;
-          const button = this.store.getButtons()[control.index]; // todo update when dashboards can be configured
-          this.onGenericButtonPressed.trigger({ column: column, row: row }, { button: button.name });
-          this.onNetworkDockButtonPressed.trigger(this, { column: column, row: row }, { button: button.name });
-          this.onNetworkDockAnyButtonPressed.trigger(this, { button: { id: button.name }, column: column, row: row });
-          this.log("press button " + button.name + " on " + column + "x" + row);
+          const button = this.dashboard?.items.find((item) => item.item === control.index+1);
+          const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
+          this.onNetworkDockAnyButtonPressed.trigger(this, tokens);
+          if (button !== undefined && this.dashboard?.name !== undefined) {
+            await this.triggerAll([this.onGenericButtonPressed, this.onNetworkDockButtonPressed], tokens, button.id);
+            this.log("press button " + button.name);
+          } else {
+            this.log("press button -no button set-");
+          }
         }
       });
-      streamDeck.on('up', (control) => {
+
+      streamDeck.on('up', async (control) => {
         if (control.type === 'button') {
-          const column = control.column + 1;
-          const row = control.row + 1;
-          const button = this.store.getButtons()[control.index]; // todo update when dashboards can be configured
-          this.onGenericButtonReleased.trigger({ column: column, row: row }, { button: button.name });
-          this.onNetworkDockButtonReleased.trigger(this, { column: column, row: row }, { button: button.name });
-          this.onNetworkDockAnyButtonReleased.trigger(this, { button: button.name, column: column, row: row });
-          this.log("release button " + button.name + " on " + column + "x" + row);
+          const button = this.dashboard?.items.find((item) => item.item === control.index+1);
+          const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
+          this.onNetworkDockAnyButtonReleased.trigger(this, tokens);
+          if (button !== undefined && this.dashboard?.name !== undefined) {
+            await this.triggerAll([this.onGenericButtonReleased, this.onNetworkDockButtonReleased], tokens, button.id);
+            this.log("release button " + button.name);
+          } else {
+            this.log("release button -no button set-");
+          }
         }
       });
 
@@ -117,22 +139,27 @@ module.exports = class NetworkDock extends Homey.Device {
       });
   }
 
-  async streamDeckLoadDashboard(streamDeck: StreamDeckTcp) {
-    await streamDeck.clearPanel();
- // todo update when dashboards can be configured
-    const images = this.store.getButtons();
-    const buttons = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
-    
-    for (const [i, button] of buttons.entries()) {
-      if (typeof images[i] !== "undefined") {
-        await this.streamDeckSetImage(streamDeck, button, images[i].id);
+  async streamDeckLoadDashboard(streamDeck: StreamDeckTcp | undefined, dashboard: Dashboard | undefined) {
+    if (streamDeck === undefined || dashboard === undefined) {
+      await streamDeck?.clearPanel();
+      this.dashboard = undefined;
+      return
+    }
+
+    this.dashboard = dashboard;
+    const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    for (const [i, control] of controls.entries()) {
+      const item = dashboard.items.find((item) => item.item === i+1);
+      if (item !== undefined) {
+        await this.streamDeckSetImage(streamDeck, control, item.imageBuffer);
+      } else {
+        await streamDeck.clearKey(control.index);
       }
     }
   }
 
-  async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageId: string) {
-    const base64ImageString = this.homey.settings.get(imageId).slice("data:image/png;base64,".length).toString();
-    const jimp = await Jimp.fromBuffer(Buffer.from(base64ImageString, 'base64'));
+  async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
+    const jimp = await Jimp.fromBuffer(imageBuffer);
     const img = await jimp
       .normalize()
       .scaleToFit({w: control.pixelSize.width, h: control.pixelSize.height});
@@ -144,8 +171,8 @@ module.exports = class NetworkDock extends Homey.Device {
    */
   async onAdded() {
     this.log('NetworkDock has been added');
-      await this.setCapabilityValue('dim', 1.0);
-      await this.setCapabilityValue('onoff', true);
+    await this.setCapabilityValue('dim', 1.0);
+    await this.setCapabilityValue('onoff', true);
   } 
 
   /**
@@ -184,6 +211,46 @@ module.exports = class NetworkDock extends Homey.Device {
       this.connectionManager.disconnectFrom(ipAddress);
     }
   }
+
+  async triggerAll(cards: (Homey.FlowCardTrigger | Homey.FlowCardTriggerDevice)[], tokens: object, buttonId: string) {
+    for (const card of cards) {
+      const argument = (card instanceof Homey.FlowCardTrigger) ? await card.getArgumentValues() : await card.getArgumentValues(this);
+      const uniqueNames = new Set<string>(argument.filter((value) => value.button.id === buttonId).map((value) => value.button.name))
+      const states = Array.from(uniqueNames).map(name => this.autocompleteForButton(buttonId, name));
+      states.forEach((state) => {
+        if (card instanceof Homey.FlowCardTrigger) {
+          card.trigger(tokens, { button: state });
+        } else {
+          card.trigger(this, tokens, { button: state });
+        }
+      });
+    };
+  }
+
+  async updateDashboardOptions() {
+    const allDashboards = this.store.getDashboards();
+    const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+    await this.setCapabilityOptions('dashboard', {values: allDashboards.map((dashboard) => ({"id": dashboard.id, "title": { "en": dashboard.name}}))});
+    
+    // dashboard has not been set or doesn't exist anymore
+    if (selectedDashboardId === undefined || !allDashboards.map((dashboard) => dashboard.id).includes(selectedDashboardId)) {
+      const dashboard = this.map(allDashboards.shift()?.id, id => this.store.getDashboard(id));
+
+      // set the first dashboard as new dashboard
+      this.setCapabilityValue('dashboard', dashboard?.id);
+
+      // load the new dashboard
+      await this.streamDeckLoadDashboard(this.streamDeck, dashboard);
+    }
+  }
+
+  autocompleteForButton(id: string, name: string) {
+    return {
+      id: id,
+      name: name,
+      description: ''
+    }
+  }
   
   registerButtonAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
     card.registerArgumentAutocompleteListener('button', (query: string, args: any) => {
@@ -194,12 +261,13 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map(button => {
-        return {
-          id: button.id,
-          name: button.name,
-          description: ''
-        }
+        return this.autocompleteForButton(button.id, button.name)
       });
     });
+  }
+
+  map<A, B>(value: A | undefined, f: (value: A) => B): B | undefined {
+    if (value === undefined) return undefined;
+    return f(value);
   }
 };

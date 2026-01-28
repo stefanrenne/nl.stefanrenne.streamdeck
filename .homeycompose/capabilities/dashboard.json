@@ -1,0 +1,12 @@
+{
+    "type": "enum",
+    "title": { 
+        "en": "Dashboard", 
+        "nl": "Dashboard"
+    },
+    "getable": true,
+    "setable": true,
+    "uiComponent": "picker",
+    "uiQuickAction": false,
+    "values": []
+}

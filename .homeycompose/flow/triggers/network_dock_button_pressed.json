@@ -26,6 +26,22 @@
   ],
   "tokens": [
     {
+      "type": "string",
+      "name": "dashboard",
+      "title": {
+        "en": "Dashboard",
+        "nl": "Dashboard"
+      }
+    },
+    {
+      "type": "string",
+      "name": "button",
+      "title": {
+        "en": "Button",
+        "nl": "Knop"
+      }
+    },
+    {
       "type": "number",
       "name": "column",
       "title": {

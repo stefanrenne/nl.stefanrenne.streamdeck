@@ -1,0 +1,27 @@
+{
+	"id":"is_dashboard",
+	"title":{
+	   "en":"Dashboard !{{is|is not}} exactly [[Value]]",
+	   "nl":"Dashboard !{{is|is niet}} precies [[Value]]"
+	},
+	"titleFormatted":{
+	   "en":"Dashboard !{{is|is not}} exactly [[dashboard]]",
+	   "nl":"Dashboard !{{is|is niet}} precies [[dashboard]]"
+	},
+    "args": [
+        {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+        },
+        {
+            "name":"dashboard",
+            "required":true,
+            "type":"autocomplete",
+            "title":{
+                "en":"Dashboard",
+                "nl":"Dashboard"
+            }
+        }
+	]
+ }

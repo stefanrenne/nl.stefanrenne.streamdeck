@@ -30,6 +30,30 @@
   "flow": {
     "triggers": [
       {
+        "id": "changed_dashboard",
+        "title": {
+          "en": "Dashboard has changed",
+          "nl": "Dashboard is veranderd"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          }
+        ],
+        "tokens": [
+          {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          }
+        ]
+      },
+      {
         "id": "generic_button_pressed",
         "title": {
           "en": "Button pressed",
@@ -355,6 +379,64 @@
             "title": {
               "en": "Row",
               "nl": "Rij"
+            }
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "is_dashboard",
+        "title": {
+          "en": "Dashboard !{{is|is not}} exactly [[Value]]",
+          "nl": "Dashboard !{{is|is niet}} precies [[Value]]"
+        },
+        "titleFormatted": {
+          "en": "Dashboard !{{is|is not}} exactly [[dashboard]]",
+          "nl": "Dashboard !{{is|is niet}} precies [[dashboard]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          },
+          {
+            "name": "dashboard",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
+            }
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "set_dashboard",
+        "title": {
+          "en": "Set Dashboard to [[Value]]",
+          "nl": "Stel het dashboard in op [[Value]]"
+        },
+        "titleFormatted": {
+          "en": "Set Dashboard to [[dashboard]]",
+          "nl": "Stel het dashboard in op [[dashboard]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          },
+          {
+            "name": "dashboard",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+              "en": "Dashboard",
+              "nl": "Dashboard"
             }
           }
         ]

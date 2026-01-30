@@ -1,0 +1,27 @@
+{
+	"id":"set_dashboard",
+	"title":{
+	   "en":"Set Dashboard to [[Value]]",
+	   "nl": "Stel het dashboard in op [[Value]]"
+	},
+	"titleFormatted":{
+	   "en":"Set Dashboard to [[dashboard]]",
+	   "nl": "Stel het dashboard in op [[dashboard]]"
+	},
+    "args": [
+        {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+        },
+        {
+            "name":"dashboard",
+            "required":true,
+            "type":"autocomplete",
+            "title":{
+                "en":"Dashboard",
+                "nl":"Dashboard"
+            }
+        }
+	]
+ }

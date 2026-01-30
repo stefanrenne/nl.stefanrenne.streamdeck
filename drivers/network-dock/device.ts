@@ -1,4 +1,4 @@
-import Homey, { FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
+import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Button, Dashboard, DashboardButton, Store } from '../../lib/storage';
@@ -17,6 +17,7 @@ module.exports = class NetworkDock extends Homey.Device {
   private onGenericButtonReleased: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_released');
   private onNetworkDockButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_released');
   private onNetworkDockAnyButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_any_button_released');
+  private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
   /**
    * onInit is called when the device is initialized.
@@ -26,6 +27,8 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
     this.registerButtonAutocompleteListenerForCard(this.onGenericButtonReleased);
     this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
+    this.registerIsDashboardListener();
+    this.registerChangeDashboardListener();
     await this.updateDashboardOptions();
 
     const ipAddress = this.getSetting("ipAddress");
@@ -72,6 +75,9 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerCapabilityListener('dashboard', async (value: string) => {
       const dashboard: Dashboard | undefined = this.store.getDashboard(value);
       this.streamDeckLoadDashboard(this.streamDeck, dashboard);
+      if (dashboard !== undefined) {
+        await this.onDashboardChanged.trigger(this, { 'dashboard': dashboard.name });
+      }
     });
   }
 
@@ -216,7 +222,7 @@ module.exports = class NetworkDock extends Homey.Device {
     for (const card of cards) {
       const argument = (card instanceof Homey.FlowCardTrigger) ? await card.getArgumentValues() : await card.getArgumentValues(this);
       const uniqueNames = new Set<string>(argument.filter((value) => value.button.id === buttonId).map((value) => value.button.name))
-      const states = Array.from(uniqueNames).map(name => this.autocompleteForButton(buttonId, name));
+      const states = Array.from(uniqueNames).map(name => this.createAutocompleteValue(buttonId, name));
       states.forEach((state) => {
         if (card instanceof Homey.FlowCardTrigger) {
           card.trigger(tokens, { button: state });
@@ -237,14 +243,19 @@ module.exports = class NetworkDock extends Homey.Device {
       const dashboard = this.map(allDashboards.shift()?.id, id => this.store.getDashboard(id));
 
       // set the first dashboard as new dashboard
-      this.setCapabilityValue('dashboard', dashboard?.id);
+      await this.setCapabilityValue('dashboard', dashboard?.id);
 
       // load the new dashboard
       await this.streamDeckLoadDashboard(this.streamDeck, dashboard);
+
+      // notifiy about the dashboard change
+      if (dashboard !== undefined) {
+        await this.onDashboardChanged.trigger(this, { 'dashboard': dashboard.name })
+      }
     }
   }
 
-  autocompleteForButton(id: string, name: string) {
+  createAutocompleteValue(id: string, name: string) {
     return {
       id: id,
       name: name,
@@ -261,8 +272,57 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map(button => {
-        return this.autocompleteForButton(button.id, button.name)
+        return this.createAutocompleteValue(button.id, button.name)
       });
+    });
+  }
+  
+  registerDashboardAutocompleteListenerForCard(card: Homey.FlowCardCondition | Homey.FlowCardAction) {
+    card.registerArgumentAutocompleteListener('dashboard', (query: string, args: any) => {
+      return this.store
+      .getDashboards()
+      .filter((dashboard) => {
+        return query.length == 0 || dashboard.name.toLowerCase().includes(query.toLowerCase());
+      })
+      .sort()
+      .map(dashboard => {
+        return this.createAutocompleteValue(dashboard.id, dashboard.name)
+      });
+    });
+  }
+
+  registerIsDashboardListener() {
+    const card = this.homey.flow.getConditionCard('is_dashboard');
+    this.registerDashboardAutocompleteListenerForCard(card);
+    card.registerRunListener(async (args) => {
+      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+      const dashboardId: string = args.dashboard.id;
+      return selectedDashboardId === dashboardId;
+    });
+  }
+
+  registerChangeDashboardListener() {
+    const card = this.homey.flow.getActionCard('set_dashboard');
+    this.registerDashboardAutocompleteListenerForCard(card);
+    card.registerRunListener(async (args) => {
+      if (!this.getAvailable()) {
+        throw await "Stream Deck is unavailable";
+      }
+      
+      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+      const dashboardId: string = args.dashboard.id;
+      if (selectedDashboardId === dashboardId) {
+        // value not changed
+        return {};
+      }
+      const newDashboard = this.store.getDashboard(dashboardId);
+      if (newDashboard !== undefined) {
+        await this.setCapabilityValue('dashboard', dashboardId);
+        await this.onDashboardChanged.trigger(this, { 'dashboard': newDashboard.name });
+        this.streamDeckLoadDashboard(this.streamDeck, newDashboard);
+        return {};
+      }
+      throw "Unknown dashboard";
     });
   }
 

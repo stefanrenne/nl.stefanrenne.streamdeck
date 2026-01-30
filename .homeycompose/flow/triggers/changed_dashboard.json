@@ -1,0 +1,24 @@
+{
+	"id":"changed_dashboard",
+	"title":{
+	   "en":"Dashboard has changed",
+	   "nl":"Dashboard is veranderd"
+	},
+    "args": [
+        {
+        "type": "device",
+        "name": "device",
+        "filter": "driver_id=network-dock"
+        }
+    ],
+    "tokens": [
+        {
+            "type": "string",
+            "name": "dashboard",
+            "title": {
+                "en": "Dashboard",
+                "nl": "Dashboard"
+            }
+        }
+    ]
+ }

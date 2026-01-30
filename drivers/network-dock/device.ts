@@ -97,30 +97,43 @@ module.exports = class NetworkDock extends Homey.Device {
       });
 
       streamDeck.on('down', async (control) => {
+        if (!this.getCapabilityValue('onoff')) {
+          return
+        }
+        var actions: Promise<void>[] = []
         if (control.type === 'button') {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
           const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
-          this.onNetworkDockAnyButtonPressed.trigger(this, tokens);
+          actions.push(this.onNetworkDockAnyButtonPressed.trigger(this, tokens));
           if (button !== undefined && this.dashboard?.name !== undefined) {
-            await this.triggerAll([this.onGenericButtonPressed, this.onNetworkDockButtonPressed], tokens, button.id);
+            actions.push(this.onGenericButtonPressed.trigger(tokens, { buttonId: button.id }));
+            actions.push(this.onNetworkDockButtonPressed.trigger(this, tokens, { buttonId: button.id }));
             this.log("press button " + button.name);
           } else {
             this.log("press button -no button set-");
           }
+          await Promise.all(actions);
         }
       });
 
       streamDeck.on('up', async (control) => {
+        if (!this.getCapabilityValue('onoff')) {
+          return
+        }
+
+        var actions: Promise<void>[] = []
         if (control.type === 'button') {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
           const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
-          this.onNetworkDockAnyButtonReleased.trigger(this, tokens);
+          actions.push(this.onNetworkDockAnyButtonReleased.trigger(this, tokens));
           if (button !== undefined && this.dashboard?.name !== undefined) {
-            await this.triggerAll([this.onGenericButtonReleased, this.onNetworkDockButtonReleased], tokens, button.id);
+            actions.push(this.onGenericButtonReleased.trigger(tokens, { buttonId: button.id }));
+            actions.push(this.onNetworkDockButtonReleased.trigger(this, tokens, { buttonId: button.id }));
             this.log("release button " + button.name);
           } else {
             this.log("release button -no button set-");
           }
+          await Promise.all(actions);
         }
       });
 
@@ -154,14 +167,17 @@ module.exports = class NetworkDock extends Homey.Device {
 
     this.dashboard = dashboard;
     const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+
+    var actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
       const item = dashboard.items.find((item) => item.item === i+1);
       if (item !== undefined) {
-        await this.streamDeckSetImage(streamDeck, control, item.imageBuffer);
+        actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer));
       } else {
-        await streamDeck.clearKey(control.index);
+        actions.push(streamDeck.clearKey(control.index));
       }
     }
+    await Promise.all(actions);
   }
 
   async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
@@ -218,21 +234,6 @@ module.exports = class NetworkDock extends Homey.Device {
     }
   }
 
-  async triggerAll(cards: (Homey.FlowCardTrigger | Homey.FlowCardTriggerDevice)[], tokens: object, buttonId: string) {
-    for (const card of cards) {
-      const argument = (card instanceof Homey.FlowCardTrigger) ? await card.getArgumentValues() : await card.getArgumentValues(this);
-      const uniqueNames = new Set<string>(argument.filter((value) => value.button.id === buttonId).map((value) => value.button.name))
-      const states = Array.from(uniqueNames).map(name => this.createAutocompleteValue(buttonId, name));
-      states.forEach((state) => {
-        if (card instanceof Homey.FlowCardTrigger) {
-          card.trigger(tokens, { button: state });
-        } else {
-          card.trigger(this, tokens, { button: state });
-        }
-      });
-    };
-  }
-
   async updateDashboardOptions() {
     const allDashboards = this.store.getDashboards();
     const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
@@ -275,6 +276,9 @@ module.exports = class NetworkDock extends Homey.Device {
       .map(button => {
         return this.createAutocompleteValue(button.id, button.name, button.base64Image);
       });
+    });
+    card.registerRunListener((args, state) => {
+      return args.button.id === state.buttonId;
     });
   }
   

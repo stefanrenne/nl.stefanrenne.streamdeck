@@ -183,8 +183,7 @@ module.exports = class NetworkDock extends Homey.Device {
   async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
     const jimp = await Jimp.fromBuffer(imageBuffer);
     const img = await jimp
-      .normalize()
-      .scaleToFit({w: control.pixelSize.width, h: control.pixelSize.height});
+      .resize({w: control.pixelSize.width, h: control.pixelSize.height});
     await streamDeck.fillKeyBuffer(control.index, img.bitmap.data, { format: 'rgba' });
   }
 

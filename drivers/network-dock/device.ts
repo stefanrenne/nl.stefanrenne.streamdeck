@@ -255,11 +255,12 @@ module.exports = class NetworkDock extends Homey.Device {
     }
   }
 
-  createAutocompleteValue(id: string, name: string) {
+  createAutocompleteValue(id: string, name: string, image: string | undefined = undefined) {
     return {
       id: id,
       name: name,
-      description: ''
+      description: '',
+      image: image ?? ''
     }
   }
   
@@ -272,7 +273,7 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map(button => {
-        return this.createAutocompleteValue(button.id, button.name)
+        return this.createAutocompleteValue(button.id, button.name, button.base64Image);
       });
     });
   }

@@ -5,6 +5,7 @@ import Homey from 'homey/lib/Homey';
 export interface Button {
     readonly id: string;
     readonly name: string;
+    readonly base64Image: string;
 }
 
 export interface Dashboard {
@@ -19,6 +20,11 @@ export interface DashboardButton {
     readonly item: number;
     readonly name: string;
     readonly imageBuffer: Buffer;
+}
+
+interface StoredButton {
+    readonly id: string;
+    readonly name: string;
 }
 
 interface StoredDashboard {
@@ -43,12 +49,19 @@ export class Store {
     }
 
     getButtons(): Button[] {
-        return this.homey.settings.get('buttons') ?? [];
+        return this.homey.settings.get('buttons')?.map((button: StoredButton) => {
+            return {
+                id: button.id,
+                name: button.name,
+                base64Image: this.homey.settings.get(button.id)
+            }
+        }) ?? [];
     }
 
     createDashboardButton(id: string, item: number): DashboardButton | undefined {
-        const name: string | undefined = this.getButtons().find((button: Button) => button.id === id)?.name;
-        const base64ImageString: string | undefined = this.homey.settings.get(id).slice("data:image/png;base64,".length).toString();
+        const button: Button | undefined = this.getButtons().find((button: Button) => button.id === id);
+        const name = button?.name;
+        const base64ImageString: string | undefined = button?.base64Image.slice("data:image/png;base64,".length).toString();
         if (name === undefined || base64ImageString === undefined) {
             return undefined
         }

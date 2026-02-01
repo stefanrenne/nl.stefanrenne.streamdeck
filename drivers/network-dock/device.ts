@@ -3,6 +3,7 @@ import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-strea
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Button, Dashboard, DashboardButton, Store } from '../../lib/storage';
 import { Jimp } from 'jimp';
+import path from 'path';
 
 module.exports = class NetworkDock extends Homey.Device {
 
@@ -13,10 +14,8 @@ module.exports = class NetworkDock extends Homey.Device {
 
   private onGenericButtonPressed: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_pressed');
   private onNetworkDockButtonPressed: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_pressed');
-  private onNetworkDockAnyButtonPressed: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_any_button_pressed');
   private onGenericButtonReleased: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_released');
   private onNetworkDockButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_released');
-  private onNetworkDockAnyButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_any_button_released');
   private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
   /**
@@ -103,15 +102,16 @@ module.exports = class NetworkDock extends Homey.Device {
         var actions: Promise<void>[] = []
         if (control.type === 'button') {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
-          const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
-          actions.push(this.onNetworkDockAnyButtonPressed.trigger(this, tokens));
           if (button !== undefined && this.dashboard?.name !== undefined) {
+            const tokens = { dashboard: this.dashboard?.name, column: control.column + 1, row: control.row + 1 };
             actions.push(this.onGenericButtonPressed.trigger(tokens, { buttonId: button.id }));
             actions.push(this.onNetworkDockButtonPressed.trigger(this, tokens, { buttonId: button.id }));
             this.log("press button " + button.name);
           } else {
             this.log("press button -no button set-");
           }
+        }
+        if (actions.length > 0) {
           await Promise.all(actions);
         }
       });
@@ -124,31 +124,21 @@ module.exports = class NetworkDock extends Homey.Device {
         var actions: Promise<void>[] = []
         if (control.type === 'button') {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
-          const tokens = { dashboard: this.dashboard?.name ?? "", button: button?.name ?? "", column: control.column + 1, row: control.row + 1 };
-          actions.push(this.onNetworkDockAnyButtonReleased.trigger(this, tokens));
           if (button !== undefined && this.dashboard?.name !== undefined) {
+            const tokens = { dashboard: this.dashboard?.name, column: control.column + 1, row: control.row + 1 };
             actions.push(this.onGenericButtonReleased.trigger(tokens, { buttonId: button.id }));
             actions.push(this.onNetworkDockButtonReleased.trigger(this, tokens, { buttonId: button.id }));
             this.log("release button " + button.name);
           } else {
             this.log("release button -no button set-");
           }
+        }
+        if (actions.length > 0) {
           await Promise.all(actions);
         }
       });
 
-      const size = streamDeck.CONTROLS.reduce((result, control) => {
-        if (control as StreamDeckButtonControlDefinitionLcdFeedback) {
-          if (result.columns < (control.column + 1)) {
-            result.columns = control.column + 1
-          }
-          if (result.rows < (control.row + 1)) {
-            result.rows = control.row + 1
-          }
-        }
-        return result
-      }, {columns: 0, rows: 0});
-
+      const size = this.getButtonControlSize(streamDeck);
       await this.setSettings({
         name: streamDeck.PRODUCT_NAME,
         serial: await streamDeck.getSerialNumber(),
@@ -158,11 +148,39 @@ module.exports = class NetworkDock extends Homey.Device {
       });
   }
 
+  async streamDeckLoadDefaultDashboard(streamDeck: StreamDeckTcp) {
+    	const panelDimensions = streamDeck.calculateFillPanelDimensions();
+      if (panelDimensions === null) {
+        await streamDeck?.clearPanel();
+        return
+      }
+      
+      const padding: number = 50
+    	const image = await Jimp.read(path.resolve(__dirname, 'assets/homey-logo.png')).then((jimp) => {
+        return jimp.scaleToFit({ w: panelDimensions.width - (padding * 2), h: panelDimensions.height - (padding * 2) })
+      });
+      
+      const background = new Jimp({ width: panelDimensions.width, height: panelDimensions.height })
+        .blit({ src: image, x: (panelDimensions.width - image.width) / 2, y: (panelDimensions.height - image.height) / 2 });
+
+      await streamDeck.fillPanelBuffer(background.bitmap.data, { format: 'rgba' }).catch((e) => console.error('fillPanelBuffer failed:', e));
+  }
+
   async streamDeckLoadDashboard(streamDeck: StreamDeckTcp | undefined, dashboard: Dashboard | undefined) {
-    if (streamDeck === undefined || dashboard === undefined) {
-      await streamDeck?.clearPanel();
+    if (streamDeck === undefined) {
       this.dashboard = undefined;
       return
+    }
+    if (dashboard === undefined) {
+      this.dashboard = undefined;
+      this.streamDeckLoadDefaultDashboard(streamDeck);
+      return
+    }
+
+    // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
+    const size = this.getButtonControlSize(streamDeck);
+    if (dashboard.displayMode < size.total) {
+      this.store.updateDashboard(dashboard.id, size.total);
     }
 
     this.dashboard = dashboard;
@@ -171,20 +189,20 @@ module.exports = class NetworkDock extends Homey.Device {
     var actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
       const item = dashboard.items.find((item) => item.item === i+1);
-      if (item !== undefined) {
-        actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer));
+      if (item === undefined) {
+        actions.push(streamDeck.clearKey(control.index).catch((e) => console.error('clearKey failed:', e)));
       } else {
-        actions.push(streamDeck.clearKey(control.index));
+        actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('streamDeckSetImage failed:', e)));
       }
     }
     await Promise.all(actions);
   }
 
   async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
-    const jimp = await Jimp.fromBuffer(imageBuffer);
-    const img = await jimp
-      .resize({w: control.pixelSize.width, h: control.pixelSize.height});
-    await streamDeck.fillKeyBuffer(control.index, img.bitmap.data, { format: 'rgba' });
+    const image = await Jimp.fromBuffer(imageBuffer).then((jimp) => {
+      return jimp.resize({ w: control.pixelSize.width, h: control.pixelSize.height });
+    });
+    await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
   }
 
   /**
@@ -231,6 +249,22 @@ module.exports = class NetworkDock extends Homey.Device {
       this.log("disconnect from " + ipAddress);
       this.connectionManager.disconnectFrom(ipAddress);
     }
+  }
+
+  getButtonControlSize(streamDeck: StreamDeckTcp) {
+    return streamDeck.CONTROLS.reduce((result, control) => {
+        if (control as StreamDeckButtonControlDefinitionLcdFeedback) {
+          if (result.columns < (control.column + 1)) {
+            result.columns = control.column + 1
+            result.total = result.rows * result.columns;
+          }
+          if (result.rows < (control.row + 1)) {
+            result.rows = control.row + 1
+            result.total = result.rows * result.columns;
+          }
+        }
+        return result
+      }, {columns: 0, rows: 0, total: 0});
   }
 
   async updateDashboardOptions() {

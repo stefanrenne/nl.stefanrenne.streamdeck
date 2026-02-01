@@ -27,6 +27,34 @@
     "email": "srenne1@gmail.com"
   },
   "brandColor": "#000063",
+  "tags": {
+    "en": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato"
+    ]
+  },
+  "source": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck",
+  "support": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck/issues",
+  "bugs": {
+    "url": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck/issues"
+  },
+  "contributors": {
+    "translators": [
+      {
+        "name": "🇬🇧 Stefan Renne"
+      },
+      {
+        "name": "🇳🇱 Stefan Renne"
+      }
+    ],
+    "developers": [
+      {
+        "name": "Stefan Renne"
+      }
+    ]
+  },
   "flow": {
     "triggers": [
       {
@@ -84,14 +112,6 @@
             }
           },
           {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
-            }
-          },
-          {
             "type": "number",
             "name": "column",
             "title": {
@@ -137,110 +157,6 @@
             "title": {
               "en": "Dashboard",
               "nl": "Dashboard"
-            }
-          },
-          {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
-            }
-          },
-          {
-            "type": "number",
-            "name": "column",
-            "title": {
-              "en": "Column",
-              "nl": "Kolom"
-            }
-          },
-          {
-            "type": "number",
-            "name": "row",
-            "title": {
-              "en": "Row",
-              "nl": "Rij"
-            }
-          }
-        ]
-      },
-      {
-        "id": "network_dock_any_button_pressed",
-        "title": {
-          "en": "Button pressed",
-          "nl": "Knop ingedrukt"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=network-dock"
-          }
-        ],
-        "tokens": [
-          {
-            "type": "string",
-            "name": "dashboard",
-            "title": {
-              "en": "Dashboard",
-              "nl": "Dashboard"
-            }
-          },
-          {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
-            }
-          },
-          {
-            "type": "number",
-            "name": "column",
-            "title": {
-              "en": "Column",
-              "nl": "Kolom"
-            }
-          },
-          {
-            "type": "number",
-            "name": "row",
-            "title": {
-              "en": "Row",
-              "nl": "Rij"
-            }
-          }
-        ]
-      },
-      {
-        "id": "network_dock_any_button_released",
-        "title": {
-          "en": "Button released",
-          "nl": "Knop losgelaten"
-        },
-        "args": [
-          {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=network-dock"
-          }
-        ],
-        "tokens": [
-          {
-            "type": "string",
-            "name": "dashboard",
-            "title": {
-              "en": "Dashboard",
-              "nl": "Dashboard"
-            }
-          },
-          {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
             }
           },
           {
@@ -297,14 +213,6 @@
             }
           },
           {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
-            }
-          },
-          {
             "type": "number",
             "name": "column",
             "title": {
@@ -355,14 +263,6 @@
             "title": {
               "en": "Dashboard",
               "nl": "Dashboard"
-            }
-          },
-          {
-            "type": "string",
-            "name": "button",
-            "title": {
-              "en": "Button",
-              "nl": "Knop"
             }
           },
           {

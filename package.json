@@ -6,10 +6,11 @@
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
   },
   "dependencies": {
-    "@elgato-stream-deck/node": "^7.4.0",
-    "@elgato-stream-deck/tcp": "^7.4.0",
-    "homey-api": "^3.15.0",
-    "jimp": "^1.6.0"
+    "@elgato-stream-deck/node": "^7.5.2",
+    "@elgato-stream-deck/tcp": "^7.5.2",
+    "homey-api": "^3.16.0",
+    "jimp": "^1.6.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.5",

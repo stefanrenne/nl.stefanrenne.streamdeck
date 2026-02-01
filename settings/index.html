@@ -372,7 +372,6 @@
         const $createDashboardItemView = document.getElementById("manage-dashboardItem");
         const buttons = await Homey.get('buttons') ?? []
         const $saveItemButton = document.getElementById("saveDashboardItem");
-        const $deck = document.getElementById("manage-dashboardItem-buttonItems");
         const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
         const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-button");
         const $noneRadio = document.getElementById("displayItemMode0");
@@ -405,27 +404,6 @@
           $createDashboardView.classList.remove("hidden");
           $createDashboardItemView.classList.add("hidden");
         });
-        
-        for (const button of Object.values(buttons)) {
-          const $item = document.createElement('div');
-          $item.classList.add("deck-item");
-          $item.title = button.name;
-          const $id = document.createAttribute("data-id");
-          $id.value = button.id;
-          $item.setAttributeNode($id);
-          $deck.appendChild($item);
-
-          $image = document.createElement('img');
-          $image.src = await Homey.get(button.id);
-          $item.appendChild($image);
-
-          $item.addEventListener('click', async () => {
-            $createDashboardItemDisplay.classList.remove("actionNone");
-            $createDashboardItemDisplay.classList.add("actionButton");
-            $createDashboardItemDisplay.querySelector('img').src = await Homey.get(button.id);
-            $createDashboardItemDisplay.dataset.buttonId = button.id;
-          });
-        }
       }
 
       function deckDefaultText(i, columns) {
@@ -619,9 +597,11 @@
       }
 
       async function loadButtons() {
+        const buttons = await Homey.get('buttons') ?? [];
+
+        /* Load Buttons Tab */
         const $container = document.getElementById("buttonContainer");
         $container.innerHTML = '';
-        const buttons = await Homey.get('buttons') ?? [];
 
         for (const button of Object.values(buttons)) {
           const $row = document.createElement('tr');
@@ -678,6 +658,51 @@
           
           $container.appendChild($row);
         }
+
+        /* Load Dashboard Select Item */
+        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
+        const $deck = document.getElementById("manage-dashboardItem-buttonItems");
+        $deck.innerHTML = '';
+
+        for (const button of Object.values(buttons)) {
+          const $item = document.createElement('div');
+          $item.classList.add("deck-item");
+          $item.title = button.name;
+          const $id = document.createAttribute("data-id");
+          $id.value = button.id;
+          $item.setAttributeNode($id);
+          $deck.appendChild($item);
+
+          $image = document.createElement('img');
+          $image.src = await Homey.get(button.id);
+          $item.appendChild($image);
+
+          $item.addEventListener('click', async () => {
+            $createDashboardItemDisplay.classList.remove("actionNone");
+            $createDashboardItemDisplay.classList.add("actionButton");
+            $createDashboardItemDisplay.querySelector('img').src = await Homey.get(button.id);
+            $createDashboardItemDisplay.dataset.buttonId = button.id;
+          });
+        }
+
+        /* Validate Existing Dashboard */
+        const buttonIds = buttons.map((item) => item.id);
+        var didUpdateDashboards = false;
+        const dashboards = await Homey.get('dashboards') ?? [];
+        const newDashboards = Object.values(dashboards).map((dashboard) => {
+          const newItems = items.filter((item) => {
+            if (item.type !== "button" || buttonIds.includes(item.buttonId)) {
+              return true;
+            }
+            didUpdateDashboards = true;
+            return false;
+          });
+          return { id: $dashboard.id, name: dashboard.name, displayMode: dashboard.displayMode, items: newItems };
+        });
+        if (didUpdateDashboards) {
+          await Homey.set('dashboards', newDashboards);
+          await loadDashboards();
+        }
       }
 
       async function loadDashboards() {
@@ -686,7 +711,6 @@
         const dashboards = await Homey.get('dashboards') ?? [];
 
         for (const dashboard of Object.values(dashboards)) {
-          console.log(dashboard);
           const $row = document.createElement('tr');
 
           $nameColumn = document.createElement('td');

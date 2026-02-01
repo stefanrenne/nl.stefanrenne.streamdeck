@@ -25,5 +25,33 @@
     "name": "Stefan Renne",
     "email": "srenne1@gmail.com"
   },
-  "brandColor": "#000063"
+  "brandColor": "#000063",
+  "tags": {
+    "en": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato"
+    ]
+  },
+  "source": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck",
+  "support": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck/issues",
+  "bugs": {
+    "url": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck/issues"
+  },
+  "contributors": {
+    "translators": [
+      {
+        "name": "🇬🇧 Stefan Renne"
+      },
+      {
+        "name": "🇳🇱 Stefan Renne"
+      }
+    ],
+    "developers": [
+      {
+        "name": "Stefan Renne"
+      }
+    ]
+  }
 }

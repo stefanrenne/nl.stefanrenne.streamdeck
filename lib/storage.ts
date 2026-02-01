@@ -72,9 +72,23 @@ export class Store {
         return this.getDashboards().find((dashboard) => dashboard.id === id);
     }
 
+    updateDashboard(id: string, size: number) {
+        if (size !== 6 && size !== 15 && size !== 32) {
+            return
+        }
+        const dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
+        const newDashboards = dashboards.map((dashboard) => {
+            if (dashboard.id === id) {
+                return { id: dashboard.id, name: dashboard.name, displayMode: size, items: dashboard.items }
+            }
+            return dashboard
+        })
+        this.homey.settings.set('dashboards', newDashboards);
+    }
+
     getDashboards(): Dashboard[] {
-        var dashboards = this.homey.settings.get('dashboards') ?? [];
-        return dashboards.map((dashboard: StoredDashboard) => {
+        var dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
+        return dashboards.map((dashboard) => {
             const items = dashboard.items.map((row: StoredDashboardItem) => {
                 if (row.type == "button") {
                     return this.createDashboardButton(row.buttonId, row.item);

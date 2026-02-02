@@ -2,150 +2,9 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="./bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="./style.css" />
     <script src="./bootstrap.min.js"></script>
-    <style>
-      td a {
-        cursor: pointer;
-        display: inherit;
-        height: 35px;
-        width: 35px;
-        border-radius: 17.5px;
-        padding: 7.5px;
-      }
-      td span.spacer {
-        display: inherit;
-        width: 5px;
-      }
-      td a span {
-        display: block;
-        mask-size: 20px;
-        mask-repeat: no-repeat;
-        mask-position: center;
-        min-height: 20px;
-        min-width: 20px;
-      }
-      td a.edit {
-        background-color: darkcyan;
-      }
-      td a.edit span {
-        -webkit-mask-image: url('./pencil.svg');
-        mask-image: url('./pencil.svg');
-        background-color: white;
-      }
-      td a.delete {
-        background-color: darkred;
-      }
-      td a.delete span {
-        -webkit-mask-image: url('./trash.svg');
-        mask-image: url('./trash.svg');
-        background-color: white;
-      }
-      td.action {
-        width: 100px;
-      }
-      td.center {
-        text-align: center
-      }
-      .hidden {
-          display: none !important;
-      }
-      .section {
-        padding-top: 20px;
-        margin: 0;
-      }
-      .linebreak {
-        margin: 0;
-      }
-      .card p {
-        font-weight: bold;
-        padding-bottom: 20px;
-      }
-      .card {
-        margin-top: 40px;
-        padding: 20px;
-        background-color: lightgray;
-        display: block;
-        border-radius: 10px;
-      }
-      .homey-button-danger-shadow.marginTop {
-        margin-top: 10px;
-      }
-      .homey-button-danger-shadow.full {
-        width: 100%;
-      }
-      .allignedradio label.homey-form-radio {
-        margin: 0 0 0 20px !important; 
-        padding: 0 !important; 
-        float: left !important;
-      }
-      .allignedradio label.homey-form-radio:first-child {
-        margin-left: 0 !important;
-      }
-      .deck1, .deck3, .deck5, .deck6, .deck8 {
-        margin-top: 20px;
-        margin-bottom: 20px;
-        display: grid;
-        column-gap: 5px;
-        row-gap: 5px;
-        background-color: #222;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .deck1 {
-        grid-template-columns: 90px;
-        grid-auto-rows: 90px;
-        width: calc(20px + 90px);
-        margin: 0;
-      }
-      .deck3 {
-        grid-template-columns: repeat(3, 90px);
-        grid-auto-rows: 90px;
-        width: calc(20px + (3 * 90px) + (2 * 5px));
-      }
-      .deck5 {
-        grid-template-columns: repeat(5, 70px);
-        grid-auto-rows: 70px;
-        width: calc(20px + (5 * 70px) + (4 * 5px));
-      }
-      .deck6 {
-        grid-template-columns: repeat(6, 50px);
-        grid-auto-rows: 50px;
-        width: calc(20px + (6 * 50px) + (5 * 5px));
-      }
-      .deck8 {
-        grid-template-columns: repeat(8, 50px);
-        grid-auto-rows: 50px;
-        width: calc(20px + (8 * 50px) + (7 * 5px));
-      }
-      .deck3 .deck-item, .deck5 .deck-item, .deck6 .deck-item, .deck8 .deck-item {
-        cursor: pointer;
-      }
-      .deck-item {
-        background-color: black;
-        border-radius: 5px;
-      }
-      .deck-item.actionImage p {
-        display: none;
-      }
-      .deck-item.actionNone img {
-        display: none;
-      }
-      .deck-item img {
-        width: 100%;
-        height: 100%;
-        border-radius: 5px;
-      }
-      .deck-item p {
-        color: #444;
-        position: relative;
-        transform: translateY(-50%);
-        top: 50%;
-        margin: 0 !important;
-        font-size: 25px;
-        text-align: center;
-        font-weight: bold;
-      }
-    </style>
+    <script src="./tabs.js"></script>
     <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
   </head>
   <body>
@@ -158,7 +17,6 @@
           <a class="nav-link" data-page="page-images" href="#" data-i18n="settings.tab.images"></a>
         </li>
       </ul>
-
       <!-- Page Dashboards -->
       <div class="page" id="page-dashboards">
         <table class="table table-striped homey-form-group">
@@ -266,6 +124,13 @@
     </div>
 
     <script type="text/javascript">
+      const $mainView = document.getElementById("main");
+      const $createDashboardView = document.getElementById("manage-dashboard");
+      const $createDashboardItemView = document.getElementById("manage-dashboardItem");
+      const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
+      const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
+      const $deck = document.getElementById("deck");
+
       function observeMenuItems() {
         const $navLinks = document.getElementsByClassName("nav-link");
         for (var i = 0; i < $navLinks.length; i ++) {
@@ -308,11 +173,6 @@
       }
 
       function observeDashboardImages() {
-        const $mainView = document.getElementById("main");
-        const $createDashboardView = document.getElementById("manage-dashboard");
-        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
-        const $deck = document.getElementById("deck");
-
         const $input = document.getElementById("dashboardName");
         const $startButton = document.getElementById("addDashboard");
         const $saveButton = document.getElementById("saveDashboard");
@@ -359,13 +219,8 @@
       }
 
       async function observeDashboardItemImages() {
-        const $mainView = document.getElementById("main");
-        const $createDashboardView = document.getElementById("manage-dashboard");
-        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
         const images = await Homey.get('images') ?? []
         const $saveItemButton = document.getElementById("saveDashboardItem");
-        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
         const $noneRadio = document.getElementById("displayItemMode0");
         const $buttonRadio = document.getElementById("displayItemMode1");
         $noneRadio.addEventListener('change', async () => {
@@ -405,10 +260,6 @@
       }
 
       async function createDeckItems(numberItems, id = undefined, name = undefined, items = []) {
-        const $deck = document.getElementById("deck");
-        const $mainView = document.getElementById("main");
-        const $createDashboardView = document.getElementById("manage-dashboard");
-        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
         document.getElementById("dashboardName").value = name ?? ""
 
         $mainView.classList.add("hidden");
@@ -442,13 +293,20 @@
           const $img = document.createElement('img');
           $item.appendChild($img);
 
+          $item.dataset.imageId = ""
+          $item.classList.add("actionNone");
+
           if (cache?.type === "image" && cache.imageId !== undefined) {
-            $item.classList.add("actionImage");
-            $item.dataset.imageId = cache.imageId 
-            $img.src = await Homey.get(cache.imageId); 
-          } else {
-            $item.classList.add("actionNone");
-            $item.dataset.imageId = ""
+            Promise.resolve().then(async () => {
+              $img.src = await Homey.get(cache.imageId); 
+              $item.classList.remove("actionNone");
+              $item.classList.add("actionImage");
+              $item.dataset.imageId = cache.imageId 
+            })
+            .catch(err => {
+              console.log(err);
+            })
+            .finally();
           }
 
           $item.addEventListener('click', async () => {
@@ -460,7 +318,6 @@
 
       function changeDisplayModeManageDeck(numberItems) {
         const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : 3;
-        const $deck = document.getElementById("deck");
         $deck.classList.remove(...$deck.classList);
         $deck.classList.add("deck" + columns);
         for (var i = 0; i < $deck.children.length; i++) {
@@ -475,10 +332,6 @@
       }
 
       async function selectDashboardItem(id, defaultText, imageId) {
-        const $createDashboardView = document.getElementById("manage-dashboard");
-        const $createDashboardItemView = document.getElementById("manage-dashboardItem");
-        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
         const $noneRadio = document.getElementById("displayItemMode0");
         const $buttonRadio = document.getElementById("displayItemMode1");
 
@@ -652,9 +505,8 @@
         }
 
         /* Load Dashboard Select Item */
-        const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $deck = document.getElementById("manage-dashboardItem-imageItems");
-        $deck.innerHTML = '';
+        const $selectImageDeck = document.getElementById("manage-dashboardItem-imageItems");
+        $selectImageDeck.innerHTML = '';
 
         for (const button of Object.values(images)) {
           const $item = document.createElement('div');
@@ -663,7 +515,7 @@
           const $id = document.createAttribute("data-id");
           $id.value = button.id;
           $item.setAttributeNode($id);
-          $deck.appendChild($item);
+          $selectImageDeck.appendChild($item);
 
           $image = document.createElement('img');
           $image.src = await Homey.get(button.id);

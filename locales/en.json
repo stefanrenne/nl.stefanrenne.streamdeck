@@ -3,7 +3,7 @@
         "tab": {
             "about": "About",
             "dashboards": "Dashboards",
-            "buttons": "Buttons"
+            "images": "Images"
         },
         "dashboard": {
             "name": "Name",
@@ -24,13 +24,13 @@
                 "title": "Select Item",
                 "displayMode": "Action",
                 "none": "None",
-                "button": "Button",
+                "image": "Image",
                 "save": "Save",
                 "cancel": "Cancel"
             }
         },
-        "button": {
-            "image": "Image",
+        "image": {
+            "title": "Image",
             "name": "Name",
             "action": "Action",
             "add": "Upload Image",

@@ -2,7 +2,7 @@
 
 import Homey from 'homey/lib/Homey';
 
-export interface Button {
+export interface Image {
     readonly id: string;
     readonly name: string;
     readonly base64Image: string;
@@ -12,17 +12,17 @@ export interface Dashboard {
     readonly id: string;
     readonly name: string;
     readonly displayMode: number;
-    readonly items: DashboardButton[];
+    readonly items: DashboardImage[];
 }
 
-export interface DashboardButton {
-    readonly id: string;
+export interface DashboardImage {
     readonly item: number;
     readonly name: string;
+    readonly imageId: string;
     readonly imageBuffer: Buffer;
 }
 
-interface StoredButton {
+interface StoredImage {
     readonly id: string;
     readonly name: string;
 }
@@ -36,7 +36,7 @@ interface StoredDashboard {
 
 interface StoredDashboardItem {
     readonly type: string;
-    readonly buttonId: string;
+    readonly imageId: string;
     readonly item: number;
 }
 
@@ -48,24 +48,24 @@ export class Store {
         this.homey = homey;
     }
 
-    getButtons(): Button[] {
-        return this.homey.settings.get('buttons')?.map((button: StoredButton) => {
+    getImages(): Image[] {
+        return this.homey.settings.get('images')?.map((image: StoredImage) => {
             return {
-                id: button.id,
-                name: button.name,
-                base64Image: this.homey.settings.get(button.id)
+                id: image.id,
+                name: image.name,
+                base64Image: this.homey.settings.get(image.id)
             }
         }) ?? [];
     }
 
-    createDashboardButton(id: string, item: number): DashboardButton | undefined {
-        const button: Button | undefined = this.getButtons().find((button: Button) => button.id === id);
-        const name = button?.name;
-        const base64ImageString: string | undefined = button?.base64Image.slice("data:image/png;base64,".length).toString();
+    createDashboardImage(imageId: string, item: number): DashboardImage | undefined {
+        const image: Image | undefined = this.getImages().find((image: Image) => image.id === imageId);
+        const name = image?.name;
+        const base64ImageString: string | undefined = image?.base64Image.slice("data:image/png;base64,".length).toString();
         if (name === undefined || base64ImageString === undefined) {
             return undefined
         }
-        return {id: id, item: item, name: name, imageBuffer: Buffer.from(base64ImageString, 'base64')};
+        return {item: item, name: name, imageId: imageId, imageBuffer: Buffer.from(base64ImageString, 'base64')};
     }
 
     getDashboard(id: string): Dashboard | undefined {
@@ -87,11 +87,11 @@ export class Store {
     }
 
     getDashboards(): Dashboard[] {
-        var dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
+        const dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
         return dashboards.map((dashboard) => {
             const items = dashboard.items.map((row: StoredDashboardItem) => {
-                if (row.type == "button") {
-                    return this.createDashboardButton(row.buttonId, row.item);
+                if (row.type === 'image') {
+                    return this.createDashboardImage(row.imageId, row.item);
                 } else {
                     return undefined;
                 }

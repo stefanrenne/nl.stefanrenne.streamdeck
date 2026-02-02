@@ -1,7 +1,7 @@
 import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
-import { Button, Dashboard, DashboardButton, Store } from '../../lib/storage';
+import { Image, Dashboard, DashboardImage, Store } from '../../lib/storage';
 import { Jimp } from 'jimp';
 import path from 'path';
 
@@ -22,10 +22,10 @@ module.exports = class NetworkDock extends Homey.Device {
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.registerButtonAutocompleteListenerForCard(this.onGenericButtonPressed);
-    this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
-    this.registerButtonAutocompleteListenerForCard(this.onGenericButtonReleased);
-    this.registerButtonAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
+    this.registerImageAutocompleteListenerForCard(this.onGenericButtonPressed);
+    this.registerImageAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
+    this.registerImageAutocompleteListenerForCard(this.onGenericButtonReleased);
+    this.registerImageAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
     await this.updateDashboardOptions();
@@ -104,11 +104,11 @@ module.exports = class NetworkDock extends Homey.Device {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
           if (button !== undefined && this.dashboard?.name !== undefined) {
             const tokens = { dashboard: this.dashboard?.name, column: control.column + 1, row: control.row + 1 };
-            actions.push(this.onGenericButtonPressed.trigger(tokens, { buttonId: button.id }));
-            actions.push(this.onNetworkDockButtonPressed.trigger(this, tokens, { buttonId: button.id }));
-            this.log("press button " + button.name);
+            actions.push(this.onGenericButtonPressed.trigger(tokens, { imageId: button.imageId }));
+            actions.push(this.onNetworkDockButtonPressed.trigger(this, tokens, { imageId: button.imageId }));
+            this.log("press image button " + button.name);
           } else {
-            this.log("press button -no button set-");
+            this.log("press empty button");
           }
         }
         if (actions.length > 0) {
@@ -126,11 +126,11 @@ module.exports = class NetworkDock extends Homey.Device {
           const button = this.dashboard?.items.find((item) => item.item === control.index+1);
           if (button !== undefined && this.dashboard?.name !== undefined) {
             const tokens = { dashboard: this.dashboard?.name, column: control.column + 1, row: control.row + 1 };
-            actions.push(this.onGenericButtonReleased.trigger(tokens, { buttonId: button.id }));
-            actions.push(this.onNetworkDockButtonReleased.trigger(this, tokens, { buttonId: button.id }));
-            this.log("release button " + button.name);
+            actions.push(this.onGenericButtonReleased.trigger(tokens, { imageId: button.imageId }));
+            actions.push(this.onNetworkDockButtonReleased.trigger(this, tokens, { imageId: button.imageId }));
+            this.log("release image button " + button.name);
           } else {
-            this.log("release button -no button set-");
+            this.log("release empty button");
           }
         }
         if (actions.length > 0) {
@@ -298,12 +298,12 @@ module.exports = class NetworkDock extends Homey.Device {
     }
   }
   
-  registerButtonAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
-    card.registerArgumentAutocompleteListener('button', (query: string, args: any) => {
+  registerImageAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
+    card.registerArgumentAutocompleteListener('image', (query: string, args: any) => {
       return this.store
-      .getButtons()
-      .filter((button) => {
-        return query.length == 0 || button.name.toLowerCase().includes(query.toLowerCase());
+      .getImages()
+      .filter((image) => {
+        return query.length == 0 || image.name.toLowerCase().includes(query.toLowerCase());
       })
       .sort()
       .map(button => {
@@ -311,7 +311,7 @@ module.exports = class NetworkDock extends Homey.Device {
       });
     });
     card.registerRunListener((args, state) => {
-      return args.button.id === state.buttonId;
+      return args.image.id === state.imageId;
     });
   }
   

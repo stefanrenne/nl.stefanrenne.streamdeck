@@ -124,7 +124,7 @@
         background-color: black;
         border-radius: 5px;
       }
-      .deck-item.actionButton p {
+      .deck-item.actionImage p {
         display: none;
       }
       .deck-item.actionNone img {
@@ -152,20 +152,12 @@
     <div id="main">
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <a class="nav-link" data-page="page-about" href="#" data-i18n="settings.tab.about"></a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link active" data-page="page-dashboards" href="#" data-i18n="settings.tab.dashboards"></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-page="page-buttons" href="#" data-i18n="settings.tab.buttons"></a>
+          <a class="nav-link" data-page="page-images" href="#" data-i18n="settings.tab.images"></a>
         </li>
       </ul>
-
-      <!-- Page About -->
-      <div class="page hidden" id="page-about">
-        about
-      </div>
 
       <!-- Page Dashboards -->
       <div class="page" id="page-dashboards">
@@ -182,21 +174,21 @@
         <button id="addDashboard" class="homey-button-primary-full" data-i18n="settings.dashboard.add"></button>
       </div>
 
-      <!-- Page Buttons -->
-      <div class="page hidden" id="page-buttons">
+      <!-- Page Images -->
+      <div class="page hidden" id="page-images">
         <table class="table table-striped homey-form-group">
           <thead>
           <tr>
-            <th data-i18n="settings.button.image" style="width: 50px"></th>
-            <th data-i18n="settings.button.name"></th>
-            <th data-i18n="settings.button.action" style="width: 100px"></th>
+            <th data-i18n="settings.image.title" style="width: 50px"></th>
+            <th data-i18n="settings.image.name"></th>
+            <th data-i18n="settings.image.action" style="width: 100px"></th>
           </tr>
           </thead>
-          <tbody id="buttonContainer"></tbody>
+          <tbody id="imagesContainer"></tbody>
         </table>
         <hr/>
-        <input class="hidden" id="addButtonInput" type="file" accept="image/png">
-        <button id="addButton" class="homey-button-primary-full" data-i18n="settings.button.add"></button>
+        <input class="hidden" id="addImageInput" type="file" accept="image/png">
+        <button id="addImage" class="homey-button-primary-full" data-i18n="settings.image.add"></button>
       </div>
     </div>
 
@@ -259,14 +251,14 @@
             <label class="homey-form-radio">
               <input class="homey-form-radio-input" id="displayItemMode1" type="radio" name="item-mode" value="1"/>
               <span class="homey-form-radio-checkmark"></span>
-              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.button"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.image"></span>
             </label>
           </div>
         </fieldset>
       </div>
 
-      <div id="manage-dashboardItem-button" style="margin-bottom: 30px" class="hidden">
-        <div id="manage-dashboardItem-buttonItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
+      <div id="manage-dashboardItem-image" style="margin-bottom: 30px" class="hidden">
+        <div id="manage-dashboardItem-imageItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
       </div>
 
       <button id="saveDashboardItem" class="homey-button-primary-full" data-i18n="settings.dashboard.item.save"></button>
@@ -306,8 +298,8 @@
             "bubbles": true,
             "cancelable": false
         });
-        const $button = document.getElementById("addButton");
-        const $input = document.getElementById("addButtonInput");
+        const $button = document.getElementById("addImage");
+        const $input = document.getElementById("addImageInput");
         $button.addEventListener("click", () => {
           if (!$button.classList.contains('is-loading')) {
             $input.dispatchEvent(clickEvent);
@@ -315,7 +307,7 @@
         });
       }
 
-      function observeDashboardButtons() {
+      function observeDashboardImages() {
         const $mainView = document.getElementById("main");
         const $createDashboardView = document.getElementById("manage-dashboard");
         const $createDashboardItemView = document.getElementById("manage-dashboardItem");
@@ -346,8 +338,8 @@
           var dashboardItems = [];
           for (var i = 0; i < $deck.children.length; i++) {
             const item = $deck.children[i];
-            if (item.classList.contains("actionButton")) {
-              dashboardItems.push({type: "button", buttonId: item.dataset.buttonId, item: i + 1});
+            if (item.classList.contains("actionImage")) {
+              dashboardItems.push({type: "image", imageId: item.dataset.imageId, item: i + 1});
             }
           }
           var displayMode = 15;
@@ -366,38 +358,38 @@
         });
       }
 
-      async function observeDashboardItemButtons() {
+      async function observeDashboardItemImages() {
         const $mainView = document.getElementById("main");
         const $createDashboardView = document.getElementById("manage-dashboard");
         const $createDashboardItemView = document.getElementById("manage-dashboardItem");
-        const buttons = await Homey.get('buttons') ?? []
+        const images = await Homey.get('images') ?? []
         const $saveItemButton = document.getElementById("saveDashboardItem");
         const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-button");
+        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
         const $noneRadio = document.getElementById("displayItemMode0");
         const $buttonRadio = document.getElementById("displayItemMode1");
         $noneRadio.addEventListener('change', async () => {
           $createDashboardItemButtonView.classList.add("hidden");
-          $createDashboardItemDisplay.classList.remove("actionButton");
+          $createDashboardItemDisplay.classList.remove("actionImage");
           $createDashboardItemDisplay.classList.add("actionNone");
         });
         $buttonRadio.addEventListener('change', async () => {
           $createDashboardItemButtonView.classList.remove("hidden");
-          if ($createDashboardItemDisplay.dataset.buttonId !== "") {
-            $createDashboardItemDisplay.classList.add("actionButton");
+          if ($createDashboardItemDisplay.dataset.imageId !== "") {
+            $createDashboardItemDisplay.classList.add("actionImage");
             $createDashboardItemDisplay.classList.remove("actionNone");
           }
         });
         $saveItemButton.addEventListener("click", async () => {
           const $dashboardItem = document.getElementById("deckItem" + $createDashboardItemDisplay.dataset.id);
-          if ($createDashboardItemDisplay.classList.contains("actionButton")) {
-            $dashboardItem.classList.add("actionButton");
+          if ($createDashboardItemDisplay.classList.contains("actionImage")) {
+            $dashboardItem.classList.add("actionImage");
             $dashboardItem.classList.remove("actionNone");
-            $dashboardItem.dataset.buttonId = $createDashboardItemDisplay.dataset.buttonId
-            $dashboardItem.querySelector('img').src = await Homey.get($createDashboardItemDisplay.dataset.buttonId);
+            $dashboardItem.dataset.imageId = $createDashboardItemDisplay.dataset.imageId
+            $dashboardItem.querySelector('img').src = await Homey.get($createDashboardItemDisplay.dataset.imageId);
           } else {
             $dashboardItem.classList.add("actionNone");
-            $dashboardItem.classList.remove("actionButton");
+            $dashboardItem.classList.remove("actionImage");
           }
 
           $mainView.classList.add("hidden");
@@ -450,18 +442,18 @@
           const $img = document.createElement('img');
           $item.appendChild($img);
 
-          if (cache?.type == "button" && cache.buttonId !== undefined) {
-            $item.classList.add("actionButton");
-            $item.dataset.buttonId = cache.buttonId 
-            $img.src = await Homey.get(cache.buttonId); 
+          if (cache?.type === "image" && cache.imageId !== undefined) {
+            $item.classList.add("actionImage");
+            $item.dataset.imageId = cache.imageId 
+            $img.src = await Homey.get(cache.imageId); 
           } else {
             $item.classList.add("actionNone");
-            $item.dataset.buttonId = ""
+            $item.dataset.imageId = ""
           }
 
           $item.addEventListener('click', async () => {
-            const buttonId = $item.classList.contains("actionButton") ? $item.dataset.buttonId : undefined;
-            await this.selectDashboardItem(id, $text.innerHTML, buttonId);
+            const imageId = $item.classList.contains("actionImage") ? $item.dataset.imageId : undefined;
+            await this.selectDashboardItem(id, $text.innerHTML, imageId);
           });
         }
       }
@@ -482,33 +474,33 @@
         }
       }
 
-      async function selectDashboardItem(id, defaultText, buttonId) {
+      async function selectDashboardItem(id, defaultText, imageId) {
         const $createDashboardView = document.getElementById("manage-dashboard");
         const $createDashboardItemView = document.getElementById("manage-dashboardItem");
         const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-button");
+        const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
         const $noneRadio = document.getElementById("displayItemMode0");
         const $buttonRadio = document.getElementById("displayItemMode1");
 
         $createDashboardView.classList.add("hidden");
         $createDashboardItemView.classList.remove("hidden");
         $createDashboardItemDisplay.dataset.id = id;
-        $createDashboardItemDisplay.dataset.buttonId = buttonId ?? "";
+        $createDashboardItemDisplay.dataset.imageId = imageId ?? "";
 
         $createDashboardItemDisplay.querySelector('p').innerHTML = defaultText;
-        if (buttonId !== undefined) {
-          $createDashboardItemDisplay.querySelector('img').src = await Homey.get(buttonId);
+        if (imageId !== undefined) {
+          $createDashboardItemDisplay.querySelector('img').src = await Homey.get(imageId);
           $createDashboardItemDisplay.classList.remove("actionNone");
-          $createDashboardItemDisplay.classList.add("actionButton");
+          $createDashboardItemDisplay.classList.add("actionImage");
           $createDashboardItemButtonView.classList.remove("hidden");
         } else {
           $createDashboardItemDisplay.querySelector('img').src = "";
           $createDashboardItemDisplay.classList.add("actionNone");
-          $createDashboardItemDisplay.classList.remove("actionButton");
+          $createDashboardItemDisplay.classList.remove("actionImage");
           $createDashboardItemButtonView.classList.add("hidden");
         }
-        $noneRadio.checked = buttonId == undefined;
-        $buttonRadio.checked = buttonId !== undefined;
+        $noneRadio.checked = imageId == undefined;
+        $buttonRadio.checked = imageId !== undefined;
       }
 
       function observeCreateDashboardDisplayMode() {
@@ -542,8 +534,8 @@
       }
 
       async function validateButtonName(name) {
-        const buttons = await Homey.get('buttons') ?? []
-        const existingNames = buttons.map(item => item.name);
+        const images = await Homey.get('images') ?? []
+        const existingNames = images.map(item => item.name);
         const validatedName = name.replace(/\.[^/.]+$/, "").trim();
         var i = -1;
         do {
@@ -562,10 +554,10 @@
         await Homey.set('dashboards', dashboards);
       }
 
-      async function insertButton(button) {
-        var buttons = await Homey.get('buttons') ?? [];
-        buttons.push(button);
-        await Homey.set('buttons', buttons);
+      async function insertImage(button) {
+        var images = await Homey.get('images') ?? [];
+        images.push(button);
+        await Homey.set('images', images);
       }
 
       function getBase64(file) {
@@ -581,8 +573,8 @@
       }
 
       function observeFileUpload() {
-        const $button = document.getElementById("addButton");
-        const $input = document.getElementById("addButtonInput");
+        const $button = document.getElementById("addImage");
+        const $input = document.getElementById("addImageInput");
         $input.addEventListener('change', async () => {
           $button.classList.add('is-loading');
           const fileId = crypto.randomUUID();
@@ -590,20 +582,20 @@
           const data = await getBase64(file);
           const name = await validateButtonName(file.name);
           await Homey.set(fileId, data);
-          await insertButton({id: fileId, name: name});
-          await loadButtons();
+          await insertImage({id: fileId, name: name});
+          await loadImages();
           $button.classList.remove('is-loading');
         });
       }
 
-      async function loadButtons() {
-        const buttons = await Homey.get('buttons') ?? [];
+      async function loadImages() {
+        const images = await Homey.get('images') ?? [];
 
-        /* Load Buttons Tab */
-        const $container = document.getElementById("buttonContainer");
+        /* Load Images Tab */
+        const $container = document.getElementById("imagesContainer");
         $container.innerHTML = '';
 
-        for (const button of Object.values(buttons)) {
+        for (const button of Object.values(images)) {
           const $row = document.createElement('tr');
 
           $imageColumn = document.createElement('td');
@@ -649,7 +641,7 @@
           $delete.classList.add('delete');
           $deleteMask = document.createElement('span');
           $delete.addEventListener('click', async () => {
-            if (await Homey.confirm(Homey.__("settings.button.confirmDelete", {name: button.name}))) {
+            if (await Homey.confirm(Homey.__("settings.image.confirmDelete", {name: button.name}))) {
               await deleteButton(button.id);
             }
           });
@@ -661,10 +653,10 @@
 
         /* Load Dashboard Select Item */
         const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-        const $deck = document.getElementById("manage-dashboardItem-buttonItems");
+        const $deck = document.getElementById("manage-dashboardItem-imageItems");
         $deck.innerHTML = '';
 
-        for (const button of Object.values(buttons)) {
+        for (const button of Object.values(images)) {
           const $item = document.createElement('div');
           $item.classList.add("deck-item");
           $item.title = button.name;
@@ -679,25 +671,25 @@
 
           $item.addEventListener('click', async () => {
             $createDashboardItemDisplay.classList.remove("actionNone");
-            $createDashboardItemDisplay.classList.add("actionButton");
+            $createDashboardItemDisplay.classList.add("actionImage");
             $createDashboardItemDisplay.querySelector('img').src = await Homey.get(button.id);
-            $createDashboardItemDisplay.dataset.buttonId = button.id;
+            $createDashboardItemDisplay.dataset.imageId = button.id;
           });
         }
 
         /* Validate Existing Dashboard */
-        const buttonIds = buttons.map((item) => item.id);
+        const imageIds = images.map((item) => item.id);
         var didUpdateDashboards = false;
         const dashboards = await Homey.get('dashboards') ?? [];
         const newDashboards = Object.values(dashboards).map((dashboard) => {
-          const newItems = items.filter((item) => {
-            if (item.type !== "button" || buttonIds.includes(item.buttonId)) {
+          const newItems = dashboard.items.filter((item) => {
+            if (item.type !== "image" || imageIds.includes(item.imageId)) {
               return true;
             }
             didUpdateDashboards = true;
             return false;
           });
-          return { id: $dashboard.id, name: dashboard.name, displayMode: dashboard.displayMode, items: newItems };
+          return { id: dashboard.id, name: dashboard.name, displayMode: dashboard.displayMode, items: newItems };
         });
         if (didUpdateDashboards) {
           await Homey.set('dashboards', newDashboards);
@@ -754,21 +746,21 @@
           if ($input.dataset.oldValue !== $input.value.trim()) {
             const newValue = await validateButtonName($input.value);
 
-            const buttons = await Homey.get('buttons') ?? [];
-            const newButtons = buttons.map(item => {
+            const images = await Homey.get('images') ?? [];
+            const newImages = images.map(item => {
               return {'id': item.id, 'name': (item.id === id) ? newValue : item.name}
             });
-            await Homey.set('buttons', newButtons);
-            await loadButtons();
+            await Homey.set('images', newImages);
+            await loadImages();
           }
       }
 
       async function deleteButton(id) {
         await Homey.unset(id);
-        const buttons = await Homey.get('buttons') ?? [];
-        const newButtons = buttons.filter(item => item.id !== id);
-        await Homey.set('buttons', newButtons);
-        await loadButtons();
+        const images = await Homey.get('images') ?? [];
+        const newImages = images.filter(item => item.id !== id);
+        await Homey.set('images', newImages);
+        await loadImages();
       }
 
       async function deleteDashboard(id) {
@@ -782,13 +774,13 @@
         observeMenuItems();
         observeFileUploadButton();
         observeFileUpload();
-        observeDashboardButtons();
+        observeDashboardImages();
         observeCreateDashboardDisplayMode();
 
         Promise.resolve().then(async () => {
           await loadDashboards();
-          await loadButtons();
-          await observeDashboardItemButtons();
+          await loadImages();
+          await observeDashboardItemImages();
         })
         .catch(err => {
           console.log(err);

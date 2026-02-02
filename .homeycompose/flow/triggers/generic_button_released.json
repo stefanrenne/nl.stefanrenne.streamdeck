@@ -5,17 +5,17 @@
     "nl": "Knop losgelaten"
   },
 	"titleFormatted":{
-    "en": "Button [[button]] released",
-    "nl": "Knop [[button]] losgelaten"
+    "en": "Button [[image]] released",
+    "nl": "Knop [[image]] losgelaten"
 	},
   "args": [
     {
-      "name":"button",
+      "name":"image",
       "required":true,
       "type":"autocomplete",
       "title":{
-        "en":"Button",
-        "nl":"Knop"
+        "en":"Image",
+        "nl":"Afbeelding"
       }
     }
   ],

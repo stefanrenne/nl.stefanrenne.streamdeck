@@ -3,7 +3,7 @@
         "tab": {
             "about": "Over",
             "dashboards": "Dashboards",
-            "buttons": "Knoppen"
+            "images": "Afbeeldingen"
         },
         "dashboard": {
             "name": "Naam",
@@ -24,13 +24,13 @@
                 "title": "Kies Item",
                 "displayMode": "Actie",
                 "none": "Niks",
-                "button": "Knop",
+                "image": "Afbeelding",
                 "save": "Opslaan",
                 "cancel": "Annuleren"
             }
         },
-        "button": {
-            "image": "Afbeelding",
+        "image": {
+            "title": "Afbeelding",
             "name": "Naam",
             "action": "Actie",
             "add": "Afbeelding Uploaden",

@@ -5,8 +5,8 @@
     "nl": "Knop ingedrukt"
 	},
 	"titleFormatted":{
-    "en": "Button [[button]] pressed",
-    "nl": "Knop [[button]] ingedrukt"
+    "en": "Button [[image]] pressed",
+    "nl": "Knop [[image]] ingedrukt"
 	},
   "args": [
     {
@@ -15,12 +15,12 @@
       "filter": "driver_id=network-dock"
     },
     {
-      "name":"button",
+      "name":"image",
       "required":true,
       "type":"autocomplete",
       "title":{
-        "en":"Button",
-        "nl":"Knop"
+        "en":"Image",
+        "nl":"Afbeelding"
       }
     }
   ],

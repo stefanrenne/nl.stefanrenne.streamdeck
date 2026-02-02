@@ -88,17 +88,17 @@
           "nl": "Knop ingedrukt"
         },
         "titleFormatted": {
-          "en": "Button [[button]] pressed",
-          "nl": "Knop [[button]] ingedrukt"
+          "en": "Button [[image]] pressed",
+          "nl": "Knop [[image]] ingedrukt"
         },
         "args": [
           {
-            "name": "button",
+            "name": "image",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Button",
-              "nl": "Knop"
+              "en": "Image",
+              "nl": "Afbeelding"
             }
           }
         ],
@@ -136,17 +136,17 @@
           "nl": "Knop losgelaten"
         },
         "titleFormatted": {
-          "en": "Button [[button]] released",
-          "nl": "Knop [[button]] losgelaten"
+          "en": "Button [[image]] released",
+          "nl": "Knop [[image]] losgelaten"
         },
         "args": [
           {
-            "name": "button",
+            "name": "image",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Button",
-              "nl": "Knop"
+              "en": "Image",
+              "nl": "Afbeelding"
             }
           }
         ],
@@ -184,8 +184,8 @@
           "nl": "Knop ingedrukt"
         },
         "titleFormatted": {
-          "en": "Button [[button]] pressed",
-          "nl": "Knop [[button]] ingedrukt"
+          "en": "Button [[image]] pressed",
+          "nl": "Knop [[image]] ingedrukt"
         },
         "args": [
           {
@@ -194,12 +194,12 @@
             "filter": "driver_id=network-dock"
           },
           {
-            "name": "button",
+            "name": "image",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Button",
-              "nl": "Knop"
+              "en": "Image",
+              "nl": "Afbeelding"
             }
           }
         ],
@@ -237,8 +237,8 @@
           "nl": "Knop losgelaten"
         },
         "titleFormatted": {
-          "en": "Button [[button]] released",
-          "nl": "Knop [[button]] losgelaten"
+          "en": "Button [[image]] released",
+          "nl": "Knop [[image]] losgelaten"
         },
         "args": [
           {
@@ -247,12 +247,12 @@
             "filter": "driver_id=network-dock"
           },
           {
-            "name": "button",
+            "name": "image",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Button",
-              "nl": "Knop"
+              "en": "Image",
+              "nl": "Afbeelding"
             }
           }
         ],

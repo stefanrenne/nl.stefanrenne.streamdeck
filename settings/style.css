@@ -13,6 +13,7 @@ td span.spacer {
 td a span {
     display: block;
     mask-size: 20px;
+    mask-size: auto;
     mask-repeat: no-repeat;
     mask-position: center;
     min-height: 20px;
@@ -26,6 +27,14 @@ td a.edit span {
     mask-image: url('./pencil.svg');
     background-color: white;
 }
+td a.copy {
+    background-color: darksalmon;
+}
+td a.copy span {
+    -webkit-mask-image: url('./pencil.svg');
+    mask-image: url('./copy.svg');
+    background-color: white;
+}
 td a.delete {
     background-color: darkred;
 }
@@ -34,8 +43,11 @@ td a.delete span {
     mask-image: url('./trash.svg');
     background-color: white;
 }
-td.action {
+td.action2 {
     width: 100px;
+}
+td.action3 {
+    width: 140px;
 }
 td.center {
     text-align: center

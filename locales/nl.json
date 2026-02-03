@@ -9,9 +9,13 @@
             "name": "Naam",
             "action": "Actie",
             "add": "Dashboard Aanmaken",
+            "editTitle": "Aanpassen",
+            "copyTitle": "Kopie maken",
+            "deleteTitle": "Verwijderen",
             "confirmDelete": "Weet je zeker dat je dashboard '__name__' wilt verwijderen?",
             "manage": {
-                "title": "Dashboard Aanmaken",
+                "titleAdd": "Dashboard Aanmaken",
+                "titleEdit": "Dashboard Aanpassen",
                 "name": "Naam",
                 "displayMode": "Weergavemodus",
                 "6Buttons": "6 knoppen",
@@ -34,7 +38,15 @@
             "name": "Naam",
             "action": "Actie",
             "add": "Afbeelding Uploaden",
-            "confirmDelete": "Weet je zeker dat je knop '__name__' wilt verwijderen?"
+            "editTitle": "Aanpassen",
+            "deleteTitle": "Verwijderen",
+            "confirmDelete": "Weet je zeker dat je knop '__name__' wilt verwijderen?",
+            "edit": {
+                "title": "Afbeelding aanpassen",
+                "name": "Naam",
+                "save": "Opslaan",
+                "cancel": "Annuleren"
+            }
         }
     }
 }

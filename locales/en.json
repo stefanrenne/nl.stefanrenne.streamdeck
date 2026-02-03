@@ -9,9 +9,13 @@
             "name": "Name",
             "action": "Action",
             "add": "Create Dashboard",
+            "editTitle": "Edit",
+            "copyTitle": "Create Copy",
+            "deleteTitle": "Delete",
             "confirmDelete": "Are you sure you want to delete dashboard '__name__'?",
             "manage": {
-                "title": "Create Dashboard",
+                "titleAdd": "Create Dashboard",
+                "titleEdit": "Edit Dashboard",
                 "name": "Name",
                 "displayMode": "Display Mode",
                 "6Buttons": "6 buttons",
@@ -34,7 +38,15 @@
             "name": "Name",
             "action": "Action",
             "add": "Upload Image",
-            "confirmDelete": "Are you sure you want to delete button '__name__'?"
+            "editTitle": "Edit",
+            "deleteTitle": "Delete",
+            "confirmDelete": "Are you sure you want to delete button '__name__'?",
+            "edit": {
+                "title": "Edit Image",
+                "name": "Name",
+                "save": "Save",
+                "cancel": "Cancel"
+            }
         }
     }
 }

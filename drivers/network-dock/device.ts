@@ -13,24 +13,17 @@ module.exports = class NetworkDock extends Homey.Device {
   private dashboard: Dashboard | undefined;
   private emptyDashboard = this.createAutocompleteValue("0", "Homey")
 
-  private onGenericButtonPressed: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_pressed');
-  private onGenericAnyButtonPressed: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_any_button_pressed');
-  private onNetworkDockButtonPressed: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_pressed');
-  private onNetworkDockAnyButtonPressed: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_any_button_pressed');
-  private onGenericButtonReleased: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_button_released');
-  private onGenericAnyButtonReleased: FlowCardTrigger = this.homey.flow.getTriggerCard('generic_any_button_released');
-  private onNetworkDockButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_button_released');
-  private onNetworkDockAnyButtonReleased: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('network_dock_any_button_released');
+  private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
+  private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
   private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
   /**
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.registerImageAutocompleteListenerForCard(this.onGenericButtonPressed);
-    this.registerImageAutocompleteListenerForCard(this.onNetworkDockButtonPressed);
-    this.registerImageAutocompleteListenerForCard(this.onGenericButtonReleased);
-    this.registerImageAutocompleteListenerForCard(this.onNetworkDockButtonReleased);
+    this.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
+    this.registerImageButtonRunListener(this.onImageButtonAction);
+    this.registerAnyButtonRunListener(this.onAnyButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
 
@@ -129,13 +122,13 @@ module.exports = class NetworkDock extends Homey.Device {
 
       streamDeck.on('down', async (control) => {
         if (this.getCapabilityValue('onoff') && control.type === 'button') {
-          await this.streamDeckEvent('pressed', control);
+          await this.streamDeckEvent('down', control);
         }
       });
 
       streamDeck.on('up', async (control) => {
         if (this.getCapabilityValue('onoff') && control.type === 'button') {
-          await this.streamDeckEvent('released', control);
+          await this.streamDeckEvent('up', control);
         }
       });
 
@@ -210,7 +203,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
   // private lastKeypressTime: number = 0;
   // private singlePressEvent: Promise<void> | undefined;
-  async streamDeckEvent(event: string, control: StreamDeckButtonControlDefinition) {
+  async streamDeckEvent(event: 'up' | 'down', control: StreamDeckButtonControlDefinition) {
     const button = this.dashboard?.items.find((item) => item.item === control.index+1);
     if (button === undefined || this.dashboard?.name === undefined) {
       this.log(event + " empty button");
@@ -236,39 +229,23 @@ module.exports = class NetworkDock extends Homey.Device {
     // }
 
     var state: {}
-    var tokens: { dashboard: string; name: string; payload: string; column: number; row: number; }
+    var tokens: { dashboard: string; imageName: string; payload: string; column: number; row: number; }
+    var actions: Promise<void>[] = []
+
     switch (button.kind) {
     case 'image':
-      state = { imageId: button.imageId }
-      tokens = { dashboard: this.dashboard?.name ?? "", name: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      state = { action: event, imageId: button.imageId }
+      tokens = { dashboard: this.dashboard?.name ?? "", imageName: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      actions.push(this.onImageButtonAction.trigger(this, tokens, state));
       this.log(event + " image button " + button.name);
+      break; 
     default:
-      state = {}
-      tokens = { dashboard: this.dashboard?.name ?? "", name: "", payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      state = { action: event }
+      tokens = { dashboard: this.dashboard?.name ?? "", imageName: "", payload: button.payload, column: control.column + 1, row: control.row + 1 };
       this.log(event + " empty button ");
+      break;
     }
-
-    var actions: Promise<void>[] = []
-    
-    switch (event) {
-
-    case 'released':
-      if (button.kind === 'image') {
-          actions.push(this.onGenericButtonReleased.trigger(tokens, state));
-          actions.push(this.onNetworkDockButtonReleased.trigger(this, tokens, state));
-      }
-      actions.push(this.onGenericAnyButtonReleased.trigger(tokens, state));
-      actions.push(this.onNetworkDockAnyButtonReleased.trigger(this, tokens, state));
-
-    case 'pressed':
-      if (button.kind === 'image') {
-        actions.push(this.onGenericButtonPressed.trigger(tokens, state));
-        actions.push(this.onNetworkDockButtonPressed.trigger(this, tokens, state));
-      }
-      actions.push(this.onGenericAnyButtonPressed.trigger(tokens, state));
-      actions.push(this.onNetworkDockAnyButtonPressed.trigger(this, tokens, state));
-      
-    }
+    actions.push(this.onAnyButtonAction.trigger(this, tokens, state));
 
     await Promise.all(actions);
   }
@@ -386,8 +363,17 @@ module.exports = class NetworkDock extends Homey.Device {
         return this.createAutocompleteValue(button.id, button.name, button.base64Image);
       });
     });
+  }
+  
+  registerImageButtonRunListener(card: Homey.FlowCardTriggerDevice) {
     card.registerRunListener((args, state) => {
-      return args.image.id === state.imageId;
+      return args.image.id === state.imageId && args.action === state.action;
+    });
+  }
+  
+  registerAnyButtonRunListener(card: Homey.FlowCardTriggerDevice) {
+    card.registerRunListener((args, state) => {
+      return args.action === state.action;
     });
   }
   

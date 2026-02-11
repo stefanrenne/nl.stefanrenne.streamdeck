@@ -1,14 +1,42 @@
 {
-  "id": "network_dock_any_button_pressed",
+  "id": "any_button_action",
 	"title":{
-    "en": "Any button pressed",
-    "nl": "Een knop ingedrukt"
+    "en": "Button action",
+    "nl": "Knop actie"
+	},
+	"titleFormatted":{
+    "en": "Button [[action]]",
+    "nl": "Knop [[action]]"
 	},
   "args": [
     {
       "type": "device",
       "name": "device",
       "filter": "driver_id=network-dock"
+    },
+    {
+      "type": "dropdown",
+      "name": "action",
+      "title": { 
+        "en": "Action",
+        "nl": "Actie"
+      },
+      "values": [
+        { 
+          "id": "down", 
+          "title": { 
+            "en": "pressed",
+            "nl": "ingedrukt" 
+          }
+        },
+        { 
+          "id": "up", 
+          "title": { 
+            "en": "released",
+            "nl": "losgelaten" 
+          }
+        }
+      ]
     }
   ],
   "tokens": [
@@ -22,10 +50,10 @@
     },
     {
       "type": "string",
-      "name": "name",
+      "name": "imageName",
       "title": {
-        "en": "Name",
-        "nl": "Naam"
+        "en": "Image name",
+        "nl": "Afbeeldingsnaam"
       }
     },
     {

@@ -1,12 +1,12 @@
 {
-  "id": "network_dock_button_pressed",
-	"title":{
-    "en": "Button pressed",
-    "nl": "Knop ingedrukt"
-	},
+  "id": "image_button_action",
+  "title": {
+    "en": "Image Button action",
+    "nl": "Afbeeldingsknop actie"
+  },
 	"titleFormatted":{
-    "en": "Button [[image]] pressed",
-    "nl": "Knop [[image]] ingedrukt"
+    "en": "[[image]] button [[action]]",
+    "nl": "[[image]] knop [[action]]"
 	},
   "args": [
     {
@@ -22,6 +22,30 @@
         "en":"Image",
         "nl":"Afbeelding"
       }
+    },
+    {
+      "type": "dropdown",
+      "name": "action",
+      "title": { 
+        "en": "Action",
+        "nl": "Actie"
+      },
+      "values": [
+        { 
+          "id": "down", 
+          "title": { 
+            "en": "pressed",
+            "nl": "ingedrukt" 
+          }
+        },
+        { 
+          "id": "up", 
+          "title": { 
+            "en": "released",
+            "nl": "losgelaten" 
+          }
+        }
+      ]
     }
   ],
   "tokens": [

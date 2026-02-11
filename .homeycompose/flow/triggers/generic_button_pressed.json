@@ -29,6 +29,14 @@
       }
     },
     {
+      "type": "string",
+      "name": "payload",
+      "title": {
+        "en": "Payload",
+        "nl": "Payload"
+      }
+    },
+    {
       "type": "number",
       "name": "column",
       "title": {

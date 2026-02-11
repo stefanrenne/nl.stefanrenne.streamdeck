@@ -1,3 +1,6 @@
+label.homey-form-label span {
+ font-size: 10px;   
+}
 td a {
     cursor: pointer;
     display: inherit;

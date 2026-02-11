@@ -30,7 +30,11 @@
                 "none": "None",
                 "image": "Image",
                 "save": "Save",
-                "cancel": "Cancel"
+                "cancel": "Cancel",
+                "payload": {
+                    "title": "Payload",
+                    "description": "Here you can define additional data that will then be exposed to a flow when you tap a button."
+                }
             }
         },
         "image": {

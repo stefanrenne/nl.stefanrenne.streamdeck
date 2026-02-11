@@ -6,98 +6,184 @@ export interface Image {
     readonly id: string;
     readonly name: string;
     readonly base64Image: string;
+    readonly imageBuffer: Buffer
 }
 
 export interface Dashboard {
     readonly id: string;
     readonly name: string;
     readonly displayMode: number;
-    readonly items: DashboardImage[];
+    readonly items: DashboardItem[];
 }
 
-export interface DashboardImage {
+export type DashboardItem = DashboardEmptyItem | DashboardImageItem;
+
+export interface DashboardEmptyItem {
+    readonly kind: 'empty';
+    readonly item: number;
+    readonly payload: string;
+}
+
+export interface DashboardImageItem {
+    readonly kind: 'image';
     readonly item: number;
     readonly name: string;
+    readonly payload: string;
     readonly imageId: string;
     readonly imageBuffer: Buffer;
 }
 
-interface StoredImage {
-    readonly id: string;
-    readonly name: string;
+export interface ImageMetadata {
+    id: string;
+    name: string;
+}
+
+export interface DashboardMetadata {
+    id: string;
+    name: string;
 }
 
 interface StoredDashboard {
-    readonly id: string;
-    readonly name: string;
-    readonly displayMode: number;
-    readonly items: StoredDashboardItem[];
+    displayMode: number;
+    items: StoredDashboardItem[];
 }
 
 interface StoredDashboardItem {
-    readonly type: string;
-    readonly imageId: string;
-    readonly item: number;
+    type: string;
+    item: number;
+    imageId: string;
+    payload: string;
 }
 
 export class Store {
 
     private homey: Homey;
+    private cachedImagesMetadata: ImageMetadata[]
+    private cachedImages: { [id: string] : Image; };
+    private cachedDashboardMetadata: DashboardMetadata[];
+    private cachedDashboards: { [id: string] : Dashboard; };
 
 	constructor(homey: Homey) {
         this.homey = homey;
-    }
-
-    getImages(): Image[] {
-        return this.homey.settings.get('images')?.map((image: StoredImage) => {
-            return {
-                id: image.id,
-                name: image.name,
-                base64Image: this.homey.settings.get(image.id)
-            }
-        }) ?? [];
-    }
-
-    createDashboardImage(imageId: string, item: number): DashboardImage | undefined {
-        const image: Image | undefined = this.getImages().find((image: Image) => image.id === imageId);
-        const name = image?.name;
-        const base64ImageString: string | undefined = image?.base64Image.slice("data:image/png;base64,".length).toString();
-        if (name === undefined || base64ImageString === undefined) {
-            return undefined
-        }
-        return {item: item, name: name, imageId: imageId, imageBuffer: Buffer.from(base64ImageString, 'base64')};
-    }
-
-    getDashboard(id: string): Dashboard | undefined {
-        return this.getDashboards().find((dashboard) => dashboard.id === id);
+        this.cachedDashboardMetadata = [];
+        this.cachedDashboards = {};
+        this.cachedImagesMetadata = [];
+        this.cachedImages = {};
     }
 
     updateDashboard(id: string, size: number) {
         if (size !== 6 && size !== 15 && size !== 32) {
             return
         }
-        const dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
-        const newDashboards = dashboards.map((dashboard) => {
-            if (dashboard.id === id) {
-                return { id: dashboard.id, name: dashboard.name, displayMode: size, items: dashboard.items }
-            }
-            return dashboard
-        })
-        this.homey.settings.set('dashboards', newDashboards);
+
+        //update cache
+        const cache = this.cachedDashboards[id];
+        if (cache !== undefined) {
+            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  displayMode: size, items: cache.items };
+        }
+
+        //write cache back to store
+        var data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
+        if (data !== undefined) {
+            data.displayMode = size;
+            this.homey.settings.set('dashboard-' + id, data);
+        }
     }
 
-    getDashboards(): Dashboard[] {
-        const dashboards: StoredDashboard[] = this.homey.settings.get('dashboards') ?? [];
-        return dashboards.map((dashboard) => {
-            const items = dashboard.items.map((row: StoredDashboardItem) => {
-                if (row.type === 'image') {
-                    return this.createDashboardImage(row.imageId, row.item);
-                } else {
-                    return undefined;
+    // cache dashboards
+    invalidateDashboardMetadata() {
+        this.cachedDashboardMetadata = this.homey.settings.get('dashboards') ?? [];
+    }
+
+    invalidateDashboard(id: string) {
+        this.invalidateDashboardMetadata()
+        if (this.cachedDashboards[id] !== undefined) {
+            delete this.cachedDashboards[id];
+        }
+    }
+
+    getDashboard(id: string): Dashboard | undefined {
+        const cache = this.cachedDashboards[id];
+        if (cache !== undefined) {
+            return cache;
+        }
+        if (this.cachedDashboardMetadata.length == 0) {
+            this.invalidateDashboardMetadata();
+        }
+        const metadata = this.cachedDashboardMetadata.find((dashboard) => dashboard.id === id);
+        const data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
+        if (metadata === undefined || data === undefined) {
+            return undefined
+        }
+        
+        const items: (DashboardEmptyItem | DashboardImageItem)[] = data.items.map((row: StoredDashboardItem) => {
+            const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');
+            if (row.type === 'image' && row.imageId !== undefined) {
+                const image = this.getImage(row.imageId)
+                if (image !== undefined) {
+                    return { kind: 'image', item: row.item, name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
                 }
+            }
+            return { kind: 'empty', item: row.item, payload: payload }
+        });
+
+        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, displayMode: data.displayMode, items: items };
+        this.cachedDashboards[id] = dashboard;
+        return dashboard;
+
+    }
+
+    getDashboardMetadata(): DashboardMetadata[] {
+        if (this.cachedDashboardMetadata.length == 0) {
+            this.invalidateDashboardMetadata();
+        }
+        return this.cachedDashboardMetadata
+    }
+
+    // cache images
+    invalidateImagedMetadata() {
+        this.cachedImagesMetadata = this.homey.settings.get('images') ?? [];
+    }
+
+    invalidateImage(id: string) {
+        this.invalidateImagedMetadata()
+        if (this.cachedImages[id] !== undefined) {
+            delete this.cachedImages[id];
+        }
+    }
+
+    getImage(id: string): Image | undefined {
+        const cache = this.cachedImages[id];
+        if (cache !== undefined) {
+            return cache;
+        }
+        if (this.cachedImagesMetadata.length == 0) {
+            this.invalidateImagedMetadata();
+        }
+        const metadata = this.cachedImagesMetadata.find((image) => image.id === id);
+        const base64Image: string | undefined = this.homey.settings.get('image-' + id);
+        const imageBuffer = (base64Image === undefined) ? undefined : Buffer.from(base64Image.slice("data:image/png;base64,".length).toString(), 'base64');
+
+        if (metadata === undefined || base64Image === undefined || imageBuffer === undefined) {
+            return undefined
+        }
+        const image: Image = { id: metadata.id, name: metadata.name, base64Image: base64Image, imageBuffer: imageBuffer }
+        this.cachedImages[id] = image;
+        return image;
+    }
+
+    getImages(): Image[] {
+        return this.getImagesMetadata()
+            .map((metadata) => {
+                return this.getImage(metadata.id)
             })
             .filter((item) => item !== undefined);
-            return {id: dashboard.id, name: dashboard.name, displayMode: dashboard.displayMode, items: items}
-        })
+    }
+
+    getImagesMetadata(): ImageMetadata[] {
+        if (this.cachedImagesMetadata.length == 0) {
+            this.invalidateImagedMetadata();
+        }
+        return this.cachedImagesMetadata;
     }
 }

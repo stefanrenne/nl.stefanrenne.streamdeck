@@ -4,7 +4,6 @@
     <link rel="stylesheet" type="text/css" href="./bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="./style.css" />
     <script src="./bootstrap.min.js"></script>
-    <script src="./tabs.js"></script>
     <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
   </head>
   <body>
@@ -91,14 +90,14 @@
       <header class="homey-header">
         <h1 class="homey-title" data-i18n="settings.dashboard.item.title"></h1>
       </header>
-      <div style="display: inline-block; margin-bottom: 30px;">
+      <div style="display: inline-block;">
         <div class="deck1" style="float: left">
           <div class="deck-item" id="manage-dashboardItem-display">
             <p></p>
             <img />
           </div>
         </div>
-        <fieldset class="homey-form-radio-set" style="float: left; margin-top: 30px; margin-left: 20px;">
+        <fieldset class="homey-form-radio-set" style="float: left; margin-top: 20px; margin-left: 20px;">
           <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.displayMode"></legend>
           <div class="allignedradio">
             <label class="homey-form-radio">
@@ -115,9 +114,15 @@
         </fieldset>
       </div>
 
-      <div id="manage-dashboardItem-image" style="margin-bottom: 30px" class="hidden">
+      <div id="manage-dashboardItem-image" style="margin-top: 20px" class="hidden">
+          <legend class="homey-form-radio-set-title">Select Image</legend>
         <div id="manage-dashboardItem-imageItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
       </div>
+
+      <fieldset class="homey-form-radio-set" style="margin-bottom: 30px; width: 100%;">
+        <label class="homey-form-label" for="payload"><p style="margin: 0;" data-i18n="settings.dashboard.item.payload.title"></p><span data-i18n="settings.dashboard.item.payload.description"></span></label>
+        <input class="homey-form-input" id="payload" type="text" value=""/>
+      </fieldset>
 
       <button id="saveDashboardItem" class="homey-button-primary-full" data-i18n="settings.dashboard.item.save"></button>
       <button id="cancelDashboardItem" class="homey-button-danger-shadow marginTop full" data-i18n="settings.dashboard.item.cancel"></button>
@@ -213,7 +218,7 @@
           for (var i = 0; i < $deck.children.length; i++) {
             const item = $deck.children[i];
             if (item.classList.contains("actionImage")) {
-              dashboardItems.push({type: "image", imageId: item.dataset.imageId, item: i + 1});
+              dashboardItems.push({type: "image", imageId: item.dataset.imageId, payload: item.dataset.payload, item: i + 1});
             }
           }
           var displayMode = 15;
@@ -222,7 +227,7 @@
           } else if (document.getElementById("displayMode32").checked) {
             displayMode = 32;
           }
-          await insertDashboard({id: $deck.dataset.id, name: await validateDashboardName($deck.dataset.id, $input.value), displayMode: displayMode, items: dashboardItems});
+          await storeDashboard($deck.dataset.id, await validateDashboardName($deck.dataset.id, $input.value), displayMode, dashboardItems);
           await loadDashboards();
 
           showView('main');
@@ -270,11 +275,12 @@
         });
         $saveItemButton.addEventListener("click", async () => {
           const $dashboardItem = document.getElementById("deckItem" + $createDashboardItemDisplay.dataset.id);
+          $dashboardItem.dataset.payload = document.getElementById("payload").value.trim().replace(/"/g, '\\x22').replace(/'/g, '\\x27');
           if ($createDashboardItemDisplay.classList.contains("actionImage")) {
             $dashboardItem.classList.add("actionImage");
             $dashboardItem.classList.remove("actionNone");
             $dashboardItem.dataset.imageId = $createDashboardItemDisplay.dataset.imageId
-            $dashboardItem.querySelector('img').src = await getImage($createDashboardItemDisplay.dataset.imageId);
+            $dashboardItem.querySelector('img').src = await getImageFromStore($createDashboardItemDisplay.dataset.imageId);
           } else {
             $dashboardItem.classList.add("actionNone");
             $dashboardItem.classList.remove("actionImage");
@@ -354,8 +360,9 @@
           const $img = document.createElement('img');
           $item.appendChild($img);
 
+          $item.dataset.payload = cache?.payload ?? ""
           if (cache?.type === "image" && cache.imageId !== undefined) {
-            $img.src = await getImage(cache.imageId); 
+            $img.src = await getImageFromStore(cache.imageId); 
             $item.classList.add("actionImage");
             $item.dataset.imageId = cache.imageId
           } else {
@@ -365,7 +372,7 @@
 
           $item.addEventListener('click', async () => {
             const imageId = $item.classList.contains("actionImage") ? $item.dataset.imageId : undefined;
-            await this.selectDashboardItem(id, $text.innerHTML, imageId);
+            await this.selectDashboardItem(id, $text.innerHTML, imageId, $item.dataset.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\''));
           });
         }
       }
@@ -385,16 +392,17 @@
         }
       }
 
-      async function selectDashboardItem(id, defaultText, imageId) {
+      async function selectDashboardItem(id, defaultText, imageId, payload) {
         const $noneRadio = document.getElementById("displayItemMode0");
         const $buttonRadio = document.getElementById("displayItemMode1");
         
         $createDashboardItemDisplay.dataset.id = id;
         $createDashboardItemDisplay.dataset.imageId = imageId ?? "";
+        document.getElementById("payload").value = payload ?? ""
 
         $createDashboardItemDisplay.querySelector('p').innerHTML = defaultText;
         if (imageId !== undefined) {
-          $createDashboardItemDisplay.querySelector('img').src = await getImage(imageId);
+          $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore(imageId);
           $createDashboardItemDisplay.classList.remove("actionNone");
           $createDashboardItemDisplay.classList.add("actionImage");
           $createDashboardItemButtonView.classList.remove("hidden");
@@ -430,7 +438,7 @@
 
       async function validateDashboardName(id, name) {
         const cleanName = (name.trim() !== "") ? name.trim() : "dashboard";
-        const dashboards = await getDashboardsFromStore()
+        const dashboards = await getDashboardsFromStore();
         const existingNames = dashboards.filter((item) => item.id !== id).map(item => item.name);
         return validateName(existingNames, cleanName);
       }
@@ -448,13 +456,6 @@
           i++;
         } while (existingNames.includes((i === 0) ? validatedName : validatedName + "-" + i));
         return (i === 0) ? validatedName : validatedName + "-" + i;
-      }
-
-      async function insertDashboard(dashboard) {
-        if (dashboard.id === undefined || dashboard.id === "") {
-          dashboard.id = crypto.randomUUID();
-        }
-        await storeDashboard(dashboard);
       }
 
       function getBase64(file) {
@@ -485,15 +486,34 @@
       }
 
       async function loadImages() {
-        const images = await getImagesFromStore();
+        
+        /* Validate Existing Dashboard */
+        var images = await getImagesFromStore();
+        const imageIds = images.map((item) => item.id);
+        const dashboards = await getDashboardsFromStore();
+        for (const metadata of Object.values(dashboards)) {
+          var didUpdateDashboards = false;
+          const dashboard = await getDashboardFromStore(metadata.id);
+          const newItems = dashboard.items.filter((item) => {
+            if (item.type !== "image" || imageIds.includes(item.imageId)) {
+              return true;
+            }
+            didUpdateDashboards = true;
+            return false;
+          });
+          if (didUpdateDashboards) {
+            await storeDashboardItem(metadata.id, dashboard.displayMode, newItems);
+          }
+        }
 
         /* Load Images Tab */
+        images = await getImagesFromStore();
         const $container = document.getElementById("imagesContainer");
         $container.innerHTML = '';
 
         for (const image of Object.values(images)) {
           const $row = document.createElement('tr');
-          const imageData = await getImage(image.id);
+          const imageData = await getImageFromStore(image.id);
 
           $imageColumn = document.createElement('td');
           $row.appendChild($imageColumn);
@@ -560,34 +580,15 @@
           $selectImageDeck.appendChild($item);
 
           $image = document.createElement('img');
-          $image.src = await getImage(button.id);
+          $image.src = await getImageFromStore(button.id);
           $item.appendChild($image);
 
           $item.addEventListener('click', async () => {
             $createDashboardItemDisplay.classList.remove("actionNone");
             $createDashboardItemDisplay.classList.add("actionImage");
-            $createDashboardItemDisplay.querySelector('img').src = await getImage(button.id);
+            $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore(button.id);
             $createDashboardItemDisplay.dataset.imageId = button.id;
           });
-        }
-
-        /* Validate Existing Dashboard */
-        const imageIds = images.map((item) => item.id);
-        var didUpdateDashboards = false;
-        const dashboards = await getDashboardsFromStore();
-        const newDashboards = Object.values(dashboards).map((dashboard) => {
-          const newItems = dashboard.items.filter((item) => {
-            if (item.type !== "image" || imageIds.includes(item.imageId)) {
-              return true;
-            }
-            didUpdateDashboards = true;
-            return false;
-          });
-          return { id: dashboard.id, name: dashboard.name, displayMode: dashboard.displayMode, items: newItems };
-        });
-        if (didUpdateDashboards) {
-          await Homey.set('dashboards', newDashboards);
-          await loadDashboards();
         }
       }
 
@@ -596,11 +597,11 @@
         $container.innerHTML = '';
         const dashboards = await getDashboardsFromStore();
 
-        for (const dashboard of Object.values(dashboards)) {
+        for (const metadata of Object.values(dashboards)) {
           const $row = document.createElement('tr');
 
           $nameColumn = document.createElement('td');
-          $nameColumn.innerHTML = dashboard.name;
+          $nameColumn.innerHTML = metadata.name;
           $row.appendChild($nameColumn);
 
           $actionColumn = document.createElement('td');
@@ -612,7 +613,8 @@
           $edit.title = Homey.__('settings.dashboard.editTitle');
           $editMask = document.createElement('span');
           $edit.addEventListener('click', async () => {
-            await createDeckItems(dashboard.displayMode, dashboard.id, dashboard.name, dashboard.items);
+            const dashboard = await getDashboardFromStore(metadata.id);
+            await createDeckItems(dashboard.displayMode, metadata.id, metadata.name, dashboard.items);
           });
           $edit.appendChild($editMask);
           $actionColumn.appendChild($edit);
@@ -626,6 +628,7 @@
           $copy.title = Homey.__('settings.dashboard.copyTitle');
           $copyMask = document.createElement('span');
           $copy.addEventListener('click', async () => {
+            const dashboard = await getDashboardFromStore(metadata.id);
             await createDeckItems(dashboard.displayMode, undefined, undefined, dashboard.items);
           });
           $copy.appendChild($copyMask);
@@ -640,8 +643,8 @@
           $delete.title = Homey.__('settings.dashboard.deleteTitle');
           $deleteMask = document.createElement('span');
           $delete.addEventListener('click', async () => {
-          if (await Homey.confirm(Homey.__("settings.dashboard.confirmDelete", {name: dashboard.name}))) {
-            await unstoreDashboard(dashboard.id);
+          if (await Homey.confirm(Homey.__("settings.dashboard.confirmDelete", {name: metadata.name}))) {
+            await unstoreDashboard(metadata.id);
             await loadDashboards();
           }
           });
@@ -652,22 +655,58 @@
         }
       }
 
-      var cachedImage = {};
-      async function storeImage(id, data, name) {
-        cachedImage[id] = data
-        await Homey.set(fileId, data);
+      var cachedDashboard = {};
+      async function storeDashboard(id, name, displayMode, items) {
+        const dashboardId = (id === undefined || id === "") ? crypto.randomUUID() : id;
 
-        var newImages = await getImagesFromStore();
-        newImages.push({id: id, name: name});
-        cachedImages = newImages;
-        await Homey.set('images', newImages);
+        const oldDashboards = await getDashboardsFromStore();
+        var newDashboards = oldDashboards.filter((row) => row.id !== dashboardId);
+        newDashboards.push({ 'id': dashboardId, 'name': name });
+        cachedDashboards = newDashboards;
+        await Homey.set('dashboards', newDashboards);
+
+        await storeDashboardItem(dashboardId, displayMode, items);
       }
 
-      async function getImage(id) {
+      async function storeDashboardItem(id, displayMode, items) {
+        const dashboardData = { 'displayMode': displayMode, 'items': items };
+        cachedDashboard[id] = dashboardData;
+        await Homey.set('dashboard-' + id, dashboardData);
+      }
+
+      async function getDashboardFromStore(id) {
+        const dashboards = await getDashboardsFromStore();
+        const metadata = dashboards.find((row) => row.id === id);
+        if (cachedDashboard[id] === undefined) {
+          cachedDashboard[id] = await Homey.get('dashboard-' + id);
+        }
+        return Object.assign(cachedDashboard[id] ?? {}, metadata);
+      }
+
+      async function unstoreDashboard(id) {
+        const oldDashboards = await getDashboardsFromStore();
+        cachedDashboards = oldDashboards.filter((row) => row.id !== id);
+
+        delete cachedDashboard[id];
+        await Homey.unset('dashboard-' + id);
+      }
+
+      var cachedImage = {};
+      async function storeImage(id, data, name) {
+        var newImages = await getImagesFromStore();
+        newImages.push({ id: id, name: name });
+        cachedImages = newImages;
+        await Homey.set('images', newImages);
+
+        cachedImage[id] = data
+        await Homey.set('image-' + id, data);
+      }
+
+      async function getImageFromStore(id) {
         if (cachedImage[id] !== undefined) {
           return cachedImage[id];
         }
-        const image = await Homey.get(id);
+        const image = await Homey.get('image-' + id);
         if (image !== undefined) {
           cachedImage[id] = image
         }
@@ -676,20 +715,21 @@
 
       async function unstoreImage(id) {
         if (cachedImage[id] !== undefined) {
-          unset(cachedImage[id]);
+          delete cachedImage[id];
         }
-        await Homey.unset(id);
 
         const images = await getImagesFromStore();
         const newImages = images.filter(item => item.id !== id);
         cachedImages = newImages;
         await Homey.set('images', newImages);
+        
+        await Homey.unset('image-' + id);
       }
 
       var cachedDashboards = [];
       async function getDashboardsFromStore() {
         if (cachedDashboards === undefined || cachedDashboards.length === 0) {
-          cachedDashboards = Homey.get('dashboards') ?? []
+          cachedDashboards = await Homey.get('dashboards') ?? []
         }
         return cachedDashboards
       }
@@ -701,18 +741,10 @@
         await Homey.set('dashboards', newDashboards);
       }
 
-      async function storeDashboard(newDashboard) {
-        const oldDashboards = await getDashboardsFromStore();
-        var newDashboards = oldDashboards.filter((row) => row.id !== dashboard.id);
-        newDashboards.push(dashboard);
-        cachedDashboards = newDashboards;
-        await Homey.set('dashboards', newDashboards);
-      }
-
       var cachedImages = [];
       async function getImagesFromStore() {
         if (cachedImages === undefined || cachedImages.length === 0) {
-          cachedImages = Homey.get('images') ?? []
+          cachedImages = await Homey.get('images') ?? []
         }
         return cachedImages
       }

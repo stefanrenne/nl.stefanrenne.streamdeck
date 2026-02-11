@@ -30,7 +30,11 @@
                 "none": "Niks",
                 "image": "Afbeelding",
                 "save": "Opslaan",
-                "cancel": "Annuleren"
+                "cancel": "Annuleren",
+                "payload": {
+                    "title": "Payload",
+                    "description": "Hier kunt je aanvullende data invoeren die vervolgens beschikbaar zijn in een flow na het klikken op een knop."
+                }
             }
         },
         "image": {

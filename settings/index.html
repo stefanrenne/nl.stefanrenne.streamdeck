@@ -245,7 +245,7 @@
           if ($input.dataset.oldValue !== $input.value.trim()) {
             $saveItemButton.classList.add('is-loading');
             const newValue = await validateButtonName(id, $input.value);
-            await updateImage(item.id, newValue);
+            await updateImage(id, newValue);
             await loadImages();
             $saveItemButton.classList.remove('is-loading');
           }
@@ -772,10 +772,10 @@
         return cachedImages
       }
 
-      async function updateImage(id, name) {
+      async function updateImage(id, newName) {
         const images = await getImagesFromStore();
         const newImages = images.map(item => {
-          return {'id': item.id, 'name': (item.id === id) ? newValue : item.name}
+          return {'id': item.id, 'name': (item.id === id) ? newName : item.name}
         });
         cachedImages = newImages;
         await Homey.set('images', newImages);

@@ -44,7 +44,7 @@
           <tbody id="imagesContainer"></tbody>
         </table>
         <hr/>
-        <input class="hidden" id="addImageInput" type="file" accept="image/png">
+        <input class="hidden" id="addImageInput" type="file" accept=".jpg, .jpeg, .png">
         <button id="addImage" class="homey-button-primary-full" data-i18n="settings.image.add"></button>
       </div>
     </div>
@@ -470,6 +470,29 @@
         })
       }
 
+      function resizeBase64Image(base64Data, maxSize) {
+        const canvas = document.createElement('canvas');
+
+        const image = new Image();
+        image.src = base64Data;
+
+        return new Promise((resolve, reject) => {
+          image.onload = () => {
+            const size = Math.min(maxSize, image.width, image.height);
+            const widthOffset = (image.width > image.height) ? image.width - image.height : 0
+            const heightOffset = (image.width < image.height) ? image.height - image.width : 0
+
+            canvas.width = size;
+            canvas.height = size;
+            canvas.getContext('2d').drawImage(image, widthOffset / 2, heightOffset / 2, image.width - widthOffset, image.height - heightOffset, 0, 0, size, size);
+
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
+          };
+
+          image.onerror = reject;
+        });
+      };
+
       function observeFileUpload() {
         const $button = document.getElementById("addImage");
         const $input = document.getElementById("addImageInput");
@@ -477,7 +500,7 @@
           $button.classList.add('is-loading');
           const fileId = crypto.randomUUID();
           const file = $input.files[0];
-          const data = await getBase64(file);
+          const data = await resizeBase64Image(await getBase64(file), 300);
           const name = await validateButtonName(undefined, file.name);
           await storeImage(fileId, data, name);
           await loadImages();

@@ -162,7 +162,7 @@ export class Store {
         }
         const metadata = this.cachedImagesMetadata.find((image) => image.id === id);
         const base64Image: string | undefined = this.homey.settings.get('image-' + id);
-        const imageBuffer = (base64Image === undefined) ? undefined : Buffer.from(base64Image.slice("data:image/png;base64,".length).toString(), 'base64');
+        const imageBuffer = (base64Image === undefined) ? undefined : Buffer.from(base64Image.replace(/^data:image\/[a-z]+;base64,/gi, ''), 'base64');
 
         if (metadata === undefined || base64Image === undefined || imageBuffer === undefined) {
             return undefined

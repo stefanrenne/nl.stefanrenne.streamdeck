@@ -545,13 +545,18 @@
           const imageData = await getImageFromStore(image.id);
 
           $imageColumn = document.createElement('td');
+          $imageColumn.classList.add('image');
           $row.appendChild($imageColumn);
+
+          $imageBorder = document.createElement('div');
+          $imageBorder.classList.add('small-deck-item');
+          $imageColumn.appendChild($imageBorder);
 
           $image = document.createElement('img');
           $image.src = imageData;
           $image.width = 50;
           $image.height = 50;
-          $imageColumn.appendChild($image);
+          $imageBorder.appendChild($image);
 
           $nameColumn = document.createElement('td');
           $nameColumn.classList.add('text');

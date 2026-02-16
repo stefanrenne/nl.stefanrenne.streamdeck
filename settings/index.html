@@ -554,6 +554,7 @@
           $imageColumn.appendChild($image);
 
           $nameColumn = document.createElement('td');
+          $nameColumn.classList.add('text');
           $nameColumn.innerHTML = image.name;
           $row.appendChild($nameColumn);
 
@@ -585,6 +586,7 @@
           $deleteMask = document.createElement('span');
           $delete.addEventListener('click', async () => {
             if (await Homey.confirm(Homey.__("settings.image.confirmDelete", {name: image.name}))) {
+              $row.classList.add('is-loading');
               await unstoreImage(image.id);
               await loadImages();
             }
@@ -630,6 +632,7 @@
           const $row = document.createElement('tr');
 
           $nameColumn = document.createElement('td');
+          $nameColumn.classList.add('text');
           $nameColumn.innerHTML = metadata.name;
           $row.appendChild($nameColumn);
 
@@ -673,6 +676,7 @@
           $deleteMask = document.createElement('span');
           $delete.addEventListener('click', async () => {
           if (await Homey.confirm(Homey.__("settings.dashboard.confirmDelete", {name: metadata.name}))) {
+            $row.classList.add('is-loading');
             await unstoreDashboard(metadata.id);
             await loadDashboards();
           }

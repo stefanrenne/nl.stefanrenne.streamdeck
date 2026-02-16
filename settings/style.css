@@ -154,3 +154,44 @@ td.center {
     text-align: center;
     font-weight: bold;
 }
+
+@keyframes table-item-loading {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+tr.is-loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+tr.is-loading td.text::before {
+  content: '';
+  mask-image: url('./spinner.svg');
+  mask-position: center center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: url('./spinner.svg');
+  -webkit-mask-position: center center;
+  -webkit-mask-repeat: no-repeat;
+  -moz-mask-image: url('./spinner.svg');
+  -moz-mask-position: center center;
+  -moz-mask-repeat: no-repeat;
+  -moz-mask-size: contain;
+  width: 23px;
+  height: 23px;
+  animation: table-item-loading 1s infinite;
+  animation-timing-function: steps(8, end);
+  background-color: black;
+  display: block;
+  float: left;
+  margin-right: 10px;
+}
+tr.is-loading td.action2 a, tr.is-loading td.action3 a {
+    display: none;
+}

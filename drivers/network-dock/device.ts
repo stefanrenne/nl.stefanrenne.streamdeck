@@ -183,7 +183,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
     var actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
-      const item = dashboard.items.find((item) => item.item === i+1);
+      const item = dashboard.items[i+1];
       switch (item?.kind) {
       case 'image':
         actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('streamDeckSetImage failed:', e)));
@@ -204,7 +204,7 @@ module.exports = class NetworkDock extends Homey.Device {
   // private lastKeypressTime: number = 0;
   // private singlePressEvent: Promise<void> | undefined;
   async streamDeckEvent(event: 'up' | 'down', control: StreamDeckButtonControlDefinition) {
-    const button = this.dashboard?.items.find((item) => item.item === control.index+1);
+    const button = this.dashboard?.items[control.index+1];
     if (button === undefined || this.dashboard?.name === undefined) {
       this.log(event + " empty button");
       return

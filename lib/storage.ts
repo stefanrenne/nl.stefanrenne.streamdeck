@@ -13,20 +13,18 @@ export interface Dashboard {
     readonly id: string;
     readonly name: string;
     readonly displayMode: number;
-    readonly items: DashboardItem[];
+    readonly items: { [item: number] : DashboardItem; };
 }
 
 export type DashboardItem = DashboardEmptyItem | DashboardImageItem;
 
 export interface DashboardEmptyItem {
     readonly kind: 'empty';
-    readonly item: number;
     readonly payload: string;
 }
 
 export interface DashboardImageItem {
     readonly kind: 'image';
-    readonly item: number;
     readonly name: string;
     readonly payload: string;
     readonly imageId: string;
@@ -115,17 +113,21 @@ export class Store {
         if (metadata === undefined || data === undefined) {
             return undefined
         }
-        
-        const items: (DashboardEmptyItem | DashboardImageItem)[] = data.items.map((row: StoredDashboardItem) => {
+
+        const defaultItems: { [item: number] : DashboardItem; } = Object.fromEntries(Array.from({length: 32}, (_, i) => [i + 1, { kind: 'empty', payload: '' }]));
+        const items: { [item: number] : DashboardItem; } = data.items.reduce((result, row) => {
             const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');
             if (row.type === 'image' && row.imageId !== undefined) {
                 const image = this.getImage(row.imageId)
                 if (image !== undefined) {
-                    return { kind: 'image', item: row.item, name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
+                    result[row.item] = { kind: 'image', name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
+                    return result;
                 }
             }
-            return { kind: 'empty', item: row.item, payload: payload }
-        });
+
+            result[row.item] = { kind: 'empty', payload: payload };
+            return result;
+        }, defaultItems);
 
         const dashboard: Dashboard = { id: metadata.id, name: metadata.name, displayMode: data.displayMode, items: items };
         this.cachedDashboards[id] = dashboard;

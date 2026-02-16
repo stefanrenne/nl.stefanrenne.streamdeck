@@ -217,9 +217,15 @@
           var dashboardItems = [];
           for (var i = 0; i < $deck.children.length; i++) {
             const item = $deck.children[i];
-            if (item.classList.contains("actionImage")) {
-              dashboardItems.push({type: "image", imageId: item.dataset.imageId, payload: item.dataset.payload, item: i + 1});
-            }
+            const isImage = item.classList.contains("actionImage");
+            dashboardItems.push(
+              {
+                type: (isImage) ? 'image' : 'empty',
+                imageId: (isImage) ? item.dataset.imageId : undefined, 
+                payload: item.dataset.payload, 
+                item: i + 1
+              }
+            );
           }
           var displayMode = 15;
           if (document.getElementById("displayMode6").checked) {
@@ -500,7 +506,7 @@
           $button.classList.add('is-loading');
           const fileId = crypto.randomUUID();
           const file = $input.files[0];
-          const data = await resizeBase64Image(await getBase64(file), 300);
+          const data = await resizeBase64Image(await getBase64(file), 250);
           const name = await validateButtonName(undefined, file.name);
           await storeImage(fileId, data, name);
           await loadImages();

@@ -1,6 +1,6 @@
 {
   "id": "nl.stefanrenne.streamdeck",
-  "version": "0.0.1",
+  "version": "0.9.0",
   "compatibility": ">=12.9.0",
   "sdk": 3,
   "platforms": [
@@ -53,5 +53,6 @@
         "name": "Stefan Renne"
       }
     ]
-  }
+  },
+  "homeyCommunityTopicId": 151256
 }

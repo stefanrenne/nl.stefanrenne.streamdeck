@@ -721,14 +721,6 @@
         return Object.assign(cachedDashboard[id] ?? {}, metadata);
       }
 
-      async function unstoreDashboard(id) {
-        const oldDashboards = await getDashboardsFromStore();
-        cachedDashboards = oldDashboards.filter((row) => row.id !== id);
-
-        delete cachedDashboard[id];
-        await Homey.unset('dashboard-' + id);
-      }
-
       var cachedImage = {};
       async function storeImage(id, data, name) {
         var newImages = await getImagesFromStore();
@@ -773,10 +765,16 @@
       }
 
       async function unstoreDashboard(id) {
+        if (cachedDashboard[id] !== undefined) {
+          delete cachedDashboard[id];
+        }
+
         const dashboards = await getDashboardsFromStore();
         const newDashboards = dashboards.filter(item => item.id !== id);
         cachedDashboards = newDashboards;
+        
         await Homey.set('dashboards', newDashboards);
+        await Homey.unset('dashboard-' + id);
       }
 
       var cachedImages = [];

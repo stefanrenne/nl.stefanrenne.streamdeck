@@ -3,6 +3,9 @@
     "en": "Proof of concept"
   },
   "0.9.0": {
-    "en": "First beta"
+    "en": "Open Beta"
+  },
+  "1.0.0": {
+    "en": "Initial Stable Release"
   }
 }

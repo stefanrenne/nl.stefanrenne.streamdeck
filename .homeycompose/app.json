@@ -54,5 +54,12 @@
       }
     ]
   },
+  "contributing": {
+    "donate": {
+      "githubSponsors": {
+        "username": "stefanrenne"
+      }
+    }
+  },
   "homeyCommunityTopicId": 151256
 }

@@ -11,7 +11,7 @@ module.exports = class NetworkDock extends Homey.Device {
   private connectionManager = new StreamDeckTcpConnectionManager();
   private streamDeck: StreamDeckTcp | undefined;
   private dashboard: Dashboard | undefined;
-  private emptyDashboard = this.createAutocompleteValue("0", "Homey")
+  private emptyDashboard = this.createAutocompleteValue('0', 'Homey')
 
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
   private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
@@ -31,8 +31,8 @@ module.exports = class NetworkDock extends Homey.Device {
     await this.updateSelectableDashboardOptions();
 
 
-    const ipAddress = this.getSetting("ipAddress");
-    this.log("NetworkDock has been initialized");
+    const ipAddress = this.getSetting('ipAddress');
+    this.log('NetworkDock has been initialized');
 
     this.connectionManager.connectTo(ipAddress)
 
@@ -41,7 +41,7 @@ module.exports = class NetworkDock extends Homey.Device {
     });
 
     this.connectionManager.on('connected', async (streamDeck) => {
-      this.log("connectionManager - connected");
+      this.log('connectionManager - connected');
 
       if (streamDeck.CONTROLS.length > 0) {
         this.streamDeck = streamDeck
@@ -51,7 +51,7 @@ module.exports = class NetworkDock extends Homey.Device {
         const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.emptyDashboard.id;
         await this.streamDeckLoadDashboard(streamDeck, dashboardId);
       } else if (this.streamDeck == undefined) {
-        await this.setUnavailable("No Stream Deck connected to Network Dock");
+        await this.setUnavailable('No Stream Deck connected to Network Dock');
       }
     });
 
@@ -61,7 +61,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       if (selectedDashboardId === id) {
-        this.log("selected dashboard updated");
+        this.log('selected dashboard updated');
         await this.streamDeckLoadDashboard(this.streamDeck, id);
       }
     });
@@ -69,7 +69,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.homey.settings.on('unset-dashboard', async (id: string) => {
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       if (selectedDashboardId === id) {
-        this.log("selected dashboard removed");
+        this.log('selected dashboard removed');
         await this.loadEmptyDashboardOptions();
       }
 
@@ -106,16 +106,16 @@ module.exports = class NetworkDock extends Homey.Device {
   }
   
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
-      this.log("device - connected");
+      this.log('device - connected');
 
       streamDeck.tcpEvents.on('disconnected', async () => {
-        this.log("device - disconnected");
-        await this.setUnavailable("Stream Deck Disconnected");
+        this.log('device - disconnected');
+        await this.setUnavailable('Stream Deck Disconnected');
         this.streamDeck = undefined;
       });
 
       streamDeck.on('error', async (error) => {
-        this.log("device - error " + error);
+        this.log('device - error ' + error);
         const message = typeof error === 'string' ? error : undefined;
         await this.setUnavailable(message);
       });
@@ -206,7 +206,7 @@ module.exports = class NetworkDock extends Homey.Device {
   async streamDeckEvent(event: 'up' | 'down', control: StreamDeckButtonControlDefinition) {
     const button = this.dashboard?.items[control.index+1];
     if (button === undefined || this.dashboard?.name === undefined) {
-      this.log(event + " empty button");
+      this.log(event + ' empty button');
       return
     }
 
@@ -215,7 +215,7 @@ module.exports = class NetworkDock extends Homey.Device {
     //   this.log(thisKeypressTime - this.lastKeypressTime)
     //   if (thisKeypressTime - this.lastKeypressTime <= 400) {
     //     this.singlePressEvent?.ca
-    //     this.log("double press");
+    //     this.log('double press');
     //     this.lastKeypressTime = 0;
     //   } else {
     //     this.lastKeypressTime = thisKeypressTime;
@@ -235,14 +235,14 @@ module.exports = class NetworkDock extends Homey.Device {
     switch (button.kind) {
     case 'image':
       state = { action: event, imageId: button.imageId }
-      tokens = { dashboard: this.dashboard?.name ?? "", imageName: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      tokens = { dashboard: this.dashboard?.name ?? '', imageName: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };
       actions.push(this.onImageButtonAction.trigger(this, tokens, state));
-      this.log(event + " image button " + button.name);
+      this.log(event + ' image button ' + button.name);
       break; 
     default:
       state = { action: event }
-      tokens = { dashboard: this.dashboard?.name ?? "", imageName: "", payload: button.payload, column: control.column + 1, row: control.row + 1 };
-      this.log(event + " empty button ");
+      tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      this.log(event + ' empty button ');
       break;
     }
     actions.push(this.onAnyButtonAction.trigger(this, tokens, state));
@@ -276,8 +276,8 @@ module.exports = class NetworkDock extends Homey.Device {
     newSettings: { [key: string]: boolean | string | number | undefined | null };
     changedKeys: string[];
   }): Promise<string | void> {
-    const oldIp = oldSettings["ipAddress"] as string;
-    const newIp = newSettings["ipAddress"] as string;
+    const oldIp = oldSettings['ipAddress'] as string;
+    const newIp = newSettings['ipAddress'] as string;
     if (oldIp !== newIp) {
       await this.streamDeck?.clearPanel();
       this.connectionManager.disconnectFrom(oldIp);
@@ -291,7 +291,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.streamDeck?.tcpEvents.removeAllListeners()
     const ipAddress = this.streamDeck?.remoteAddress
     if (ipAddress !== undefined) {
-      this.log("disconnect from " + ipAddress);
+      this.log('disconnect from ' + ipAddress);
       this.connectionManager.disconnectFrom(ipAddress);
     }
   }
@@ -322,11 +322,11 @@ module.exports = class NetworkDock extends Homey.Device {
 
   async updateSelectableDashboardOptions() {
     const staticOptions = [
-      {"id": this.emptyDashboard.id, "title": { "en": this.emptyDashboard.name } }
+      {'id': this.emptyDashboard.id, 'title': { 'en': this.emptyDashboard.name } }
     ]
     const dynamicOptions = this.store
       .getDashboardMetadata()
-      .map((dashboard) => ({"id": dashboard.id, "title": { "en": dashboard.name } }) );
+      .map((dashboard) => ({'id': dashboard.id, 'title': { 'en': dashboard.name } }) );
 
     await this.setCapabilityOptions('dashboard', { values: staticOptions.concat(dynamicOptions) });
   }
@@ -407,7 +407,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
       if (!this.getAvailable()) {
-        throw "Stream Deck is unavailable";
+        throw 'Stream Deck is unavailable';
       }
       
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');

@@ -188,4 +188,23 @@ export class Store {
         }
         return this.cachedImagesMetadata;
     }
+
+    // dead files
+    cleanSettings() {
+        const dashboardMetadata: DashboardMetadata[] = this.homey.settings.get('dashboards') ?? [];
+        const imageMetadata: ImageMetadata[] = this.homey.settings.get('images') ?? [];
+
+        const dashboardFiles = dashboardMetadata.map((metadata) => 'dashboard-' + metadata.id);
+        const imageFiles = imageMetadata.map((metadata) => 'image-' + metadata.id);
+        const allowedFiles = ['dashboards', 'images'].concat(dashboardFiles).concat(imageFiles);
+        const toRemove = this.homey.settings.getKeys().filter((item) => !allowedFiles.includes(item));
+
+        if (toRemove.length > 0) {
+            this.homey.log("== remove ==");
+            this.homey.log(toRemove);
+            toRemove.forEach((item) => {
+                this.homey.settings.unset(item);
+            });
+        }
+    }
 }

@@ -110,13 +110,29 @@
               <span class="homey-form-radio-checkmark"></span>
               <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.image"></span>
             </label>
+            <label class="homey-form-radio">
+              <input class="homey-form-radio-input" id="displayItemMode2" type="radio" name="item-mode" value="2"/>
+              <span class="homey-form-radio-checkmark"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.text"></span>
+            </label>
           </div>
         </fieldset>
       </div>
 
       <div id="manage-dashboardItem-image" style="margin-top: 20px" class="hidden">
-          <legend class="homey-form-radio-set-title">Select Image</legend>
+          <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.selectImage"></legend>
         <div id="manage-dashboardItem-imageItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
+      </div>
+
+      <div id="manage-dashboardItem-text" style="margin-top: 20px" class="hidden">
+        <div class="homey-form-group">
+          <label class="homey-form-label" for="selectTextFirstLine" data-i18n="settings.dashboard.item.selectTextFirstLine"></label>
+          <input class="homey-form-input" id="selectTextFirstLine" type="text" value=""/>
+        </div>
+        <div class="homey-form-group">
+          <label class="homey-form-label" for="selectTextSecondLine"><p style="margin: 0;" data-i18n="settings.dashboard.item.selectTextSecondLine"></p><span data-i18n="settings.dashboard.item.selectTextSecondLineHint"></span></label>
+          <input class="homey-form-input" id="selectTextSecondLine" type="text" value=""/>
+        </div>
       </div>
 
       <fieldset class="homey-form-radio-set" style="margin-bottom: 30px; width: 100%;">
@@ -151,7 +167,8 @@
 
     <script type="text/javascript">
       const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
-      const $createDashboardItemButtonView = document.getElementById("manage-dashboardItem-image");
+      const $createDashboardItemSelectImageView = document.getElementById("manage-dashboardItem-image");
+      const $createDashboardItemSelectTextView = document.getElementById("manage-dashboardItem-text");
       const $deck = document.getElementById("deck");
 
       function observeMenuItems() {
@@ -218,10 +235,13 @@
           for (var i = 0; i < $deck.children.length; i++) {
             const item = $deck.children[i];
             const isImage = item.classList.contains("actionImage");
+            const isText = item.classList.contains("actionText");
             dashboardItems.push(
               {
-                type: (isImage) ? 'image' : 'empty',
-                imageId: (isImage) ? item.dataset.imageId : undefined, 
+                type: (isImage) ? 'image' : (isText) ? 'text' : 'empty',
+                imageId: (isImage) ? item.dataset.imageId : undefined,
+                textFirstLine: (isText) ? item.dataset.firstLine : undefined,
+                textSecondLine: (isText) ? item.dataset.secondLine : undefined,
                 payload: item.dataset.payload, 
                 item: i + 1
               }
@@ -265,18 +285,34 @@
       async function observeDashboardItemImages() {
         const $saveItemButton = document.getElementById("saveDashboardItem");
         const $noneRadio = document.getElementById("displayItemMode0");
-        const $buttonRadio = document.getElementById("displayItemMode1");
+        const $imageRadio = document.getElementById("displayItemMode1");
+        const $textRadio = document.getElementById("displayItemMode2");
+
+        const $textFirstLine = document.getElementById("selectTextFirstLine");
+        const $textSecondLine = document.getElementById("selectTextSecondLine");
 
         $noneRadio.addEventListener('change', async () => {
-          $createDashboardItemButtonView.classList.add("hidden");
+          $createDashboardItemSelectImageView.classList.add("hidden");
+          $createDashboardItemSelectTextView.classList.add("hidden");
           $createDashboardItemDisplay.classList.remove("actionImage");
+          $createDashboardItemDisplay.classList.remove("actionText");
           $createDashboardItemDisplay.classList.add("actionNone");
         });
-        $buttonRadio.addEventListener('change', async () => {
-          $createDashboardItemButtonView.classList.remove("hidden");
+        $imageRadio.addEventListener('change', async () => {
+          $createDashboardItemSelectImageView.classList.remove("hidden");
+          $createDashboardItemSelectTextView.classList.add("hidden");
           if ($createDashboardItemDisplay.dataset.imageId !== "") {
+            $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore($createDashboardItemDisplay.dataset.imageId);
             $createDashboardItemDisplay.classList.add("actionImage");
+            $createDashboardItemDisplay.classList.remove("actionText");
             $createDashboardItemDisplay.classList.remove("actionNone");
+          }
+        });
+        $textRadio.addEventListener('change', async () => {
+          $createDashboardItemSelectImageView.classList.add("hidden");
+          $createDashboardItemSelectTextView.classList.remove("hidden");
+          if ($textFirstLine.value.trim() !== "") {
+            await textChangeEvent();
           }
         });
         $saveItemButton.addEventListener("click", async () => {
@@ -284,16 +320,45 @@
           $dashboardItem.dataset.payload = document.getElementById("payload").value.trim().replace(/"/g, '\\x22').replace(/'/g, '\\x27');
           if ($createDashboardItemDisplay.classList.contains("actionImage")) {
             $dashboardItem.classList.add("actionImage");
+            $dashboardItem.classList.remove("actionText");
             $dashboardItem.classList.remove("actionNone");
             $dashboardItem.dataset.imageId = $createDashboardItemDisplay.dataset.imageId
             $dashboardItem.querySelector('img').src = await getImageFromStore($createDashboardItemDisplay.dataset.imageId);
+          } else if ($createDashboardItemDisplay.classList.contains("actionText")) {
+            $dashboardItem.classList.remove("actionImage");
+            $dashboardItem.classList.add("actionText");
+            $dashboardItem.classList.remove("actionNone");
+            $dashboardItem.dataset.firstLine = document.getElementById("selectTextFirstLine").value
+            $dashboardItem.dataset.secondLine = document.getElementById("selectTextSecondLine").value
+            $dashboardItem.querySelector('img').src = await getImageForText(document.getElementById("selectTextFirstLine").value, document.getElementById("selectTextSecondLine").value)
           } else {
             $dashboardItem.classList.add("actionNone");
+            $dashboardItem.classList.remove("actionText");
             $dashboardItem.classList.remove("actionImage");
           }
 
           showView('dashboard');
         });
+
+        $textFirstLine.addEventListener("change", textChangeEvent, false);
+        $textFirstLine.addEventListener("keyup", textChangeEvent, false);
+        $textSecondLine.addEventListener("change", textChangeEvent, false);
+        $textSecondLine.addEventListener("keyup", textChangeEvent, false);
+
+        async function textChangeEvent() {
+          const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
+          if (!$textRadio.checked) { return }
+          if ($textFirstLine.value.trim() === "") {
+            $createDashboardItemDisplay.classList.add("actionNone");
+            $createDashboardItemDisplay.classList.remove("actionImage");
+            $createDashboardItemDisplay.classList.remove("actionText");
+          } else {
+            $createDashboardItemDisplay.classList.remove("actionNone");
+            $createDashboardItemDisplay.classList.remove("actionImage");
+            $createDashboardItemDisplay.classList.add("actionText");
+            $createDashboardItemDisplay.querySelector('img').src = image;
+          }
+        }
       }
 
       function deckDefaultText(i, columns) {
@@ -370,15 +435,27 @@
           if (cache?.type === "image" && cache.imageId !== undefined) {
             $img.src = await getImageFromStore(cache.imageId); 
             $item.classList.add("actionImage");
-            $item.dataset.imageId = cache.imageId
+            $item.dataset.imageId = cache.imageId;
+            $item.dataset.firstLine = "";
+            $item.dataset.secondLine = "";
+          } else if (cache?.type === "text" && cache.textFirstLine !== undefined) {
+            $img.src = await getImageForText(cache.textFirstLine, cache.textSecondLine); 
+            $item.classList.add("actionText");
+            $item.dataset.firstLine = cache.textFirstLine;
+            $item.dataset.secondLine = cache.textSecondLine;
+            $item.dataset.imageId = "";
           } else {
-            $item.dataset.imageId = ""
             $item.classList.add("actionNone");
+            $item.dataset.imageId = "";
+            $item.dataset.firstLine = "";
+            $item.dataset.secondLine = "";
           }
 
           $item.addEventListener('click', async () => {
             const imageId = $item.classList.contains("actionImage") ? $item.dataset.imageId : undefined;
-            await this.selectDashboardItem(id, $text.innerHTML, imageId, $item.dataset.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\''));
+            const firstLine = $item.classList.contains("actionText") ? $item.dataset.firstLine : undefined;
+            const secondLine = $item.classList.contains("actionText") ? $item.dataset.secondLine : undefined;
+            await this.selectDashboardItem(id, $text.innerHTML, imageId, firstLine, secondLine, $item.dataset.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\''));
           });
         }
       }
@@ -398,28 +475,43 @@
         }
       }
 
-      async function selectDashboardItem(id, defaultText, imageId, payload) {
+      async function selectDashboardItem(id, defaultText, imageId, firstLine, secondLine, payload) {
         const $noneRadio = document.getElementById("displayItemMode0");
-        const $buttonRadio = document.getElementById("displayItemMode1");
+        const $imageRadio = document.getElementById("displayItemMode1");
+        const $textRadio = document.getElementById("displayItemMode2");
         
         $createDashboardItemDisplay.dataset.id = id;
         $createDashboardItemDisplay.dataset.imageId = imageId ?? "";
-        document.getElementById("payload").value = payload ?? ""
+        document.getElementById("payload").value = payload ?? "";
+        document.getElementById("selectTextFirstLine").value = firstLine ?? "";
+        document.getElementById("selectTextSecondLine").value = secondLine ?? "";
 
         $createDashboardItemDisplay.querySelector('p').innerHTML = defaultText;
         if (imageId !== undefined) {
           $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore(imageId);
           $createDashboardItemDisplay.classList.remove("actionNone");
+          $createDashboardItemDisplay.classList.remove("actionText");
           $createDashboardItemDisplay.classList.add("actionImage");
-          $createDashboardItemButtonView.classList.remove("hidden");
+          $createDashboardItemSelectImageView.classList.remove("hidden");
+          $createDashboardItemSelectTextView.classList.add("hidden");
+        } else if (firstLine !== undefined) {
+          $createDashboardItemDisplay.querySelector('img').src = await getImageForText(firstLine, secondLine);
+          $createDashboardItemDisplay.classList.remove("actionNone");
+          $createDashboardItemDisplay.classList.add("actionText");
+          $createDashboardItemDisplay.classList.remove("actionImage");
+          $createDashboardItemSelectImageView.classList.add("hidden");
+          $createDashboardItemSelectTextView.classList.remove("hidden");
         } else {
           $createDashboardItemDisplay.querySelector('img').src = "";
           $createDashboardItemDisplay.classList.add("actionNone");
+          $createDashboardItemDisplay.classList.remove("actionText");
           $createDashboardItemDisplay.classList.remove("actionImage");
-          $createDashboardItemButtonView.classList.add("hidden");
+          $createDashboardItemSelectImageView.classList.add("hidden");
+          $createDashboardItemSelectTextView.classList.add("hidden");
         }
-        $noneRadio.checked = imageId == undefined;
-        $buttonRadio.checked = imageId !== undefined;
+        $noneRadio.checked = imageId == undefined && firstLine == undefined;
+        $imageRadio.checked = imageId !== undefined;
+        $textRadio.checked = firstLine !== undefined;
 
         showView('dashboardItem');
       }
@@ -693,6 +785,17 @@
           
           $container.appendChild($row);
         }
+      }
+
+      var cachedTextImages = {};
+      async function getImageForText(firstLine, secondLine) {
+        const key = firstLine + "|" + secondLine
+        if (cachedTextImages[key] !== undefined) {
+          return cachedTextImages[key];
+        }
+        const data = await Homey.api("POST", "/textToImage", { firstLine: firstLine, secondLine: secondLine });
+        cachedTextImages[key] = data;
+        return data;
       }
 
       var cachedDashboard = {};

@@ -2,7 +2,9 @@ import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTrig
 import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Dashboard, DashboardEmptyItem, DashboardImageItem, Store } from '../../lib/storage';
-import { Jimp } from 'jimp';
+import { TextToImage } from '../../lib/textToImage';
+import { Jimp, loadFont, HorizontalAlign, VerticalAlign } from 'jimp';
+import * as Font from "jimp/fonts";
 import path from 'path';
 
 module.exports = class NetworkDock extends Homey.Device {
@@ -185,13 +187,22 @@ module.exports = class NetworkDock extends Homey.Device {
     for (const [i, control] of controls.entries()) {
       const item = dashboard.items[i+1];
       switch (item?.kind) {
+      case 'text':
+        actions.push(this.streamDeckSetText(streamDeck, control, item.firstLine, item.secondLine).catch((e) => console.error('streamDeckSetImage failed:', e)));
+        break;
       case 'image':
         actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('streamDeckSetImage failed:', e)));
+        break;
       default:
         actions.push(streamDeck.clearKey(control.index).catch((e) => console.error('clearKey failed:', e)));
       }
     }
     await Promise.all(actions);
+  }
+
+  async streamDeckSetText(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined) {
+    const image = await TextToImage.create(control.pixelSize.width, firstLine, secondLine);
+    await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
   }
 
   async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
@@ -233,6 +244,12 @@ module.exports = class NetworkDock extends Homey.Device {
     var actions: Promise<void>[] = []
 
     switch (button.kind) {
+    case 'text':
+      // todo extend
+      state = { action: event }
+      tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      this.log(event + ' text button ' + button.firstLine);
+      break; 
     case 'image':
       state = { action: event, imageId: button.imageId }
       tokens = { dashboard: this.dashboard?.name ?? '', imageName: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };

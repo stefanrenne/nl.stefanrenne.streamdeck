@@ -68,6 +68,12 @@
     }
   },
   "homeyCommunityTopicId": 151256,
+  "api": {
+    "textToImage": {
+      "method": "POST",
+      "path": "/textToImage"
+    }
+  },
   "flow": {
     "triggers": [
       {

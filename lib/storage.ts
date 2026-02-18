@@ -16,7 +16,7 @@ export interface Dashboard {
     readonly items: { [item: number] : DashboardItem; };
 }
 
-export type DashboardItem = DashboardEmptyItem | DashboardImageItem;
+export type DashboardItem = DashboardEmptyItem | DashboardImageItem | DashboardTextItem;
 
 export interface DashboardEmptyItem {
     readonly kind: 'empty';
@@ -29,6 +29,13 @@ export interface DashboardImageItem {
     readonly payload: string;
     readonly imageId: string;
     readonly imageBuffer: Buffer;
+}
+
+export interface DashboardTextItem {
+    readonly kind: 'text';
+    readonly firstLine: string;
+    readonly secondLine: string | undefined;
+    readonly payload: string;
 }
 
 export interface ImageMetadata {
@@ -49,7 +56,9 @@ interface StoredDashboard {
 interface StoredDashboardItem {
     type: string;
     item: number;
-    imageId: string;
+    imageId: string | undefined;
+    textFirstLine: string | undefined;
+    textSecondLine: string | undefined;
     payload: string;
 }
 
@@ -123,6 +132,10 @@ export class Store {
                     result[row.item] = { kind: 'image', name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
                     return result;
                 }
+            }
+            if (row.type === 'text' && row.textFirstLine !== undefined) {
+                result[row.item] = { kind: 'text', payload: payload, firstLine: row.textFirstLine, secondLine: row.textSecondLine };
+                return result;
             }
 
             result[row.item] = { kind: 'empty', payload: payload };

@@ -1,6 +1,6 @@
 {
   "id": "nl.stefanrenne.streamdeck",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=12.9.0",
   "sdk": 3,
   "platforms": [
@@ -10,7 +10,8 @@
     "en": "Stream Deck"
   },
   "description": {
-    "en": "Control Homey from your Stream Deck"
+    "en": "Stream Deck meets smart home magic",
+    "nl": "Maak van je Stream Deck pure smart-home magie."
   },
   "category": [
     "tools"
@@ -31,7 +32,11 @@
       "stream",
       "deck",
       "streamdeck",
-      "elgato"
+      "elgato",
+      "lan",
+      "network",
+      "lcd",
+      "button"
     ]
   },
   "source": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck",

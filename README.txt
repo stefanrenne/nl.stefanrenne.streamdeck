@@ -1,4 +1,10 @@
-Control Homey over your lan from your Stream Deck
+Control Homey instantly from your Stream Deck — right over your LAN.
+Turn every LCD button into a powerful smart home trigger.
+
+Configuration:
+Set it up your way.
+Upload custom images, build personalized dashboards, and assign unique payloads to every button press. 
+One tap — and Homey takes care of the rest.
 
 Requirements:
 - Stream Deck Studio
@@ -12,6 +18,3 @@ Requirements:
 	- Stream Deck XL
 	- Stream Deck neo (only lcd buttons supported)
 	- Stream Deck + (only lcd buttons supported)
-
-Configuration:
-In the app's settings screen you can upload images and create dashboards, you can even set a payload that needs to be send on button press.

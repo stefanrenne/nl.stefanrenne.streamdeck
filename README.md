@@ -1,6 +1,6 @@
 # Stream Deck
 
-Control Homey from your Stream Deck
+Control Homey instantly from your Stream Deck — right over your LAN.<br/>Turn every LCD button into a powerful smart home trigger.
 
 **Download:**<br/>
 Stable version: [Stream Deck | Homey](https://homey.app/a/nl.stefanrenne.streamdeck)<br/>
@@ -50,4 +50,9 @@ List and manage images:
 Edit image:
 ![edit-image](./assets/edit-image.png)
 
+## Powered by
+This App would not have been possible without:
 
+- [node-elgato-stream-deck](https://github.com/Julusian/node-elgato-stream-deck)
+- [jimp](https://github.com/jimp-dev/jimp)
+- [path](https://github.com/jinder/path)

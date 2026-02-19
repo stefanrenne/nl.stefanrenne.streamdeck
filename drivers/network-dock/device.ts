@@ -27,8 +27,8 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
 
-    await this.validateSelectedDashboardOption();
     await this.updateSelectableDashboardOptions();
+    await this.validateSelectedDashboardOption();
 
 
     const ipAddress = this.getSetting('ipAddress');

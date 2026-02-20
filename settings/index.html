@@ -44,7 +44,7 @@
           <tbody id="imagesContainer"></tbody>
         </table>
         <hr/>
-        <input class="hidden" id="addImageInput" type="file" accept=".jpg, .jpeg, .png">
+        <input class="hidden" id="addImageInput" name="files[]" type="file" accept=".jpg, .jpeg, .png" multiple="multiple">
         <button id="addImage" class="homey-button-primary-full" data-i18n="settings.image.add"></button>
       </div>
     </div>
@@ -504,11 +504,12 @@
         const $input = document.getElementById("addImageInput");
         $input.addEventListener('change', async () => {
           $button.classList.add('is-loading');
-          const fileId = crypto.randomUUID();
-          const file = $input.files[0];
-          const data = await resizeBase64Image(await getBase64(file), 250);
-          const name = await validateButtonName(undefined, file.name);
-          await storeImage(fileId, data, name);
+          for (const file of Array.from($input.files)) {
+            const fileId = crypto.randomUUID();
+            const data = await resizeBase64Image(await getBase64(file), 250);
+            const name = await validateButtonName(undefined, file.name);
+            await storeImage(fileId, data, name);
+          }
           await loadImages();
           $input.value = '';
           $button.classList.remove('is-loading');

@@ -6,8 +6,8 @@ Control Homey instantly from your Stream Deck — right over your LAN.<br/>Turn 
 Stable version: [Stream Deck | Homey](https://homey.app/a/nl.stefanrenne.streamdeck)<br/>
 Test version: [Stream Deck | Homey](https://homey.app/a/nl.stefanrenne.streamdeck)
 
-![streamdeck-homey](./assets/streamdeck-homey.jpg)
-![streamdeck-buttons](./assets/streamdeck-buttons.jpg)
+![streamdeck-homey](./md/streamdeck-homey.jpg)
+![streamdeck-buttons](./md/streamdeck-buttons.jpg)
 
 ## Requirements:
 - Stream Deck Studio
@@ -24,31 +24,31 @@ Test version: [Stream Deck | Homey](https://homey.app/a/nl.stefanrenne.streamdec
 
 ## Flow:
 Act on specific button presses or process a send payload
-![flow-button](./assets/flow-button.png)
+![flow-button](./md/flow-button.png)
 
 Navigate between dashboards
-![flow-navigate](./assets/flow-navigate.png)
+![flow-navigate](./md/flow-navigate.png)
 
 Toggle your streamdeck
-![flow-onoff](./assets/flow-onoff.png)
+![flow-onoff](./md/flow-onoff.png)
 
 ## Configuration:
 In the app's settings screen you can upload images and create dashboards, you can even set a payload that needs to be send on button press.
 
 List and manage dashboards:
-![list-dashboard](./assets/list-dashboard.png)
+![list-dashboard](./md/list-dashboard.png)
 
 Create / Edit dashboard:
-![create-dashboard](./assets/create-dashboard.png)
+![create-dashboard](./md/create-dashboard.png)
 
 Update dashboard item:
-![select-item](./assets/select-item.png)
+![select-item](./md/select-item.png)
 
 List and manage images:
-![list-images](./assets/list-images.png)
+![list-images](./md/list-images.png)
 
 Edit image:
-![edit-image](./assets/edit-image.png)
+![edit-image](./md/edit-image.png)
 
 ## Powered by
 This App would not have been possible without:

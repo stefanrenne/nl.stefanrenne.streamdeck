@@ -510,6 +510,7 @@
           const name = await validateButtonName(undefined, file.name);
           await storeImage(fileId, data, name);
           await loadImages();
+          $input.value = '';
           $button.classList.remove('is-loading');
         });
       }

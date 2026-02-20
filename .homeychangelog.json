@@ -16,5 +16,8 @@
   },
   "1.0.3": {
     "en": "Fixed Image Upload"
+  },
+  "1.0.4": {
+    "en": "Hiccup in the Homey app processing"
   }
 }

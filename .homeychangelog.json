@@ -19,5 +19,8 @@
   },
   "1.0.4": {
     "en": "Hiccup in the Homey app processing"
+  },
+  "1.0.5": {
+    "en": "Ability to select multiple images during upload"
   }
 }

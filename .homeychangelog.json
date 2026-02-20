@@ -13,5 +13,8 @@
   },
   "1.0.2": {
     "en": "Fixed Invalid enum capability crash"
+  },
+  "1.0.3": {
+    "en": "Fixed Image Upload"
   }
 }

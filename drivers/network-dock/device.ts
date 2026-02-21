@@ -14,7 +14,8 @@ module.exports = class NetworkDock extends Homey.Device {
   private streamDeck: StreamDeckTcp | undefined;
   private dashboard: Dashboard | undefined;
   private emptyDashboard = this.createAutocompleteValue('0', 'Homey', undefined, undefined);
-
+  
+  private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
   private onTextButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('text_button_action');
   private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
@@ -126,14 +127,14 @@ module.exports = class NetworkDock extends Homey.Device {
       });
 
       streamDeck.on('down', async (control) => {
-        if (this.getCapabilityValue('onoff') && control.type === 'button') {
-          await this.streamDeckEvent('down', control);
+        if (control.type === 'button') {
+          await this.streamDeckEvent('down', this.getCapabilityValue('onoff'), control);
         }
       });
 
       streamDeck.on('up', async (control) => {
-        if (this.getCapabilityValue('onoff') && control.type === 'button') {
-          await this.streamDeckEvent('up', control);
+        if (control.type === 'button') {
+          await this.streamDeckEvent('up', this.getCapabilityValue('onoff'), control);
         }
       });
 
@@ -217,10 +218,20 @@ module.exports = class NetworkDock extends Homey.Device {
 
   // private lastKeypressTime: number = 0;
   // private singlePressEvent: Promise<void> | undefined;
-  async streamDeckEvent(event: 'up' | 'down', control: StreamDeckButtonControlDefinition) {
+  async streamDeckEvent(event: 'up' | 'down', isTurnedOn: Boolean, control: StreamDeckButtonControlDefinition) {
+
     const button = this.dashboard?.items[control.index+1];
+    var state = { action: event, textId: '', imageId: '' }
+    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1 }
+    
+    if (!isTurnedOn) {
+      await this.onOffButtonAction.trigger(this, tokens, state);
+      this.log(event + ' disabled button');
+      return
+    }
+
     if (button === undefined || this.dashboard?.name === undefined) {
-      this.log(event + ' empty button');
+      this.log(event + ' empty dashboard button');
       return
     }
 
@@ -241,9 +252,6 @@ module.exports = class NetworkDock extends Homey.Device {
     //     });
     //   }
     // }
-
-    var state = { action: event, textId: '', imageId: '' }
-    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button.payload, column: control.column + 1, row: control.row + 1 }
     var actions: Promise<void>[] = []
 
     switch (button.kind) {

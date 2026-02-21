@@ -286,6 +286,66 @@
         ]
       },
       {
+        "id": "off_button_action",
+        "title": {
+          "en": "Disabled button action",
+          "nl": "Uitgeschakelde knop actie"
+        },
+        "titleFormatted": {
+          "en": "Disabled button [[action]]",
+          "nl": "Uitgeschakelde knop [[action]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+          },
+          {
+            "type": "dropdown",
+            "name": "action",
+            "title": {
+              "en": "Action",
+              "nl": "Actie"
+            },
+            "values": [
+              {
+                "id": "down",
+                "title": {
+                  "en": "pressed",
+                  "nl": "ingedrukt"
+                }
+              },
+              {
+                "id": "up",
+                "title": {
+                  "en": "released",
+                  "nl": "losgelaten"
+                }
+              }
+            ]
+          }
+        ],
+        "tokens": [
+          {
+            "type": "number",
+            "name": "column",
+            "title": {
+              "en": "Column",
+              "nl": "Kolom"
+            }
+          },
+          {
+            "type": "number",
+            "name": "row",
+            "title": {
+              "en": "Row",
+              "nl": "Rij"
+            }
+          }
+        ]
+      },
+      {
         "id": "text_button_action",
         "title": {
           "en": "Text button action",

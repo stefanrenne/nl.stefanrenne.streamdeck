@@ -13,9 +13,10 @@ module.exports = class NetworkDock extends Homey.Device {
   private connectionManager = new StreamDeckTcpConnectionManager();
   private streamDeck: StreamDeckTcp | undefined;
   private dashboard: Dashboard | undefined;
-  private emptyDashboard = this.createAutocompleteValue('0', 'Homey')
+  private emptyDashboard = this.createAutocompleteValue('0', 'Homey', undefined, undefined);
 
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
+  private onTextButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('text_button_action');
   private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
   private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
@@ -25,6 +26,8 @@ module.exports = class NetworkDock extends Homey.Device {
   async onInit() {
     this.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
     this.registerImageButtonRunListener(this.onImageButtonAction);
+    this.registerTextAutocompleteListenerForCard(this.onTextButtonAction);
+    this.registerTextButtonRunListener(this.onTextButtonAction);
     this.registerAnyButtonRunListener(this.onAnyButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
@@ -239,26 +242,25 @@ module.exports = class NetworkDock extends Homey.Device {
     //   }
     // }
 
-    var state: {}
-    var tokens: { dashboard: string; imageName: string; payload: string; column: number; row: number; }
+    var state = { action: event, textId: '', imageId: '' }
+    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button.payload, column: control.column + 1, row: control.row + 1 }
     var actions: Promise<void>[] = []
 
     switch (button.kind) {
     case 'text':
-      // todo extend
-      state = { action: event }
-      tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      state.textId = button.textId;
+      tokens.textFirstLine = button.firstLine;
+      tokens.textSecondLine = button.secondLine ?? '';
+      actions.push(this.onTextButtonAction.trigger(this, tokens, state));
       this.log(event + ' text button ' + button.firstLine);
       break; 
     case 'image':
-      state = { action: event, imageId: button.imageId }
-      tokens = { dashboard: this.dashboard?.name ?? '', imageName: button.name, payload: button.payload, column: control.column + 1, row: control.row + 1 };
+      state.imageId = button.imageId;
+      tokens.imageName = button.name;
       actions.push(this.onImageButtonAction.trigger(this, tokens, state));
       this.log(event + ' image button ' + button.name);
       break; 
     default:
-      state = { action: event }
-      tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', payload: button.payload, column: control.column + 1, row: control.row + 1 };
       this.log(event + ' empty button ');
       break;
     }
@@ -359,11 +361,11 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.onDashboardChanged.trigger(this, { 'dashboard': this.emptyDashboard.name })
   }
 
-  createAutocompleteValue(id: string, name: string, image: string | undefined = undefined) {
+  createAutocompleteValue(id: string, name: string, description: string | undefined, image: string | undefined) {
     return {
       id: id,
       name: name,
-      description: '',
+      description: description ?? '',
       image: image ?? ''
     }
   }
@@ -377,7 +379,7 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map(button => {
-        return this.createAutocompleteValue(button.id, button.name, button.base64Image);
+        return this.createAutocompleteValue(button.id, button.name, undefined, button.base64Image);
       });
     });
   }
@@ -385,6 +387,26 @@ module.exports = class NetworkDock extends Homey.Device {
   registerImageButtonRunListener(card: Homey.FlowCardTriggerDevice) {
     card.registerRunListener((args, state) => {
       return args.image.id === state.imageId && args.action === state.action;
+    });
+  }
+  
+  registerTextAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
+    card.registerArgumentAutocompleteListener('text', (query: string, args: any) => {
+      return this.store
+      .getTexts()
+      .filter((text) => {
+        return query.length == 0 || text.name.toLowerCase().includes(query.toLowerCase());
+      })
+      .sort()
+      .map((text) => {
+        return this.createAutocompleteValue(text.id, text.name, this.homey.__('inDashboard', { dashboard: text.dashboard }), undefined);
+      });
+    });
+  }
+  
+  registerTextButtonRunListener(card: Homey.FlowCardTriggerDevice) {
+    card.registerRunListener((args, state) => {
+      return args.text.id === state.textId && args.action === state.action;
     });
   }
   
@@ -398,7 +420,7 @@ module.exports = class NetworkDock extends Homey.Device {
     card.registerArgumentAutocompleteListener('dashboard', (query: string, args: any) => {
 
       const selectableOptions = this.store.getDashboardMetadata().map(dashboard => {
-        return this.createAutocompleteValue(dashboard.id, dashboard.name)
+        return this.createAutocompleteValue(dashboard.id, dashboard.name, undefined, undefined)
       }).sort();
       
       return [this.emptyDashboard]

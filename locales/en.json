@@ -1,4 +1,5 @@
 {
+    "inDashboard": "In dashboard __dashboard__",
     "settings": {
         "tab": {
             "about": "About",
@@ -27,8 +28,8 @@
             "item": {
                 "title": "Select Item",
                 "selectImage": "Select Image",
-                "selectTextFirstLine": "Tekst voor op de eerste regel",
-                "selectTextSecondLine": "Optionele tekst voor de tweede regel",
+                "selectTextFirstLine": "Text for the first line",
+                "selectTextSecondLine": "Optional text for the second line",
                 "selectTextSecondLineHint": "This text can be changed from a flow",
                 "displayMode": "Action",
                 "none": "Empty",

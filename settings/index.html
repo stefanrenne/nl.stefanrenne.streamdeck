@@ -240,6 +240,7 @@
               {
                 type: (isImage) ? 'image' : (isText) ? 'text' : 'empty',
                 imageId: (isImage) ? item.dataset.imageId : undefined,
+                textId: (isText) ? item.dataset.id : undefined,
                 textFirstLine: (isText) ? item.dataset.firstLine : undefined,
                 textSecondLine: (isText) ? item.dataset.secondLine : undefined,
                 payload: item.dataset.payload, 
@@ -435,17 +436,20 @@
           if (cache?.type === "image" && cache.imageId !== undefined) {
             $img.src = await getImageFromStore(cache.imageId); 
             $item.classList.add("actionImage");
+            $item.dataset.id = cache.textId;
             $item.dataset.imageId = cache.imageId;
             $item.dataset.firstLine = "";
             $item.dataset.secondLine = "";
           } else if (cache?.type === "text" && cache.textFirstLine !== undefined) {
             $img.src = await getImageForText(cache.textFirstLine, cache.textSecondLine); 
             $item.classList.add("actionText");
+            $item.dataset.id = crypto.randomUUID();
             $item.dataset.firstLine = cache.textFirstLine;
             $item.dataset.secondLine = cache.textSecondLine;
             $item.dataset.imageId = "";
           } else {
             $item.classList.add("actionNone");
+            $item.dataset.id = crypto.randomUUID();
             $item.dataset.imageId = "";
             $item.dataset.firstLine = "";
             $item.dataset.secondLine = "";

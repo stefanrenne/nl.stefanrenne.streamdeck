@@ -9,6 +9,12 @@ export interface Image {
     readonly imageBuffer: Buffer
 }
 
+export interface Text {
+    readonly id: string;
+    readonly name: string;
+    readonly dashboard: string;
+}
+
 export interface Dashboard {
     readonly id: string;
     readonly name: string;
@@ -36,6 +42,7 @@ export interface DashboardTextItem {
     readonly firstLine: string;
     readonly secondLine: string | undefined;
     readonly payload: string;
+    readonly textId: string;
 }
 
 export interface ImageMetadata {
@@ -57,6 +64,7 @@ interface StoredDashboardItem {
     type: string;
     item: number;
     imageId: string | undefined;
+    textId: string | undefined;
     textFirstLine: string | undefined;
     textSecondLine: string | undefined;
     payload: string;
@@ -133,8 +141,8 @@ export class Store {
                     return result;
                 }
             }
-            if (row.type === 'text' && row.textFirstLine !== undefined) {
-                result[row.item] = { kind: 'text', payload: payload, firstLine: row.textFirstLine, secondLine: row.textSecondLine };
+            if (row.type === 'text' && row.textFirstLine !== undefined && row.textId !== undefined) {
+                result[row.item] = { kind: 'text', payload: payload, firstLine: row.textFirstLine, secondLine: row.textSecondLine, textId: row.textId };
                 return result;
             }
 
@@ -193,6 +201,20 @@ export class Store {
                 return this.getImage(metadata.id)
             })
             .filter((item) => item !== undefined);
+    }
+
+    getTexts(): Text[] {
+        return this.getDashboardMetadata()
+            .map((metadata) => {
+                return this.getDashboard(metadata.id)
+            })
+            .filter((item) => item !== undefined)
+            .map((dashboard) => {
+                return Object.values(dashboard.items)
+                .filter((item) => item.kind === 'text')
+                .map((item) => { return { id: item.textId, name: item.firstLine, dashboard: dashboard.name } }) 
+            })
+            .flatMap((item) => item)
     }
 
     getImagesMetadata(): ImageMetadata[] {

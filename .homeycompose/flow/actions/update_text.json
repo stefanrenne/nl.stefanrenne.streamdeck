@@ -2,18 +2,13 @@
 	"id": "update_text",
 	"title": {
 	   "en": "Update the subtitle for title",
-	   "nl": "Update de subtitel voor title"
+	   "nl": "Wijzig de ondertiteling voor title"
 	},
 	"titleFormatted": {
-	   "en": "Update the [[value]] for [[text]]",
-	   "nl": "Update de [[value]] voor [[text]]"
+	   "en": "Update the subtitle for [[text]] to [[value]] ",
+	   "nl": "Wijzig de ondertiteling voor [[text]] naar [[value]]"
 	},
     "args": [
-        {
-            "type": "device",
-            "name": "device",
-            "filter": "driver_id=network-dock"
-        },
         {
             "name": "text",
             "required": true,

@@ -28,8 +28,8 @@
             "item": {
                 "title": "Select Item",
                 "selectImage": "Select Image",
-                "selectTextFirstLine": "Text for the first line",
-                "selectTextSecondLine": "Optional text for the second line",
+                "selectTextFirstLine": "First line title",
+                "selectTextSecondLine": "Optionele tweede regel ondertiteling",
                 "selectTextSecondLineHint": "This text can be changed from a flow",
                 "displayMode": "Action",
                 "none": "Empty",

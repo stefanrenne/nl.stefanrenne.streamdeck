@@ -1,19 +1,19 @@
-import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
+import Homey, { FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
-import { Dashboard, DashboardEmptyItem, DashboardImageItem, Store } from '../../lib/storage';
+import { Dashboard, Store } from '../../lib/storage';
+import { CardListener } from '../../lib/cardListener';
 import { TextToImage } from '../../lib/textToImage';
-import { Jimp, loadFont, HorizontalAlign, VerticalAlign } from 'jimp';
-import * as Font from "jimp/fonts";
+import { Jimp } from 'jimp';
 import path from 'path';
 
 module.exports = class NetworkDock extends Homey.Device {
 
   private store = new Store(this.homey);
+  private cardListener = new CardListener(this.homey, this.store);
   private connectionManager = new StreamDeckTcpConnectionManager();
   private streamDeck: StreamDeckTcp | undefined;
   private dashboard: Dashboard | undefined;
-  private emptyDashboard = this.createAutocompleteValue('0', 'Homey');
   
   private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
@@ -25,14 +25,13 @@ module.exports = class NetworkDock extends Homey.Device {
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
-    this.registerImageButtonRunListener(this.onImageButtonAction);
-    this.registerTextAutocompleteListenerForCard(this.onTextButtonAction);
-    this.registerTextButtonRunListener(this.onTextButtonAction);
-    this.registerAnyButtonRunListener(this.onAnyButtonAction);
+    this.cardListener.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
+    this.cardListener.registerImageButtonRunListener(this.onImageButtonAction);
+    this.cardListener.registerTextAutocompleteListenerForCard(this.onTextButtonAction);
+    this.cardListener.registerTextButtonRunListener(this.onTextButtonAction);
+    this.cardListener.registerAnyButtonRunListener(this.onAnyButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
-    this.registerChangeTextListener();
 
     await this.updateSelectableDashboardOptions();
     await this.validateSelectedDashboardOption();
@@ -55,7 +54,7 @@ module.exports = class NetworkDock extends Homey.Device {
         await this.setAvailable();
         this.streamDeckDidConnect(streamDeck);
 
-        const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.emptyDashboard.id;
+        const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
         await this.streamDeckLoadDashboard(streamDeck, dashboardId);
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable('No Stream Deck connected to Network Dock');
@@ -105,7 +104,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
     this.registerCapabilityListener('dashboard', async (id: string) => {
       await this.streamDeckLoadDashboard(this.streamDeck, id);
-      const dashboardName = (id === this.emptyDashboard.id) ? this.emptyDashboard.name : this.store.getDashboard(id)?.name
+      const dashboardName = (id === this.cardListener.emptyDashboard.id) ? this.cardListener.emptyDashboard.name : this.store.getDashboard(id)?.name
       if (dashboardName) {
         await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
       }
@@ -172,7 +171,7 @@ module.exports = class NetworkDock extends Homey.Device {
       this.dashboard = undefined;
       return
     }
-    const dashboard: Dashboard | undefined = (id === this.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
+    const dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
     if (dashboard === undefined) {
       this.dashboard = undefined;
       this.streamDeckLoadDefaultDashboard(streamDeck);
@@ -350,7 +349,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
   async updateSelectableDashboardOptions() {
     const staticOptions = [
-      {'id': this.emptyDashboard.id, 'title': { 'en': this.emptyDashboard.name } }
+      {'id': this.cardListener.emptyDashboard.id, 'title': { 'en': this.cardListener.emptyDashboard.name } }
     ]
     const dynamicOptions = this.store
       .getDashboardMetadata()
@@ -361,93 +360,18 @@ module.exports = class NetworkDock extends Homey.Device {
 
   async loadEmptyDashboardOptions() {
       // set the first dashboard as new dashboard
-      await this.setCapabilityValue('dashboard', this.emptyDashboard.id);
+      await this.setCapabilityValue('dashboard', this.cardListener.emptyDashboard.id);
 
       // load the new dashboard
-      await this.streamDeckLoadDashboard(this.streamDeck, this.emptyDashboard.id);
+      await this.streamDeckLoadDashboard(this.streamDeck, this.cardListener.emptyDashboard.id);
 
       // notifiy about the dashboard change
-      await this.onDashboardChanged.trigger(this, { 'dashboard': this.emptyDashboard.name })
-  }
-
-  createAutocompleteValue(id: string, name: string, image: string | undefined = undefined) {
-    return {
-      id: id,
-      name: name,
-      description: '',
-      image: image ?? ''
-    }
-  }
-  
-  registerImageAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
-    card.registerArgumentAutocompleteListener('image', (query: string, args: any) => {
-      return this.store
-      .getImages()
-      .filter((image) => {
-        return query.length == 0 || image.name.toLowerCase().includes(query.toLowerCase());
-      })
-      .sort()
-      .map(button => {
-        return this.createAutocompleteValue(button.id, button.name, button.base64Image);
-      });
-    });
-  }
-  
-  registerImageButtonRunListener(card: Homey.FlowCardTriggerDevice) {
-    card.registerRunListener((args, state) => {
-      return args.image.id === state.imageId && args.action === state.action;
-    });
-  }
-  
-  registerTextAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice | Homey.FlowCardAction) {
-    card.registerArgumentAutocompleteListener('text', (query: string, args: any) => {
-      return this.store
-      .getTexts()
-      .filter((text) => {
-        return query.length == 0 || text.name.toLowerCase().includes(query.toLowerCase());
-      })
-      .sort()
-      .map((text) => {
-        return {
-          textId: text.id,
-          dashboardId: text.dashboardId,
-          name: text.name,
-          description: this.homey.__('inDashboard', { dashboard: text.dashboard })
-        }
-      });
-    });
-  }
-  
-  registerTextButtonRunListener(card: Homey.FlowCardTriggerDevice) {
-    card.registerRunListener((args, state) => {
-      return args.text.textId === state.textId && args.action === state.action;
-    });
-  }
-  
-  registerAnyButtonRunListener(card: Homey.FlowCardTriggerDevice) {
-    card.registerRunListener((args, state) => {
-      return args.action === state.action;
-    });
-  }
-  
-  registerDashboardAutocompleteListenerForCard(card: Homey.FlowCardCondition | Homey.FlowCardAction) {
-    card.registerArgumentAutocompleteListener('dashboard', (query: string, args: any) => {
-
-      const selectableOptions = this.store.getDashboardMetadata().map(dashboard => {
-        return this.createAutocompleteValue(dashboard.id, dashboard.name)
-      }).sort();
-      
-      return [this.emptyDashboard]
-        .concat(selectableOptions)
-        .filter((option) => {
-          return query.length == 0 || option.name.toLowerCase().includes(query.toLowerCase());
-        });
-    });
+      await this.onDashboardChanged.trigger(this, { 'dashboard': this.cardListener.emptyDashboard.name })
   }
 
   registerIsDashboardListener() {
     const card = this.homey.flow.getConditionCard('is_dashboard');
-    this.registerDashboardAutocompleteListenerForCard(card);
+    this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       const dashboardId: string = args.dashboard.id;
@@ -457,7 +381,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
   registerChangeDashboardListener() {
     const card = this.homey.flow.getActionCard('set_dashboard');
-    this.registerDashboardAutocompleteListenerForCard(card);
+    this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
       if (!this.getAvailable()) {
         throw 'Stream Deck is unavailable';
@@ -474,46 +398,6 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
       await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
       return {};
-    });
-  }
-
-  registerChangeTextListener() {
-    const card = this.homey.flow.getActionCard('update_text');
-    this.registerTextAutocompleteListenerForCard(card);
-    card.registerRunListener(async (args) => {
-      if (!this.getAvailable()) {
-        throw 'Stream Deck is unavailable';
-      }
-      
-      // TODO
-      console.log(args);
-
-      // {
-      //   text: {
-      //     textId: '9c011b1a-33a7-4c99-bd3d-cb713bc6340b',
-      //     dashboardId: '9e078e88-7113-4b70-8d3a-c156b1fd880a',
-      //     name: 'Brightness',
-      //     description: 'In het dashboard test'
-      //   },
-      //   value: 'lalal'
-      // }
-
-
-
-
-      
-
-      // const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      // const dashboardId: string = args.dashboard.id;
-      // const dashboardName: string = args.dashboard.name;
-      // if (selectedDashboardId === dashboardId) {
-      //   // value not changed
-      //   return {};
-      // }
-      // await this.setCapabilityValue('dashboard', dashboardId);
-      // await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
-      // await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
-      // return {};
     });
   }
 

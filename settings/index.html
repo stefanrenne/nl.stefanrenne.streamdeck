@@ -436,14 +436,14 @@
           if (cache?.type === "image" && cache.imageId !== undefined) {
             $img.src = await getImageFromStore(cache.imageId); 
             $item.classList.add("actionImage");
-            $item.dataset.id = cache.textId;
+            $item.dataset.id = crypto.randomUUID();
             $item.dataset.imageId = cache.imageId;
             $item.dataset.firstLine = "";
             $item.dataset.secondLine = "";
           } else if (cache?.type === "text" && cache.textFirstLine !== undefined) {
             $img.src = await getImageForText(cache.textFirstLine, cache.textSecondLine); 
             $item.classList.add("actionText");
-            $item.dataset.id = crypto.randomUUID();
+            $item.dataset.id = cache.textId;
             $item.dataset.firstLine = cache.textFirstLine;
             $item.dataset.secondLine = cache.textSecondLine;
             $item.dataset.imageId = "";

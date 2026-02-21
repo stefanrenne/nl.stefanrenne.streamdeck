@@ -218,6 +218,21 @@ export class Store {
             .flatMap((item) => item)
     }
 
+    updateTextButtonForDashboard(dashboardId: string, textId: string, newSubtitle: string) {
+        var data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + dashboardId);
+        if (data === undefined) { return }
+        data.items = data.items.map((item) => {
+            if (item.type === 'text' && item.textId === textId) {
+                item.textSecondLine = newSubtitle
+            }
+            return item;
+        });
+        if (this.cachedDashboards[dashboardId] !== undefined) {
+            delete this.cachedDashboards[dashboardId];
+        }
+        this.homey.settings.set('dashboard-' + dashboardId, data);
+    }
+
     getImagesMetadata(): ImageMetadata[] {
         if (this.cachedImagesMetadata.length == 0) {
             this.invalidateImagedMetadata();

@@ -1,14 +1,17 @@
 import Homey from 'homey';
 import { Store } from './lib/storage';
+import { CardListener } from './lib/cardListener';
 
 module.exports = class StreamDeckApp extends Homey.App {
 
   private store = new Store(this.homey);
+  private cardListener = new CardListener(this.homey, this.store);
   
   async onInit() {
     this.log('StreamDeckApp has been initialized');
     this.store.cleanSettings();
     this.observeSettings();
+    this.registerUpdateTextListener();
   }
 
   observeSettings() {
@@ -35,6 +38,16 @@ module.exports = class StreamDeckApp extends Homey.App {
         this.log('unset dashboard: ' + dashboardId);
         this.homey.settings.emit('unset-dashboard', dashboardId);
       }
+    });
+  }
+
+  registerUpdateTextListener() {
+    const card = this.homey.flow.getActionCard('update_text');
+    this.cardListener.registerTextAutocompleteListenerForCard(card);
+    card.registerRunListener(async (args) => {
+      const value = (args.value !== undefined) ? args.value.trim() : '';
+      this.store.updateTextButtonForDashboard(args.text.dashboardId, args.text.textId, value);
+      return {};
     });
   }
 }

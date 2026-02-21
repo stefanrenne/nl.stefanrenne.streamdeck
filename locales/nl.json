@@ -28,7 +28,7 @@
             "item": {
                 "title": "Kies Item",
                 "selectImage": "Selecteer afbeelding",
-                "selectTextFirstLine": "Tekst voor op de eerste regel",
+                "selectTextFirstLine": "Titel van de eerste regel",
                 "selectTextSecondLine": "Optionele tekst voor de tweede regel",
                 "selectTextSecondLineHint": "Deze tekst kan worden gewijzigd vanuit een flow",
                 "displayMode": "Actie",

@@ -1,0 +1,36 @@
+{
+	"id": "update_text",
+	"title": {
+	   "en": "Update the subtitle for title",
+	   "nl": "Update de subtitel voor title"
+	},
+	"titleFormatted": {
+	   "en": "Update the [[value]] for [[text]]",
+	   "nl": "Update de [[value]] voor [[text]]"
+	},
+    "args": [
+        {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=network-dock"
+        },
+        {
+            "name": "text",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+                "en": "Text",
+                "nl": "Tekst"
+            }
+        },
+        {
+            "name": "value",
+            "required": false,
+            "type": "text",
+            "title": {
+                "en": "Subtitle",
+                "nl": "Subtitel"
+            }
+        }
+	]
+ }

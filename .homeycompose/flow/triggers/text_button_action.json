@@ -4,7 +4,7 @@
     "en": "Text button action",
     "nl": "Tekst knop actie"
   },
-	"titleFormatted":{
+	"titleFormatted": {
     "en": "[[text]] button [[action]]",
     "nl": "[[text]] knop [[action]]"
 	},
@@ -15,12 +15,12 @@
       "filter": "driver_id=network-dock"
     },
     {
-      "name":"text",
-      "required":true,
-      "type":"autocomplete",
-      "title":{
-        "en":"Text",
-        "nl":"Tekst"
+      "name": "text",
+      "required": true,
+      "type": "autocomplete",
+      "title": {
+        "en": "Text",
+        "nl": "Tekst"
       }
     },
     {

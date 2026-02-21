@@ -1,10 +1,10 @@
 {
   "id": "off_button_action",
-	"title":{
+	"title": {
     "en": "Disabled button action",
     "nl": "Uitgeschakelde knop actie"
 	},
-	"titleFormatted":{
+	"titleFormatted": {
     "en": "Disabled button [[action]]",
     "nl": "Uitgeschakelde knop [[action]]"
 	},

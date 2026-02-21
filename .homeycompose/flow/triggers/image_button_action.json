@@ -4,7 +4,7 @@
     "en": "Image button action",
     "nl": "Afbeeldingsknop actie"
   },
-	"titleFormatted":{
+	"titleFormatted": {
     "en": "[[image]] button [[action]]",
     "nl": "[[image]] knop [[action]]"
 	},
@@ -15,12 +15,12 @@
       "filter": "driver_id=network-dock"
     },
     {
-      "name":"image",
-      "required":true,
-      "type":"autocomplete",
-      "title":{
-        "en":"Image",
-        "nl":"Afbeelding"
+      "name": "image",
+      "required": true,
+      "type": "autocomplete",
+      "title": {
+        "en": "Image",
+        "nl": "Afbeelding"
       }
     },
     {

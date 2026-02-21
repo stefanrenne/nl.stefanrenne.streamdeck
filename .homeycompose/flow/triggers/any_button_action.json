@@ -1,10 +1,10 @@
 {
   "id": "any_button_action",
-	"title":{
+	"title": {
     "en": "Button action",
     "nl": "Knop actie"
 	},
-	"titleFormatted":{
+	"titleFormatted": {
     "en": "Button [[action]]",
     "nl": "Knop [[action]]"
 	},

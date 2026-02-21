@@ -13,7 +13,7 @@ module.exports = class NetworkDock extends Homey.Device {
   private connectionManager = new StreamDeckTcpConnectionManager();
   private streamDeck: StreamDeckTcp | undefined;
   private dashboard: Dashboard | undefined;
-  private emptyDashboard = this.createAutocompleteValue('0', 'Homey', undefined, undefined);
+  private emptyDashboard = this.createAutocompleteValue('0', 'Homey');
   
   private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
@@ -32,6 +32,7 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerAnyButtonRunListener(this.onAnyButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
+    this.registerChangeTextListener();
 
     await this.updateSelectableDashboardOptions();
     await this.validateSelectedDashboardOption();
@@ -369,11 +370,11 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.onDashboardChanged.trigger(this, { 'dashboard': this.emptyDashboard.name })
   }
 
-  createAutocompleteValue(id: string, name: string, description: string | undefined, image: string | undefined) {
+  createAutocompleteValue(id: string, name: string, image: string | undefined = undefined) {
     return {
       id: id,
       name: name,
-      description: description ?? '',
+      description: '',
       image: image ?? ''
     }
   }
@@ -387,7 +388,7 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map(button => {
-        return this.createAutocompleteValue(button.id, button.name, undefined, button.base64Image);
+        return this.createAutocompleteValue(button.id, button.name, button.base64Image);
       });
     });
   }
@@ -398,7 +399,7 @@ module.exports = class NetworkDock extends Homey.Device {
     });
   }
   
-  registerTextAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice) {
+  registerTextAutocompleteListenerForCard(card: Homey.FlowCardTriggerDevice | Homey.FlowCardAction) {
     card.registerArgumentAutocompleteListener('text', (query: string, args: any) => {
       return this.store
       .getTexts()
@@ -407,14 +408,19 @@ module.exports = class NetworkDock extends Homey.Device {
       })
       .sort()
       .map((text) => {
-        return this.createAutocompleteValue(text.id, text.name, this.homey.__('inDashboard', { dashboard: text.dashboard }), undefined);
+        return {
+          textId: text.id,
+          dashboardId: text.dashboardId,
+          name: text.name,
+          description: this.homey.__('inDashboard', { dashboard: text.dashboard })
+        }
       });
     });
   }
   
   registerTextButtonRunListener(card: Homey.FlowCardTriggerDevice) {
     card.registerRunListener((args, state) => {
-      return args.text.id === state.textId && args.action === state.action;
+      return args.text.textId === state.textId && args.action === state.action;
     });
   }
   
@@ -428,7 +434,7 @@ module.exports = class NetworkDock extends Homey.Device {
     card.registerArgumentAutocompleteListener('dashboard', (query: string, args: any) => {
 
       const selectableOptions = this.store.getDashboardMetadata().map(dashboard => {
-        return this.createAutocompleteValue(dashboard.id, dashboard.name, undefined, undefined)
+        return this.createAutocompleteValue(dashboard.id, dashboard.name)
       }).sort();
       
       return [this.emptyDashboard]
@@ -468,6 +474,46 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
       await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
       return {};
+    });
+  }
+
+  registerChangeTextListener() {
+    const card = this.homey.flow.getActionCard('update_text');
+    this.registerTextAutocompleteListenerForCard(card);
+    card.registerRunListener(async (args) => {
+      if (!this.getAvailable()) {
+        throw 'Stream Deck is unavailable';
+      }
+      
+      // TODO
+      console.log(args);
+
+      // {
+      //   text: {
+      //     textId: '9c011b1a-33a7-4c99-bd3d-cb713bc6340b',
+      //     dashboardId: '9e078e88-7113-4b70-8d3a-c156b1fd880a',
+      //     name: 'Brightness',
+      //     description: 'In het dashboard test'
+      //   },
+      //   value: 'lalal'
+      // }
+
+
+
+
+      
+
+      // const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+      // const dashboardId: string = args.dashboard.id;
+      // const dashboardName: string = args.dashboard.name;
+      // if (selectedDashboardId === dashboardId) {
+      //   // value not changed
+      //   return {};
+      // }
+      // await this.setCapabilityValue('dashboard', dashboardId);
+      // await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
+      // await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
+      // return {};
     });
   }
 

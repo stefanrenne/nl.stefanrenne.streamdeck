@@ -13,6 +13,7 @@ export interface Text {
     readonly id: string;
     readonly name: string;
     readonly dashboard: string;
+    readonly dashboardId: string;
 }
 
 export interface Dashboard {
@@ -212,7 +213,7 @@ export class Store {
             .map((dashboard) => {
                 return Object.values(dashboard.items)
                 .filter((item) => item.kind === 'text')
-                .map((item) => { return { id: item.textId, name: item.firstLine, dashboard: dashboard.name } }) 
+                .map((item) => { return { id: item.textId, name: item.firstLine, dashboard: dashboard.name, dashboardId: dashboard.id } }) 
             })
             .flatMap((item) => item)
     }

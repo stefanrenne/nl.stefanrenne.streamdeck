@@ -15,6 +15,9 @@
         <li class="nav-item">
           <a class="nav-link" data-page="page-images" href="#" data-i18n="settings.tab.images"></a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" data-page="page-logs" href="#">Logs</a>
+        </li>
       </ul>
       <!-- Page Dashboards -->
       <div class="page" id="page-dashboards">
@@ -47,6 +50,11 @@
         <input class="hidden" id="addImageInput" name="files[]" type="file" accept=".jpg, .jpeg, .png" multiple="multiple">
         <button id="addImage" class="homey-button-primary-full" data-i18n="settings.image.add"></button>
       </div>
+    </div>
+
+    <!-- Page Logs -->
+    <div class="page hidden" id="page-logs">
+      <pre id="json"></pre>
     </div>
 
     <!-- Manage Dashboard -->
@@ -795,6 +803,11 @@
         cachedImages = newImages;
         await Homey.set('images', newImages);
       }
+
+      async function loadLogs() {
+        const data = await Homey.api("GET", "/discovery");
+        document.getElementById("json").innerHTML = JSON.stringify(data, null, 2);
+      }
       
       function onHomeyReady(Homey) {
         observeMenuItems();
@@ -808,6 +821,7 @@
           await loadDashboards();
           await loadImages();
           await observeDashboardItemImages();
+          await loadLogs();
         })
         .catch(err => {
           console.log(err);

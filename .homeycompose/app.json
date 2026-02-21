@@ -1,6 +1,6 @@
 {
   "id": "nl.stefanrenne.streamdeck",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "compatibility": ">=12.9.0",
   "sdk": 3,
   "platforms": [
@@ -66,5 +66,11 @@
       }
     }
   },
-  "homeyCommunityTopicId": 151256
+  "homeyCommunityTopicId": 151256,
+  "api": {
+    "discovery": {
+      "method": "GET",
+      "path": "/discovery"
+    }
+  }
 }

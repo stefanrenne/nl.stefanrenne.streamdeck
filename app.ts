@@ -4,6 +4,7 @@ import { Store } from './lib/storage';
 module.exports = class StreamDeckApp extends Homey.App {
 
   private store = new Store(this.homey);
+  strategy = this.homey.discovery.getStrategy('studio');
   
   async onInit() {
     this.log('StreamDeckApp has been initialized');

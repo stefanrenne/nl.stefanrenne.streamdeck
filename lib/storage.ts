@@ -46,12 +46,7 @@ export interface DashboardTextItem {
     readonly textId: string;
 }
 
-export interface ImageMetadata {
-    id: string;
-    name: string;
-}
-
-export interface DashboardMetadata {
+export interface Metadata {
     id: string;
     name: string;
 }
@@ -74,9 +69,9 @@ interface StoredDashboardItem {
 export class Store {
 
     private homey: Homey;
-    private cachedImagesMetadata: ImageMetadata[]
+    private cachedImagesMetadata: Metadata[]
     private cachedImages: { [id: string] : Image; };
-    private cachedDashboardMetadata: DashboardMetadata[];
+    private cachedDashboardMetadata: Metadata[];
     private cachedDashboards: { [id: string] : Dashboard; };
 
 	constructor(homey: Homey) {
@@ -157,7 +152,7 @@ export class Store {
 
     }
 
-    getDashboardMetadata(): DashboardMetadata[] {
+    getDashboardMetadata(): Metadata[] {
         if (this.cachedDashboardMetadata.length == 0) {
             this.invalidateDashboardMetadata();
         }
@@ -233,7 +228,7 @@ export class Store {
         this.homey.settings.set('dashboard-' + dashboardId, data);
     }
 
-    getImagesMetadata(): ImageMetadata[] {
+    getImagesMetadata(): Metadata[] {
         if (this.cachedImagesMetadata.length == 0) {
             this.invalidateImagedMetadata();
         }
@@ -242,12 +237,14 @@ export class Store {
 
     // dead files
     cleanSettings() {
-        const dashboardMetadata: DashboardMetadata[] = this.homey.settings.get('dashboards') ?? [];
-        const imageMetadata: ImageMetadata[] = this.homey.settings.get('images') ?? [];
+        const dashboardMetadata: Metadata[] = this.homey.settings.get('dashboards') ?? [];
+        const imageMetadata: Metadata[] = this.homey.settings.get('images') ?? [];
+        const variablesMetadata: Metadata[] = this.homey.settings.get('variables') ?? [];
 
         const dashboardFiles = dashboardMetadata.map((metadata) => 'dashboard-' + metadata.id);
         const imageFiles = imageMetadata.map((metadata) => 'image-' + metadata.id);
-        const allowedFiles = ['dashboards', 'images'].concat(dashboardFiles).concat(imageFiles);
+        const variableFiles = variablesMetadata.map((metadata) => 'variable-' + metadata.id);
+        const allowedFiles = ['dashboards', 'images', 'variables'].concat(dashboardFiles).concat(imageFiles).concat(variableFiles);
         const toRemove = this.homey.settings.getKeys().filter((item) => !allowedFiles.includes(item));
 
         if (toRemove.length > 0) {

@@ -4,7 +4,8 @@
         "tab": {
             "about": "Over",
             "dashboards": "Dashboards",
-            "images": "Afbeeldingen"
+            "images": "Afbeeldingen",
+            "variables": "Variabelen"
         },
         "dashboard": {
             "name": "Naam",
@@ -28,9 +29,6 @@
             "item": {
                 "title": "Kies Item",
                 "selectImage": "Selecteer afbeelding",
-                "selectTextFirstLine": "Titel van de eerste regel",
-                "selectTextSecondLine": "Optionele tekst voor de tweede regel",
-                "selectTextSecondLineHint": "Deze tekst kan worden gewijzigd vanuit een flow",
                 "displayMode": "Actie",
                 "none": "Leeg",
                 "text": "Tekst",
@@ -40,6 +38,9 @@
                 "payload": {
                     "title": "Payload",
                     "description": "Hier kunt je aanvullende data invoeren die vervolgens beschikbaar zijn in een flow na het klikken op een knop."
+                },
+                "manage": {
+                    "name": "Naam"
                 }
             }
         },
@@ -50,12 +51,32 @@
             "add": "Afbeelding Uploaden",
             "editTitle": "Aanpassen",
             "deleteTitle": "Verwijderen",
-            "confirmDelete": "Weet je zeker dat je knop '__name__' wilt verwijderen?",
-            "edit": {
+            "confirmDelete": "Weet je zeker dat je de afbeelding '__name__' wilt verwijderen?",
+            "manage": {
                 "title": "Afbeelding aanpassen",
                 "name": "Naam",
                 "save": "Opslaan",
                 "cancel": "Annuleren"
+            }
+        },
+        "variable": {
+            "title": "Variabel",
+            "name": "Naam",
+            "action": "Actie",
+            "add": "Variabel aanmaken",
+            "editTitle": "Aanpassen",
+            "deleteTitle": "Verwijderen",
+            "confirmDelete": "Weet je zeker dat je de variabel '__name__' wilt verwijderen?",
+            "manage": {
+                "title": "Variabel aanpassen",
+                "inputName": "Identificatiecode",
+                "inputNameHint": "Unieke sleutel die gebruikt wordt om de variabel vanuit een flow bij te werken.",
+                "save": "Opslaan",
+                "cancel": "Annuleren",
+                "inputLines": "Tekst die weergegeven moet worden",
+                "inputLineHint": "Deze tekst kan worden gewijzigd vanuit een flow",
+                "inputFirstLine": "Tekst op de eerste regel",
+                "inputSecondLine": "Optionele tekst op de tweede regel"
             }
         }
     }

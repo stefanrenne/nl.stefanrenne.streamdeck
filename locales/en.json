@@ -4,7 +4,8 @@
         "tab": {
             "about": "About",
             "dashboards": "Dashboards",
-            "images": "Images"
+            "images": "Images",
+            "variables": "Variables"
         },
         "dashboard": {
             "name": "Name",
@@ -28,9 +29,6 @@
             "item": {
                 "title": "Select Item",
                 "selectImage": "Select Image",
-                "selectTextFirstLine": "First line title",
-                "selectTextSecondLine": "Optionele tweede regel ondertiteling",
-                "selectTextSecondLineHint": "This text can be changed from a flow",
                 "displayMode": "Action",
                 "none": "Empty",
                 "text": "Text",
@@ -50,12 +48,32 @@
             "add": "Upload Image",
             "editTitle": "Edit",
             "deleteTitle": "Delete",
-            "confirmDelete": "Are you sure you want to delete button '__name__'?",
-            "edit": {
+            "confirmDelete": "Are you sure you want to delete the image '__name__'?",
+            "manage": {
                 "title": "Edit Image",
                 "name": "Name",
                 "save": "Save",
                 "cancel": "Cancel"
+            }
+        },
+        "variable": {
+            "title": "Variable",
+            "name": "Name",
+            "action": "Action",
+            "add": "Create Variable",
+            "editTitle": "Edit",
+            "deleteTitle": "Delete",
+            "confirmDelete": "Are you sure you want to delete the variable '__name__'?",
+            "manage": {
+                "title": "Edit Variable",
+                "inputName": "Identifier",
+                "inputNameHint": "Unique key used to update the variable from a flow",
+                "save": "Save",
+                "cancel": "Cancel",
+                "inputLines": "Text to be displayed",
+                "inputLineHint": "This lines can also be changed from a flow",
+                "inputFirstLine": "First line text",
+                "inputSecondLine": "Optionele second line text"
             }
         }
     }

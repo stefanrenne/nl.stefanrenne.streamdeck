@@ -764,7 +764,13 @@
           $copyMask = document.createElement('span');
           $copy.addEventListener('click', async () => {
             const dashboard = await getDashboardFromStore(metadata.id);
-            await createDeckItems(dashboard.displayMode, undefined, undefined, dashboard.items);
+            const items = dashboard.items.map((item) => {
+              if (item.textId !== undefined) {
+                item.textId = crypto.randomUUID();
+              }
+              return item;
+            });
+            await createDeckItems(dashboard.displayMode, undefined, undefined, items);
           });
           $copy.appendChild($copyMask);
           $actionColumn.appendChild($copy);

@@ -16,21 +16,16 @@ export class CardListener {
     }
     
     // Autocomplete Listeners
-    registerTextAutocompleteListenerForCard(card: FlowCardTriggerDevice | FlowCardAction) {
-        card.registerArgumentAutocompleteListener('text', (query: string, args: any) => {
+    registerVariableAutocompleteListenerForCard(card: FlowCardTriggerDevice | FlowCardAction) {
+        card.registerArgumentAutocompleteListener('variable', (query: string, args: any) => {
             return this.store
-                .getTexts()
-                .filter((text) => {
-                    return query.length == 0 || text.name.toLowerCase().includes(query.toLowerCase());
+                .getVariables()
+                .filter((variable) => {
+                    return query.length == 0 || variable.name.toLowerCase().includes(query.toLowerCase());
                 })
                 .sort()
-                .map((text) => {
-                    return {
-                    textId: text.id,
-                    dashboardId: text.dashboardId,
-                    name: text.name,
-                    description: this.homey.__('inDashboard', { dashboard: text.dashboard })
-                    }
+                .map((variable) => {
+                    return this.createAutocompleteValue(variable.id, variable.name, variable.base64Sample);
                 });
         });
     }
@@ -71,9 +66,9 @@ export class CardListener {
         });
     }
     
-    registerTextButtonRunListener(card: FlowCardTriggerDevice) {
+    registerVariableButtonRunListener(card: FlowCardTriggerDevice) {
         card.registerRunListener((args, state) => {
-            return args.text.textId === state.textId && args.action === state.action;
+            return args.variable.id === state.variableId && args.action === state.action;
         });
     }
     

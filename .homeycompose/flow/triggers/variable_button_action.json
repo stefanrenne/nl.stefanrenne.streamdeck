@@ -1,12 +1,12 @@
 {
-  "id": "text_button_action",
+  "id": "variable_button_action",
   "title": {
-    "en": "Text button action",
-    "nl": "Tekst knop actie"
+    "en": "Variable button action",
+    "nl": "Variabel knop actie"
   },
 	"titleFormatted": {
-    "en": "[[text]] button [[action]]",
-    "nl": "[[text]] knop [[action]]"
+    "en": "[[variable]] button [[action]]",
+    "nl": "[[variable]] knop [[action]]"
 	},
   "args": [
     {
@@ -15,12 +15,12 @@
       "filter": "driver_id=network-dock"
     },
     {
-      "name": "text",
+      "name": "variable",
       "required": true,
       "type": "autocomplete",
       "title": {
-        "en": "Text",
-        "nl": "Tekst"
+          "en": "Variable",
+          "nl": "Variabel"
       }
     },
     {

@@ -17,7 +17,7 @@ module.exports = class NetworkDock extends Homey.Device {
   
   private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
-  private onTextButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('text_button_action');
+  private onVariableButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('variable_button_action');
   private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
   private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
@@ -27,8 +27,8 @@ module.exports = class NetworkDock extends Homey.Device {
   async onInit() {
     this.cardListener.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
     this.cardListener.registerImageButtonRunListener(this.onImageButtonAction);
-    this.cardListener.registerTextAutocompleteListenerForCard(this.onTextButtonAction);
-    this.cardListener.registerTextButtonRunListener(this.onTextButtonAction);
+    this.cardListener.registerVariableAutocompleteListenerForCard(this.onVariableButtonAction);
+    this.cardListener.registerVariableButtonRunListener(this.onVariableButtonAction);
     this.cardListener.registerAnyButtonRunListener(this.onAnyButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
@@ -91,6 +91,23 @@ module.exports = class NetworkDock extends Homey.Device {
       this.store.invalidateImage(id);
     });
 
+    this.homey.settings.on('set-variable', async (id: string) => {
+      this.store.invalidateVariable(id);
+      const control = await this.getDisplayedControlForVariable(id);
+      if (control !== undefined && this.streamDeck !== undefined) {
+        const variable = this.store.getVariable(id);
+        await this.streamDeckSetText(this.streamDeck, control, variable?.firstLine ?? '', variable?.secondLine);
+      }
+    });
+
+    this.homey.settings.on('unset-variable', async (id: string) => {
+      this.store.invalidateVariable(id);
+      const control = await this.getDisplayedControlForVariable(id);
+      if (control !== undefined) {
+        await this.streamDeck?.clearKey(control.index);
+      }
+    });
+
     this.registerCapabilityListener('onoff', async (value: boolean) => {
       const number: number = value ? 100 : 0;
       await this.streamDeck?.setBrightness(number);
@@ -148,6 +165,25 @@ module.exports = class NetworkDock extends Homey.Device {
       });
   }
 
+  async getDisplayedControlForVariable(variableId: string) {
+    if (this.streamDeck === undefined) {
+      return undefined;
+    }
+    const dashboard: Dashboard | undefined = this.map(await this.getCapabilityValue('dashboard'), (dashboardId) => this.store.getDashboard(dashboardId));
+    if (dashboard === undefined) {
+      return undefined;
+    }
+
+    const controls = this.streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    for (const [i, control] of controls.entries()) {
+      const item = dashboard.items[i+1];
+      if (item.kind === 'variable' && item.variableId === variableId) {
+        return control
+      }
+    }
+    return undefined
+  }
+
   async streamDeckLoadDefaultDashboard(streamDeck: StreamDeckTcp) {
     	const panelDimensions = streamDeck.calculateFillPanelDimensions();
       if (panelDimensions === null) {
@@ -191,7 +227,7 @@ module.exports = class NetworkDock extends Homey.Device {
     for (const [i, control] of controls.entries()) {
       const item = dashboard.items[i+1];
       switch (item?.kind) {
-      case 'text':
+      case 'variable':
         actions.push(this.streamDeckSetText(streamDeck, control, item.firstLine, item.secondLine).catch((e) => console.error('streamDeckSetImage failed:', e)));
         break;
       case 'image':
@@ -221,7 +257,7 @@ module.exports = class NetworkDock extends Homey.Device {
   async streamDeckEvent(event: 'up' | 'down', isTurnedOn: Boolean, control: StreamDeckButtonControlDefinition) {
 
     const button = this.dashboard?.items[control.index+1];
-    var state = { action: event, textId: '', imageId: '' }
+    var state = { action: event, variableId: '', imageId: '' }
     var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1 }
     
     if (!isTurnedOn) {
@@ -255,12 +291,12 @@ module.exports = class NetworkDock extends Homey.Device {
     var actions: Promise<void>[] = []
 
     switch (button.kind) {
-    case 'text':
-      state.textId = button.textId;
+    case 'variable':
+      state.variableId = button.variableId;
       tokens.textFirstLine = button.firstLine;
       tokens.textSecondLine = button.secondLine ?? '';
-      actions.push(this.onTextButtonAction.trigger(this, tokens, state));
-      this.log(event + ' text button ' + button.firstLine);
+      actions.push(this.onVariableButtonAction.trigger(this, tokens, state));
+      this.log(event + ' variable button ' + button.firstLine);
       break; 
     case 'image':
       state.imageId = button.imageId;

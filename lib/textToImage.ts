@@ -6,6 +6,8 @@ import * as Font from "jimp/fonts";
 
 export class TextToImage {
 
+    static sampleSize = 192;
+
     static async create(maxSize: number, firstLine: string, secondLine: string | undefined) {
 
         const textPadding = 2;

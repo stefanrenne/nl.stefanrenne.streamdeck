@@ -1,0 +1,31 @@
+{
+	"id": "update_variable_secondline",
+	"title": {
+	   "en": "Update only the text of the second line of the variable.",
+	   "nl": "Wijzig alleen de tekst op de tweede regel van de variabele bij."
+	},
+	"titleFormatted": {
+	   "en": "Update only the [[variable]]'s second line text to [[secondLine]]",
+	   "nl": "Wijzig alleen [[variable]]'s text op de tweede regel naar [[secondLine]]"
+	},
+    "args": [
+        {
+            "name": "variable",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+                "en": "Variable",
+                "nl": "Variabel"
+            }
+        },
+        {
+            "name": "secondLine",
+            "required": false,
+            "type": "text",
+            "title": {
+                "en": "Optional second line text",
+                "nl": "Optionele tekst op de tweede regel"
+            }
+        }
+	]
+ }

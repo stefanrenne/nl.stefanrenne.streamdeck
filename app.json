@@ -346,14 +346,14 @@
         ]
       },
       {
-        "id": "text_button_action",
+        "id": "variable_button_action",
         "title": {
-          "en": "Text button action",
-          "nl": "Tekst knop actie"
+          "en": "Variable button action",
+          "nl": "Variabel knop actie"
         },
         "titleFormatted": {
-          "en": "[[text]] button [[action]]",
-          "nl": "[[text]] knop [[action]]"
+          "en": "[[variable]] button [[action]]",
+          "nl": "[[variable]] knop [[action]]"
         },
         "args": [
           {
@@ -362,12 +362,12 @@
             "filter": "driver_id=network-dock"
           },
           {
-            "name": "text",
+            "name": "variable",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Text",
-              "nl": "Tekst"
+              "en": "Variable",
+              "nl": "Variabel"
             }
           },
           {
@@ -505,32 +505,103 @@
         ]
       },
       {
-        "id": "update_text",
+        "id": "update_variable",
         "title": {
-          "en": "Update the subtitle for title",
-          "nl": "Wijzig de ondertiteling voor title"
+          "en": "Update variable",
+          "nl": "Wijzig variabel"
         },
         "titleFormatted": {
-          "en": "Update the subtitle for [[text]] to [[value]] ",
-          "nl": "Wijzig de ondertiteling voor [[text]] naar [[value]]"
+          "en": "Update [[variable]] to [[firstLine]], [[secondLine]]",
+          "nl": "Wijzig [[variable]] naar [[firstLine]], [[secondLine]]"
         },
         "args": [
           {
-            "name": "text",
+            "name": "variable",
             "required": true,
             "type": "autocomplete",
             "title": {
-              "en": "Text",
-              "nl": "Tekst"
+              "en": "Variable",
+              "nl": "Variabel"
             }
           },
           {
-            "name": "value",
+            "name": "firstLine",
+            "required": true,
+            "type": "text",
+            "title": {
+              "en": "First line text",
+              "nl": "Tekst op de eerste regel"
+            }
+          },
+          {
+            "name": "secondLine",
+            "required": true,
+            "type": "text",
+            "title": {
+              "en": "Second line text",
+              "nl": "Tekst op de tweede regel"
+            }
+          }
+        ]
+      },
+      {
+        "id": "update_variable_firstline",
+        "title": {
+          "en": "Update only the text of the first line of the variable.",
+          "nl": "Wijzig alleen de tekst op de eerste regel van de variabele bij."
+        },
+        "titleFormatted": {
+          "en": "Update only the [[variable]]'s first line text to [[firstLine]]",
+          "nl": "Wijzig alleen [[variable]]'s text op de eerste regel naar [[firstLine]]"
+        },
+        "args": [
+          {
+            "name": "variable",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+              "en": "Variable",
+              "nl": "Variabel"
+            }
+          },
+          {
+            "name": "firstLine",
+            "required": true,
+            "type": "text",
+            "title": {
+              "en": "First line text",
+              "nl": "Tekst op de eerste regel"
+            }
+          }
+        ]
+      },
+      {
+        "id": "update_variable_secondline",
+        "title": {
+          "en": "Update only the text of the second line of the variable.",
+          "nl": "Wijzig alleen de tekst op de tweede regel van de variabele bij."
+        },
+        "titleFormatted": {
+          "en": "Update only the [[variable]]'s second line text to [[secondLine]]",
+          "nl": "Wijzig alleen [[variable]]'s text op de tweede regel naar [[secondLine]]"
+        },
+        "args": [
+          {
+            "name": "variable",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+              "en": "Variable",
+              "nl": "Variabel"
+            }
+          },
+          {
+            "name": "secondLine",
             "required": false,
             "type": "text",
             "title": {
-              "en": "Subtitle",
-              "nl": "Subtitel"
+              "en": "Optional second line text",
+              "nl": "Optionele tekst op de tweede regel"
             }
           }
         ]

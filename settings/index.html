@@ -13,10 +13,10 @@
           <a class="nav-link active" data-page="page-dashboards" href="#" data-i18n="settings.tab.dashboards"></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-page="page-images" href="#" data-i18n="settings.tab.images"></a>
+          <a class="nav-link" data-page="page-variables" href="#" data-i18n="settings.tab.variables"></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-page="page-variables" href="#" data-i18n="settings.tab.variables"></a>
+          <a class="nav-link" data-page="page-images" href="#" data-i18n="settings.tab.images"></a>
         </li>
       </ul>
       <!-- Page Dashboards -->
@@ -127,24 +127,25 @@
             <label class="homey-form-radio">
               <input class="homey-form-radio-input" id="displayItemMode1" type="radio" name="item-mode" value="1"/>
               <span class="homey-form-radio-checkmark"></span>
-              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.image"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.variable"></span>
             </label>
             <label class="homey-form-radio">
               <input class="homey-form-radio-input" id="displayItemMode2" type="radio" name="item-mode" value="2"/>
               <span class="homey-form-radio-checkmark"></span>
-              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.text"></span>
+              <span class="homey-form-radio-text" data-i18n="settings.dashboard.item.image"></span>
             </label>
           </div>
         </fieldset>
       </div>
 
       <div id="manage-dashboardItem-image" style="margin-top: 20px" class="hidden">
-          <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.selectImage"></legend>
-        <div id="manage-dashboardItem-imageItems" class="deck6" style="margin: 0; background-color: transparent;"></div>
+        <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.selectImage"></legend>
+        <ul id="manage-dashboardItem-imageItems" class="imageDeck"></ul>
       </div>
 
-      <div id="manage-dashboardItem-text" style="margin-top: 20px" class="hidden">
-        todo
+      <div id="manage-dashboardItem-variable" style="margin-top: 20px" class="hidden">
+        <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.item.selectVariable"></legend>
+        <ul id="manage-dashboardItem-variableItems" class="variableDeck"></ul>
       </div>
 
       <fieldset class="homey-form-radio-set" style="margin-bottom: 30px; width: 100%;">
@@ -159,7 +160,7 @@
     <!-- Manage Image Item -->
     <div class="hidden" id="manage-imageItem">
       <header class="homey-header">
-        <h1 class="homey-title" data-i18n="settings.image.manage.title"></h1>
+        <h1 class="homey-title" data-i18n="settings.image.manage.titleAdd"></h1>
       </header>
       <div style="display: inline-block; margin-bottom: 30px; width: 100%;">
         <div class="deck1" style="float: left">
@@ -209,7 +210,7 @@
     <script type="text/javascript">
       const $createDashboardItemDisplay = document.getElementById("manage-dashboardItem-display");
       const $createDashboardItemSelectImageView = document.getElementById("manage-dashboardItem-image");
-      const $createDashboardItemSelectTextView = document.getElementById("manage-dashboardItem-text");
+      const $createDashboardItemSelectTextView = document.getElementById("manage-dashboardItem-variable");
       const $deck = document.getElementById("deck");
 
       function observeMenuItems() {
@@ -261,15 +262,17 @@
         const $createItemDisplay = document.getElementById("manage-variableItem-display");
         const $textFirstLine = document.getElementById("selectTextFirstLine");
         const $textSecondLine = document.getElementById("selectTextSecondLine");
+        const $input = document.getElementById("variableName");
 
         $textFirstLine.placeholder = Homey.__('settings.variable.manage.inputFirstLine');
         $textSecondLine.placeholder = Homey.__('settings.variable.manage.inputSecondLine');
 
         $createItemButton.addEventListener("click", () => {
+            document.getElementById("manage-variableItem").querySelector('h1').innerHTML = Homey.__('settings.variable.manage.titleAdd');
             $createItemDisplay.classList.add('actionNone');
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.remove('actionVariable');
-            $createItemDisplay.dataset.id = '';
+            $createItemDisplay.dataset.id = crypto.randomUUID();
             $createItemDisplay.querySelector('img').src = '';
             $createItemDisplay.value = '';
             $createItemDisplay.dataset.oldValue = '';
@@ -277,12 +280,11 @@
         });
 
         $saveItemButton.addEventListener("click", async () => {
-          const id = document.getElementById("manage-variableItem-display").dataset.id
-          const $input = document.getElementById("variableName");
-          if ($input.dataset.oldValue !== $input.value.trim()) {
+          const id = document.getElementById("manage-variableItem-display").dataset.id;
+          if ($textFirstLine.value !== '' || $input.value !== '') {
             $saveItemButton.classList.add('is-loading');
-            const newValue = await validateVariableName(id, $input.value);
-            // await updateVariable(id, newValue); // TODO
+            const name = ($input.value.trim() !== $input.dataset.oldValue) ? await validateVariableName(id, $input.value.trim() === '' ? $textFirstLine.value : $input.value) : $input.value.trim();
+            await storeVariable(id, name, $createItemDisplay.querySelector('img').src, $textFirstLine.value.trim(), $textSecondLine.value.trim());
             await loadVariables();
             $saveItemButton.classList.remove('is-loading');
           }
@@ -338,7 +340,7 @@
             const isVariable = item.classList.contains("actionVariable");
             dashboardItems.push(
               {
-                type: (isImage) ? 'image' : (isText) ? 'text' : 'empty',
+                type: (isImage) ? 'image' : (isVariable) ? 'variable' : 'empty',
                 imageId: (isImage) ? item.dataset.imageId : undefined,
                 variableId: (isVariable) ? item.dataset.variableId : undefined,
                 payload: item.dataset.payload, 
@@ -367,7 +369,7 @@
         $saveItemButton.addEventListener("click", async () => {
           const id = document.getElementById("manage-imageItem-display").dataset.id
           const $input = document.getElementById("imageName");
-          if ($input.dataset.oldValue !== $input.value.trim()) {
+          if ($input.value.trim() !== $input.dataset.oldValue && $input.value.trim() !== '') {
             $saveItemButton.classList.add('is-loading');
             const newValue = await validateButtonName(id, $input.value);
             await updateImage(id, newValue);
@@ -384,8 +386,8 @@
       async function observeDashboardItemImages() {
         const $saveItemButton = document.getElementById("saveDashboardItem");
         const $noneRadio = document.getElementById("displayItemMode0");
-        const $imageRadio = document.getElementById("displayItemMode1");
-        const $textRadio = document.getElementById("displayItemMode2");
+        const $variableRadio = document.getElementById("displayItemMode1");
+        const $imageRadio = document.getElementById("displayItemMode2");
 
         $noneRadio.addEventListener('change', async () => {
           $createDashboardItemSelectImageView.classList.add("hidden");
@@ -404,12 +406,16 @@
             $createDashboardItemDisplay.classList.remove("actionNone");
           }
         });
-        $textRadio.addEventListener('change', async () => {
+        $variableRadio.addEventListener('change', async () => {
           $createDashboardItemSelectImageView.classList.add("hidden");
           $createDashboardItemSelectTextView.classList.remove("hidden");
-          // if ($textFirstLine.value.trim() !== "") {
-          //   await textChangeEvent();
-          // }
+          if ($createDashboardItemDisplay.dataset.variableId !== "") {
+            const variable = await getVariableFromStore($createDashboardItemDisplay.dataset.variableId);
+            $createDashboardItemDisplay.querySelector('img').src = variable.sample;
+            $createDashboardItemDisplay.classList.add("actionVariable");
+            $createDashboardItemDisplay.classList.remove("actionImage");
+            $createDashboardItemDisplay.classList.remove("actionNone");
+          }
         });
         $saveItemButton.addEventListener("click", async () => {
           const $dashboardItem = document.getElementById("deckItem" + $createDashboardItemDisplay.dataset.id);
@@ -418,15 +424,15 @@
             $dashboardItem.classList.add("actionImage");
             $dashboardItem.classList.remove("actionVariable");
             $dashboardItem.classList.remove("actionNone");
-            $dashboardItem.dataset.imageId = $createDashboardItemDisplay.dataset.imageId
+            $dashboardItem.dataset.imageId = $createDashboardItemDisplay.dataset.imageId;
             $dashboardItem.querySelector('img').src = await getImageFromStore($createDashboardItemDisplay.dataset.imageId);
           } else if ($createDashboardItemDisplay.classList.contains("actionVariable")) {
-            const data = await getVariableFromStore($createDashboardItemDisplay.dataset.variableId);
+            const variable = await getVariableFromStore($createDashboardItemDisplay.dataset.variableId);
             $dashboardItem.classList.remove("actionImage");
             $dashboardItem.classList.add("actionVariable");
             $dashboardItem.classList.remove("actionNone");
             $dashboardItem.dataset.variableId = $createDashboardItemDisplay.dataset.variableId;
-            $dashboardItem.querySelector('img').src = await getImageForText(document.getElementById("selectTextFirstLine").value, document.getElementById("selectTextSecondLine").value)
+            $dashboardItem.querySelector('img').src = variable.sample;
           } else {
             $dashboardItem.classList.add("actionNone");
             $dashboardItem.classList.remove("actionVariable");
@@ -521,7 +527,7 @@
             $item.dataset.imageId = cache.imageId;
             $item.dataset.variableId = "";
           } else if (cache?.type === "variable" && cache.variableId !== undefined) {
-            const variable = await getVariableFromStore(cache.textId);
+            const variable = await getVariableFromStore(cache.variableId);
             $img.src = variable.sample;
             $item.classList.add("actionVariable");
             $item.dataset.imageId = "";
@@ -557,13 +563,23 @@
 
       async function selectDashboardItem(id, defaultText, imageId, variableId, payload) {
         const $noneRadio = document.getElementById("displayItemMode0");
-        const $imageRadio = document.getElementById("displayItemMode1");
-        const $textRadio = document.getElementById("displayItemMode2");
+        const $variableRadio = document.getElementById("displayItemMode1");
+        const $imageRadio = document.getElementById("displayItemMode2");
         
         $createDashboardItemDisplay.dataset.id = id;
         $createDashboardItemDisplay.dataset.imageId = imageId ?? "";
         $createDashboardItemDisplay.dataset.variableId = variableId ?? "";
         document.getElementById("payload").value = payload ?? "";
+
+        const selectImageRadios = document.querySelectorAll('input[name=selectImage]');
+        for (const item of selectImageRadios) {
+          item.checked = (item.value === imageId);
+        }
+
+        const selectVariableRadios = document.querySelectorAll('input[name=selectVariable]');
+        for (const item of selectVariableRadios) {
+          item.checked = (item.value === variableId);
+        }
 
         $createDashboardItemDisplay.querySelector('p').innerHTML = defaultText;
         if (imageId !== undefined) {
@@ -589,9 +605,9 @@
           $createDashboardItemSelectImageView.classList.add("hidden");
           $createDashboardItemSelectTextView.classList.add("hidden");
         }
-        $noneRadio.checked = imageId == undefined && firstLine == undefined;
+        $noneRadio.checked = imageId == undefined && variableId == undefined;
         $imageRadio.checked = imageId !== undefined;
-        $textRadio.checked = firstLine !== undefined;
+        $variableRadio.checked = variableId !== undefined;
 
         showView('dashboardItem');
       }
@@ -787,20 +803,30 @@
         $selectImageDeck.innerHTML = '';
 
         for (const button of Object.values(images)) {
-          const $item = document.createElement('div');
-          $item.classList.add("deck-item");
-          $item.title = button.name;
-          const $id = document.createAttribute("data-id");
-          $id.value = button.id;
-          $item.setAttributeNode($id);
+          const $item = document.createElement('li');
           $selectImageDeck.appendChild($item);
 
+          const $checkboxBackground = document.createElement('div');
+          $item.appendChild($checkboxBackground);
+          $checkboxBackground.classList.add("radio-item");
+          const $checkbox = document.createElement('input');
+          $checkbox.type = 'radio';
+          $checkbox.name = 'selectImage';
+          $checkbox.value = button.id;
+          $checkboxBackground.appendChild($checkbox);
+
+          const $imageBackground = document.createElement('div');
+          $imageBackground.classList.add("deck-item");
+          $imageBackground.title = button.name;
+          $item.appendChild($imageBackground);
           $image = document.createElement('img');
           $image.src = await getImageFromStore(button.id);
-          $item.appendChild($image);
+          $imageBackground.appendChild($image);
 
           $item.addEventListener('click', async () => {
+            $checkbox.checked = true;
             $createDashboardItemDisplay.classList.remove("actionNone");
+            $createDashboardItemDisplay.classList.remove("actionVariable");
             $createDashboardItemDisplay.classList.add("actionImage");
             $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore(button.id);
             $createDashboardItemDisplay.dataset.imageId = button.id;
@@ -868,13 +894,16 @@
           $edit.title = Homey.__('settings.variable.manageTitle');
           $editMask = document.createElement('span');
           $edit.addEventListener('click', async () => {
+            document.getElementById("manage-variableItem").querySelector('h1').innerHTML = Homey.__('settings.variable.manage.titleEdit');
             $createItemDisplay.dataset.id = variable.id;
-            $createItemDisplay.querySelector('img').src = variableData;
+            $createItemDisplay.querySelector('img').src = variable.sample;
             $createItemDisplay.classList.remove('actionNone');
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.add('actionVariable');
             document.getElementById("variableName").value = variable.name;
             document.getElementById("variableName").dataset.oldValue = variable.name;
+            document.getElementById("selectTextFirstLine").value = variable.firstLine;
+            document.getElementById("selectTextSecondLine").value =  variable.secondLine;
             showView('variableItem');
           });
           $edit.appendChild($editMask);
@@ -902,31 +931,46 @@
         }
 
         /* Load Dashboard Select Item */
-        // TODO
-        // const $selectImageDeck = document.getElementById("manage-dashboardItem-imageItems");
-        // $selectImageDeck.innerHTML = '';
+        const $selectVariableDeck = document.getElementById("manage-dashboardItem-variableItems");
+        $selectVariableDeck.innerHTML = '';
 
-        // for (const button of Object.values(images)) {
-        //   const $item = document.createElement('div');
-        //   $item.classList.add("deck-item");
-        //   $item.title = button.name;
-        //   const $id = document.createAttribute("data-id");
-        //   $id.value = button.id;
-        //   $item.setAttributeNode($id);
-        //   $selectImageDeck.appendChild($item);
+        for (const variable of Object.values(variables)) {
+          const $item = document.createElement('li');
+          $selectVariableDeck.appendChild($item);
 
-        //   $image = document.createElement('img');
-        //   $image.src = await getImageFromStore(button.id);
-        //   $item.appendChild($image);
+          const $checkboxBackground = document.createElement('div');
+          $item.appendChild($checkboxBackground);
+          $checkboxBackground.classList.add("radio-item");
+          const $checkbox = document.createElement('input');
+          $checkbox.type = 'radio';
+          $checkbox.name = 'selectVariable';
+          $checkbox.value = variable.id;
+          $checkboxBackground.appendChild($checkbox);
 
-        //   $item.addEventListener('click', async () => {
-        //     $createDashboardItemDisplay.classList.remove("actionNone");
-        //     $createDashboardItemDisplay.classList.add("actionImage");
-        //     $createDashboardItemDisplay.querySelector('img').src = await getImageFromStore(button.id);
-        //     $createDashboardItemDisplay.dataset.imageId = button.id;
-        //   });
-        // }
+          const $imageBackground = document.createElement('div');
+          $imageBackground.classList.add("deck-item");
+          $imageBackground.title = variable.name;
+          $item.appendChild($imageBackground);
+          $image = document.createElement('img');
+          $image.src = variable.sample;
+          $imageBackground.appendChild($image);
 
+          const $nameBackground = document.createElement('div');
+          $item.appendChild($nameBackground);
+          $nameBackground.classList.add("name-item");
+          const $name = document.createElement('p');
+          $name.innerHTML = variable.name;
+          $nameBackground.appendChild($name);
+
+          $item.addEventListener('click', async () => {
+            $checkbox.checked = true;
+            $createDashboardItemDisplay.classList.remove("actionNone");
+            $createDashboardItemDisplay.classList.remove("actionImage");
+            $createDashboardItemDisplay.classList.add("actionVariable");
+            $createDashboardItemDisplay.querySelector('img').src = variable.sample;
+            $createDashboardItemDisplay.dataset.variableId = variable.id;
+          });
+        }
       }
 
       async function loadDashboards() {
@@ -967,13 +1011,7 @@
           $copyMask = document.createElement('span');
           $copy.addEventListener('click', async () => {
             const dashboard = await getDashboardFromStore(metadata.id);
-            const items = dashboard.items.map((item) => {
-              if (item.textId !== undefined) {
-                item.textId = crypto.randomUUID();
-              }
-              return item;
-            });
-            await createDeckItems(dashboard.displayMode, undefined, undefined, items);
+            await createDeckItems(dashboard.displayMode, undefined, undefined, dashboard.items);
           });
           $copy.appendChild($copyMask);
           $actionColumn.appendChild($copy);
@@ -1115,43 +1153,38 @@
       var cachedVariables = [];
       async function getVariablesFromStore() {
         if (cachedVariables === undefined || cachedVariables.length === 0) {
-          cachedVariables = await Homey.get('variables') ?? []
+          const variables = await Homey.get('variables') ?? [];
+          for (const metadata of Object.values(variables)) {
+            const variable = await Homey.get('variable-' + metadata.id);
+            cachedVariables.push(Object.assign({}, metadata, variable));
+          }
         }
         return cachedVariables
       }
 
-      var cachedVariable = {};
-      async function storeVariable(id, name, data, firstLine, secondLine) {
-        var newVariables = await getVariablesFromStore();
-        newVariables.push({ id: id, name: name });
-        cachedVariables = newVariables;
-        await Homey.set('variables', newVariables);
+      async function storeVariable(id, name, sample, firstLine, secondLine) {
+        const variables = await getVariablesFromStore();
+        const metadata = { id: id, name: name };
+        const variable = { sample: sample, firstLine: firstLine, secondLine: secondLine };
 
-        cachedVariable[id] = data
-        await Homey.set('variable-' + id, { sample: data, firstLine: firstLine, secondLine: secondLine });
+        var newVariables = variables.filter((item) => item.id !== id)
+        newVariables.push(Object.assign({}, metadata, variable));
+        cachedVariables = newVariables;
+
+        await Homey.set('variables', newVariables);
+        await Homey.set('variable-' + id, variable);
       }
 
       async function getVariableFromStore(id) {
-        if (cachedVariable[id] !== undefined) {
-          return cachedVariable[id];
-        }
-        const variable = await Homey.get('variable-' + id);
-        if (variable !== undefined) {
-          cachedVariable[id] = variable
-        }
-        return variable
+        const variables = await getVariablesFromStore();
+        return variables.find((item) => item.id === id);
       }
 
       async function unstoreVariable(id) {
-        if (cachedVariable[id] !== undefined) {
-          delete cachedVariable[id];
-        }
-
         const variables = await getVariablesFromStore();
         const newVariables = variables.filter(item => item.id !== id);
         cachedVariables = newVariables;
         await Homey.set('variables', newVariables);
-        
         await Homey.unset('variable-' + id);
       }
       
@@ -1166,8 +1199,8 @@
 
         Promise.resolve().then(async () => {
           await loadDashboards();
-          await loadImages();
           await loadVariables();
+          await loadImages();
           await observeDashboardItemImages();
         })
         .catch(err => {

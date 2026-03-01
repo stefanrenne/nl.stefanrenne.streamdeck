@@ -22,5 +22,8 @@
   },
   "1.0.5": {
     "en": "Ability to select multiple images during upload"
+  },
+  "1.1.0": {
+    "en": "Create, Modify and Assign variables"
   }
 }

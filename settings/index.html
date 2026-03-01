@@ -837,28 +837,27 @@
       async function loadVariables() {
         
         /* Validate Existing Dashboard */
-        // TODO
         var variables = await getVariablesFromStore();
-        // const imageIds = images.map((item) => item.id);
-        // const dashboards = await getDashboardsFromStore();
-        // for (const metadata of Object.values(dashboards)) {
-        //   var didUpdateDashboards = false;
-        //   const dashboard = await getDashboardFromStore(metadata.id);
-        //   const newItems = dashboard.items.filter((item) => {
-        //     if (item.type !== "image" || imageIds.includes(item.imageId)) {
-        //       return true;
-        //     }
-        //     didUpdateDashboards = true;
-        //     return false;
-        //   });
-        //   if (didUpdateDashboards) {
-        //     await storeDashboardItem(metadata.id, dashboard.displayMode, newItems);
-        //   }
-        // }
+        const variableIds = variables.map((item) => item.id);
+        const dashboards = await getDashboardsFromStore();
+        for (const metadata of Object.values(dashboards)) {
+          var didUpdateDashboards = false;
+          const dashboard = await getDashboardFromStore(metadata.id);
+          const newItems = dashboard.items.filter((item) => {
+            if (item.type !== "variable" || variableIds.includes(item.variableId)) {
+              return true;
+            }
+            didUpdateDashboards = true;
+            return false;
+          });
+          if (didUpdateDashboards) {
+            await storeDashboardItem(metadata.id, dashboard.displayMode, newItems);
+          }
+        }
 
         /* Load Images Tab */
+        variables = await getVariablesFromStore();
         const $createItemDisplay = document.getElementById("manage-variableItem-display");
-        varimages = await getVariablesFromStore();
         const $container = document.getElementById("variablesContainer");
         $container.innerHTML = '';
 

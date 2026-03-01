@@ -175,12 +175,27 @@ ul.variableDeck, ul.imageDeck {
     list-style-type: none;
 }
 
+ul.variableDeck li.error, ul.imageDeck li.error, p.error {
+  width: 100%;
+  background-color: orange;
+  border-color: darkorange;
+  border-radius: 5px;
+  padding: 10px;
+  border-style: solid;
+  border-width: 2px;
+}
+
+p.error {
+    margin-top: 30px;
+}
+
 ul.variableDeck li {
+    display: inline-block;
     width: 50%;
 }
 
 ul.imageDeck li {
-    float: left;
+    display: inline-block;
     width: 85px;
     height: 60px;
 }

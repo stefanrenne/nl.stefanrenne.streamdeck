@@ -28,7 +28,9 @@
             "item": {
                 "title": "Select Item",
                 "selectImage": "Select Image",
+                "selectImageError": "No images available, you can upload a image in the 'Images' tab.",
                 "selectVariable": "Select Variable",
+                "selectVariableError": "No variables available, you can create a variable in the 'Variables' tab.",
                 "displayMode": "Action",
                 "none": "Empty",
                 "variable": "Variable",
@@ -42,6 +44,7 @@
             }
         },
         "image": {
+            "emptyError": "In this tab you can upload a image, images can then be assigned to stream deck dashboard positions.",
             "title": "Image",
             "name": "Name",
             "action": "Action",
@@ -57,6 +60,7 @@
             }
         },
         "variable": {
+            "emptyError": "In this tab you can create a variable, variables are buttons with one or two lines of text, and those text lines can be updated from a honey flow.",
             "title": "Variable",
             "name": "Name",
             "action": "Action",

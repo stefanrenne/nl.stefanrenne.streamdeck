@@ -28,7 +28,9 @@
             "item": {
                 "title": "Kies Item",
                 "selectImage": "Selecteer afbeelding",
+                "selectImageError": "Er zijn geen afbeeldingen beschikbaar. U kunt een afbeelding uploaden via het tabblad 'Afbeeldingen'.",
                 "selectVariable": "Selecteer variabel",
+                "selectVariableError": "Er zijn geen variabelen beschikbaar. U kunt een variabele aanmaken in het tabblad 'Variabelen'.",
                 "displayMode": "Actie",
                 "none": "Leeg",
                 "variable": "Variabel",
@@ -45,6 +47,7 @@
             }
         },
         "image": {
+            "emptyError": "In dit tabblad kunt u een afbeelding uploaden. Afbeeldingen kunnen vervolgens aan posities op het stream deck dashboard worden toegewezen.",
             "title": "Afbeelding",
             "name": "Naam",
             "action": "Actie",
@@ -60,6 +63,7 @@
             }
         },
         "variable": {
+            "emptyError": "In dit tabblad kunt u een variabele aanmaken. Variabelen zijn knoppen met één of twee tekstregels, en deze tekstregels kunnen worden bijgewerkt vanuit een Honeyflow.",
             "title": "Variabel",
             "name": "Naam",
             "action": "Actie",

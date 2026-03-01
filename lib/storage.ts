@@ -22,6 +22,7 @@ export interface Dashboard {
     readonly name: string;
     readonly displayMode: number;
     readonly items: { [item: number] : DashboardItem; };
+    readonly usedVariableIds: string[];
 }
 
 export type DashboardItem = DashboardEmptyItem | DashboardImageItem | DashboardVariableItem;
@@ -100,7 +101,7 @@ export class Store {
         //update cache
         const cache = this.cachedDashboards[id];
         if (cache !== undefined) {
-            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  displayMode: size, items: cache.items };
+            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  displayMode: size, items: cache.items, usedVariableIds: cache.usedVariableIds };
         }
 
         //write cache back to store
@@ -137,6 +138,7 @@ export class Store {
             return undefined
         }
 
+        var usedVariableIds: string[] = [];
         const defaultItems: { [item: number] : DashboardItem; } = Object.fromEntries(Array.from({length: 32}, (_, i) => [i + 1, { kind: 'empty', payload: '' }]));
         const items: { [item: number] : DashboardItem; } = data.items.reduce((result, row) => {
             const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');
@@ -152,6 +154,7 @@ export class Store {
             if (row.type === 'variable' && row.variableId !== undefined) {
                 const variable = this.getVariable(row.variableId);
                 if (variable !== undefined) {
+                    usedVariableIds.push(variable.id);
                     result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine };
                     return result;
                 }
@@ -161,7 +164,7 @@ export class Store {
             return result;
         }, defaultItems);
 
-        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, displayMode: data.displayMode, items: items };
+        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, displayMode: data.displayMode, items: items, usedVariableIds: usedVariableIds };
         this.cachedDashboards[id] = dashboard;
         return dashboard;
 
@@ -184,6 +187,15 @@ export class Store {
         if (this.cachedVariables[id] !== undefined) {
             delete this.cachedVariables[id];
         }
+
+        // Invalidate existing dashboard cache where variable is used
+        this.cachedDashboardMetadata.forEach((metadata) => {
+            const dashboard = this.cachedDashboards[metadata.id];
+            if (dashboard !== undefined && dashboard.usedVariableIds.includes(id)) {
+                this.homey.log("Invalidate Dashboard " + metadata.id);
+                this.invalidateDashboard(metadata.id);
+            }
+        });
     }
 
     getVariablesMetadata(): Metadata[] {

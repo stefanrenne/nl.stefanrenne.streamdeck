@@ -32,6 +32,7 @@ module.exports = class StreamDeckApp extends Homey.App {
       }
       if (variableId !== undefined) {
         this.log('set variable: ' + variableId);
+        this.store.invalidateVariable(variableId);
         this.homey.settings.emit('set-variable', variableId);
       }
     });
@@ -49,6 +50,7 @@ module.exports = class StreamDeckApp extends Homey.App {
       }
       if (variableId !== undefined) {
         this.log('unset variable: ' + variableId);
+        this.store.invalidateVariable(variableId);
         this.homey.settings.emit('unset-variable', variableId);
       }
     });
@@ -63,10 +65,6 @@ module.exports = class StreamDeckApp extends Homey.App {
       const secondLine = args.secondLine.trim();
       const variable = this.store.getVariable(id);
 
-      this.homey.log("====");
-      this.homey.log(id);
-      this.homey.log(firstLine);
-      this.homey.log(secondLine);
       if (variable !== undefined) {
         const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, secondLine);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });
@@ -83,9 +81,7 @@ module.exports = class StreamDeckApp extends Homey.App {
       const id = args.variable.id;
       const firstLine = args.firstLine.trim();
       const variable = this.store.getVariable(id);
-      this.homey.log("====");
-      this.homey.log(id);
-      this.homey.log(firstLine);
+      
       if (variable !== undefined) {
         const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, variable.secondLine);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });
@@ -102,9 +98,7 @@ module.exports = class StreamDeckApp extends Homey.App {
       const id = args.variable.id;
       const secondLine = (args.secondLine !== undefined) ? args.secondLine.trim() : undefined;
       const variable = this.store.getVariable(id);
-      this.homey.log("====");
-      this.homey.log(id);
-      this.homey.log(secondLine);
+      
       if (variable !== undefined) {
         const jimp = await TextToImage.create(TextToImage.sampleSize, variable.firstLine, secondLine);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });

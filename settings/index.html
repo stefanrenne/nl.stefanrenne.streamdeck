@@ -36,6 +36,7 @@
 
       <!-- Page Images -->
       <div class="page hidden" id="page-images">
+        <p class="error" data-i18n="settings.image.emptyError"></p>
         <table class="table table-striped homey-form-group">
           <thead>
           <tr>
@@ -53,6 +54,7 @@
 
       <!-- Page Variables -->
       <div class="page hidden" id="page-variables">
+        <p class="error" data-i18n="settings.variable.emptyError"></p>
         <table class="table table-striped homey-form-group">
           <thead>
           <tr>
@@ -321,13 +323,16 @@
 
           const key = $textFirstLine.value + "|" + $textSecondLine.value;
           if ($createItemDisplay.dataset.key !== key) {
-            const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
+            console.log("fetch " + key);
             $createItemDisplay.dataset.key = key;
+            const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
             $createItemDisplay.classList.remove("actionNone");
             $createItemDisplay.classList.remove("actionImage");
             $createItemDisplay.classList.add("actionVariable");
-            $createItemDisplay.querySelector('img').src = image;
-            $createItemDisplay.classList.remove("is-loading");
+            if ($createItemDisplay.dataset.key === key) {
+              $createItemDisplay.querySelector('img').src = image;
+              $createItemDisplay.classList.remove("is-loading");
+            }
           }
         }
       }
@@ -754,6 +759,14 @@
         const $container = document.getElementById("imagesContainer");
         $container.innerHTML = '';
 
+        if (images.length === 0) {
+          document.getElementById("page-images").querySelector('p').classList.remove('hidden')
+          document.getElementById("page-images").querySelector('table').classList.add('hidden')
+        } else {
+          document.getElementById("page-images").querySelector('p').classList.add('hidden')
+          document.getElementById("page-images").querySelector('table').classList.remove('hidden')
+        }
+
         for (const image of Object.values(images)) {
           const $row = document.createElement('tr');
           const imageData = await getImageFromStore(image.id);
@@ -820,6 +833,13 @@
         const $selectImageDeck = document.getElementById("manage-dashboardItem-imageItems");
         $selectImageDeck.innerHTML = '';
 
+        if (images.length === 0) {
+          const $item = document.createElement('li');
+          $item.classList.add('error');
+          $item.innerHTML = Homey.__('settings.dashboard.item.selectImageError');
+          $selectImageDeck.appendChild($item);
+        }
+
         for (const button of Object.values(images)) {
           const $item = document.createElement('li');
           $selectImageDeck.appendChild($item);
@@ -873,11 +893,19 @@
           }
         }
 
-        /* Load Images Tab */
+        /* Load Variables Tab */
         variables = await getVariablesFromStore();
         const $createItemDisplay = document.getElementById("manage-variableItem-display");
         const $container = document.getElementById("variablesContainer");
         $container.innerHTML = '';
+
+        if (variables.length === 0) {
+          document.getElementById("page-variables").querySelector('p').classList.remove('hidden')
+          document.getElementById("page-variables").querySelector('table').classList.add('hidden')
+        } else {
+          document.getElementById("page-variables").querySelector('p').classList.add('hidden')
+          document.getElementById("page-variables").querySelector('table').classList.remove('hidden')
+        }
 
         for (const variable of Object.values(variables)) {
           const $row = document.createElement('tr');
@@ -951,6 +979,13 @@
         /* Load Dashboard Select Item */
         const $selectVariableDeck = document.getElementById("manage-dashboardItem-variableItems");
         $selectVariableDeck.innerHTML = '';
+
+        if (variables.length === 0) {
+          const $item = document.createElement('li');
+          $item.classList.add('error');
+          $item.innerHTML = Homey.__('settings.dashboard.item.selectVariableError');
+          $selectVariableDeck.appendChild($item);
+        }
 
         for (const variable of Object.values(variables)) {
           const $item = document.createElement('li');

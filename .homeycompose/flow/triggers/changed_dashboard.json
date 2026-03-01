@@ -1,8 +1,8 @@
 {
-	"id":"changed_dashboard",
-	"title":{
-	   "en":"Dashboard has changed",
-	   "nl":"Dashboard is veranderd"
+	"id": "changed_dashboard",
+	"title": {
+	   "en": "Dashboard has changed",
+	   "nl": "Dashboard is veranderd"
 	},
     "args": [
         {

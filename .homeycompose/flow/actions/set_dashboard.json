@@ -1,11 +1,11 @@
 {
-	"id":"set_dashboard",
-	"title":{
-	   "en":"Set Dashboard to [[Value]]",
+	"id": "set_dashboard",
+	"title": {
+	   "en": "Set Dashboard to [[Value]]",
 	   "nl": "Stel het dashboard in op [[Value]]"
 	},
-	"titleFormatted":{
-	   "en":"Set Dashboard to [[dashboard]]",
+	"titleFormatted": {
+	   "en": "Set Dashboard to [[dashboard]]",
 	   "nl": "Stel het dashboard in op [[dashboard]]"
 	},
     "args": [
@@ -15,12 +15,12 @@
             "filter": "driver_id=network-dock"
         },
         {
-            "name":"dashboard",
-            "required":true,
-            "type":"autocomplete",
-            "title":{
-                "en":"Dashboard",
-                "nl":"Dashboard"
+            "name": "dashboard",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+                "en": "Dashboard",
+                "nl": "Dashboard"
             }
         }
 	]

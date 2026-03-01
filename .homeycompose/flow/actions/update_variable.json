@@ -1,0 +1,40 @@
+{
+	"id": "update_variable",
+	"title": {
+	   "en": "Update variable",
+	   "nl": "Wijzig variabel"
+	},
+	"titleFormatted": {
+	   "en": "Update [[variable]] to [[firstLine]], [[secondLine]]",
+	   "nl": "Wijzig [[variable]] naar [[firstLine]], [[secondLine]]"
+	},
+    "args": [
+        {
+            "name": "variable",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+                "en": "Variable",
+                "nl": "Variabel"
+            }
+        },
+        {
+            "name": "firstLine",
+            "required": true,
+            "type": "text",
+            "title": {
+                "en": "First line text",
+                "nl": "Tekst op de eerste regel"
+            }
+        },
+        {
+            "name": "secondLine",
+            "required": true,
+            "type": "text",
+            "title": {
+                "en": "Second line text",
+                "nl": "Tekst op de tweede regel"
+            }
+        }
+	]
+ }

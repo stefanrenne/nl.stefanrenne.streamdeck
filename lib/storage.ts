@@ -9,6 +9,14 @@ export interface Image {
     readonly imageBuffer: Buffer
 }
 
+export interface Variable {
+    readonly id: string;
+    readonly name: string;
+    readonly firstLine: string;
+    readonly secondLine: string | undefined;
+    readonly base64Sample: string | undefined;
+}
+
 export interface Dashboard {
     readonly id: string;
     readonly name: string;
@@ -16,7 +24,7 @@ export interface Dashboard {
     readonly items: { [item: number] : DashboardItem; };
 }
 
-export type DashboardItem = DashboardEmptyItem | DashboardImageItem;
+export type DashboardItem = DashboardEmptyItem | DashboardImageItem | DashboardVariableItem;
 
 export interface DashboardEmptyItem {
     readonly kind: 'empty';
@@ -31,14 +39,24 @@ export interface DashboardImageItem {
     readonly imageBuffer: Buffer;
 }
 
-export interface ImageMetadata {
+export interface DashboardVariableItem {
+    readonly kind: 'variable';
+    readonly name: string;
+    readonly payload: string;
+    readonly variableId: string;
+    readonly firstLine: string;
+    readonly secondLine: string | undefined;
+}
+
+export interface Metadata {
     id: string;
     name: string;
 }
 
-export interface DashboardMetadata {
-    id: string;
-    name: string;
+interface StoredVariable {
+    firstLine: string;
+    secondLine: string;
+    sample: string;
 }
 
 interface StoredDashboard {
@@ -49,22 +67,27 @@ interface StoredDashboard {
 interface StoredDashboardItem {
     type: string;
     item: number;
-    imageId: string;
+    imageId: string | undefined;
+    variableId: string | undefined;
     payload: string;
 }
 
 export class Store {
 
     private homey: Homey;
-    private cachedImagesMetadata: ImageMetadata[]
-    private cachedImages: { [id: string] : Image; };
-    private cachedDashboardMetadata: DashboardMetadata[];
+    private cachedDashboardMetadata: Metadata[];
     private cachedDashboards: { [id: string] : Dashboard; };
+    private cachedVariablesMetadata: Metadata[]
+    private cachedVariables: { [id: string] : Variable; };
+    private cachedImagesMetadata: Metadata[]
+    private cachedImages: { [id: string] : Image; };
 
 	constructor(homey: Homey) {
         this.homey = homey;
         this.cachedDashboardMetadata = [];
         this.cachedDashboards = {};
+        this.cachedVariablesMetadata = [];
+        this.cachedVariables = {};
         this.cachedImagesMetadata = [];
         this.cachedImages = {};
     }
@@ -117,10 +140,19 @@ export class Store {
         const defaultItems: { [item: number] : DashboardItem; } = Object.fromEntries(Array.from({length: 32}, (_, i) => [i + 1, { kind: 'empty', payload: '' }]));
         const items: { [item: number] : DashboardItem; } = data.items.reduce((result, row) => {
             const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');
+
             if (row.type === 'image' && row.imageId !== undefined) {
-                const image = this.getImage(row.imageId)
+                const image = this.getImage(row.imageId);
                 if (image !== undefined) {
                     result[row.item] = { kind: 'image', name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
+                    return result;
+                }
+            }
+
+            if (row.type === 'variable' && row.variableId !== undefined) {
+                const variable = this.getVariable(row.variableId);
+                if (variable !== undefined) {
+                    result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine };
                     return result;
                 }
             }
@@ -135,20 +167,77 @@ export class Store {
 
     }
 
-    getDashboardMetadata(): DashboardMetadata[] {
+    getDashboardMetadata(): Metadata[] {
         if (this.cachedDashboardMetadata.length == 0) {
             this.invalidateDashboardMetadata();
         }
         return this.cachedDashboardMetadata
     }
 
+    // cache variables
+    invalidateVariablesMetadata() {
+        this.cachedVariablesMetadata = this.homey.settings.get('variables') ?? [];
+    }
+
+    invalidateVariable(id: string) {
+        this.invalidateVariablesMetadata()
+        if (this.cachedVariables[id] !== undefined) {
+            delete this.cachedVariables[id];
+        }
+    }
+
+    getVariablesMetadata(): Metadata[] {
+        if (this.cachedVariablesMetadata.length == 0) {
+            this.invalidateVariablesMetadata();
+        }
+        return this.cachedVariablesMetadata;
+    }
+
+    setVariable(id: string, firstLine: string, secondLine: string | undefined, base64Sample: string) {
+        if (this.cachedImages[id] !== undefined) {
+            delete this.cachedImages[id];
+        }
+        const variable: StoredVariable = { firstLine: firstLine, secondLine: secondLine ?? '', sample: base64Sample };
+        this.homey.settings.set('variable-' + id, variable);
+    }
+
+    getVariable(id: string): Variable | undefined {
+        const cache = this.cachedVariables[id];
+        if (cache !== undefined) {
+            return cache;
+        }
+        if (this.cachedVariablesMetadata.length == 0) {
+            this.invalidateVariablesMetadata();
+        }
+        const metadata = this.cachedVariablesMetadata.find((variable) => variable.id === id);
+        const variable: StoredVariable | undefined = this.homey.settings.get('variable-' + id);
+        if (metadata === undefined) {
+            return undefined
+        }
+
+        const firstLine = variable?.firstLine ?? ''
+        const secondLine = variable?.secondLine ?? ''
+
+        const image: Variable = { id: metadata.id, name: metadata.name, firstLine: firstLine, secondLine: (secondLine === '') ? undefined : secondLine, base64Sample: variable?.sample }
+        this.cachedVariables[id] = image;
+        return image;
+    }
+
+    getVariables(): Variable[] {
+        return this.getVariablesMetadata()
+            .map((metadata) => {
+                return this.getVariable(metadata.id);
+            })
+            .filter((item) => item !== undefined);
+    }
+
     // cache images
-    invalidateImagedMetadata() {
+    invalidateImagesMetadata() {
         this.cachedImagesMetadata = this.homey.settings.get('images') ?? [];
     }
 
     invalidateImage(id: string) {
-        this.invalidateImagedMetadata()
+        this.invalidateImagesMetadata();
         if (this.cachedImages[id] !== undefined) {
             delete this.cachedImages[id];
         }
@@ -160,7 +249,7 @@ export class Store {
             return cache;
         }
         if (this.cachedImagesMetadata.length == 0) {
-            this.invalidateImagedMetadata();
+            this.invalidateImagesMetadata();
         }
         const metadata = this.cachedImagesMetadata.find((image) => image.id === id);
         const base64Image: string | undefined = this.homey.settings.get('image-' + id);
@@ -182,21 +271,23 @@ export class Store {
             .filter((item) => item !== undefined);
     }
 
-    getImagesMetadata(): ImageMetadata[] {
+    getImagesMetadata(): Metadata[] {
         if (this.cachedImagesMetadata.length == 0) {
-            this.invalidateImagedMetadata();
+            this.invalidateImagesMetadata();
         }
         return this.cachedImagesMetadata;
     }
 
     // dead files
     cleanSettings() {
-        const dashboardMetadata: DashboardMetadata[] = this.homey.settings.get('dashboards') ?? [];
-        const imageMetadata: ImageMetadata[] = this.homey.settings.get('images') ?? [];
+        const dashboardMetadata: Metadata[] = this.homey.settings.get('dashboards') ?? [];
+        const imageMetadata: Metadata[] = this.homey.settings.get('images') ?? [];
+        const variablesMetadata: Metadata[] = this.homey.settings.get('variables') ?? [];
 
         const dashboardFiles = dashboardMetadata.map((metadata) => 'dashboard-' + metadata.id);
         const imageFiles = imageMetadata.map((metadata) => 'image-' + metadata.id);
-        const allowedFiles = ['dashboards', 'images'].concat(dashboardFiles).concat(imageFiles);
+        const variableFiles = variablesMetadata.map((metadata) => 'variable-' + metadata.id);
+        const allowedFiles = ['dashboards', 'images', 'variables'].concat(dashboardFiles).concat(imageFiles).concat(variableFiles);
         const toRemove = this.homey.settings.getKeys().filter((item) => !allowedFiles.includes(item));
 
         if (toRemove.length > 0) {

@@ -3,7 +3,8 @@
         "tab": {
             "about": "About",
             "dashboards": "Dashboards",
-            "images": "Images"
+            "images": "Images",
+            "variables": "Variables"
         },
         "dashboard": {
             "name": "Name",
@@ -26,8 +27,11 @@
             },
             "item": {
                 "title": "Select Item",
+                "selectImage": "Select Image",
+                "selectVariable": "Select Variable",
                 "displayMode": "Action",
-                "none": "None",
+                "none": "Empty",
+                "variable": "Variable",
                 "image": "Image",
                 "save": "Save",
                 "cancel": "Cancel",
@@ -44,12 +48,33 @@
             "add": "Upload Image",
             "editTitle": "Edit",
             "deleteTitle": "Delete",
-            "confirmDelete": "Are you sure you want to delete button '__name__'?",
-            "edit": {
+            "confirmDelete": "Are you sure you want to delete the image '__name__'?",
+            "manage": {
                 "title": "Edit Image",
                 "name": "Name",
                 "save": "Save",
                 "cancel": "Cancel"
+            }
+        },
+        "variable": {
+            "title": "Variable",
+            "name": "Name",
+            "action": "Action",
+            "add": "Create Variable",
+            "editTitle": "Edit",
+            "deleteTitle": "Delete",
+            "confirmDelete": "Are you sure you want to delete the variable '__name__'?",
+            "manage": {
+                "titleAdd": "Create Variable",
+                "titleEdit": "Edit Variable",
+                "inputName": "Name",
+                "inputNameHint": "Unique name used to update the variable from a flow",
+                "save": "Save",
+                "cancel": "Cancel",
+                "inputLines": "Text to be displayed",
+                "inputLineHint": "This lines can also be changed from a flow",
+                "inputFirstLine": "First line text",
+                "inputSecondLine": "Optionele second line text"
             }
         }
     }

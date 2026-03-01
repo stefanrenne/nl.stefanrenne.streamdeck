@@ -1,18 +1,27 @@
 {
-  "id": "any_button_action",
-	"title": {
-    "en": "Button action",
-    "nl": "Knop actie"
-	},
+  "id": "variable_button_action",
+  "title": {
+    "en": "Variable button action",
+    "nl": "Variabel knop actie"
+  },
 	"titleFormatted": {
-    "en": "Button [[action]]",
-    "nl": "Knop [[action]]"
+    "en": "[[variable]] button [[action]]",
+    "nl": "[[variable]] knop [[action]]"
 	},
   "args": [
     {
       "type": "device",
       "name": "device",
       "filter": "driver_id=network-dock"
+    },
+    {
+      "name": "variable",
+      "required": true,
+      "type": "autocomplete",
+      "title": {
+          "en": "Variable",
+          "nl": "Variabel"
+      }
     },
     {
       "type": "dropdown",
@@ -46,14 +55,6 @@
       "title": {
         "en": "Dashboard",
         "nl": "Dashboard"
-      }
-    },
-    {
-      "type": "string",
-      "name": "imageName",
-      "title": {
-        "en": "Image name",
-        "nl": "Afbeeldingsnaam"
       }
     },
     {

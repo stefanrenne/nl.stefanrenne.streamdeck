@@ -1,0 +1,31 @@
+{
+	"id": "update_variable_firstline",
+	"title": {
+	   "en": "Update only the text of the first line of the variable.",
+	   "nl": "Wijzig alleen de tekst op de eerste regel van de variabele bij."
+	},
+	"titleFormatted": {
+	   "en": "Update only the [[variable]]'s first line text to [[firstLine]]",
+	   "nl": "Wijzig alleen [[variable]]'s text op de eerste regel naar [[firstLine]]"
+	},
+    "args": [
+        {
+            "name": "variable",
+            "required": true,
+            "type": "autocomplete",
+            "title": {
+                "en": "Variable",
+                "nl": "Variabel"
+            }
+        },
+        {
+            "name": "firstLine",
+            "required": true,
+            "type": "text",
+            "title": {
+                "en": "First line text",
+                "nl": "Tekst op de eerste regel"
+            }
+        }
+	]
+ }

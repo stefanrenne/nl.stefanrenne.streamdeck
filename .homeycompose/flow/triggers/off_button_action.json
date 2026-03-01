@@ -1,27 +1,18 @@
 {
-  "id": "image_button_action",
-  "title": {
-    "en": "Image button action",
-    "nl": "Afbeeldingsknop actie"
-  },
+  "id": "off_button_action",
+	"title": {
+    "en": "Disabled button action",
+    "nl": "Uitgeschakelde knop actie"
+	},
 	"titleFormatted": {
-    "en": "[[image]] button [[action]]",
-    "nl": "[[image]] knop [[action]]"
+    "en": "Disabled button [[action]]",
+    "nl": "Uitgeschakelde knop [[action]]"
 	},
   "args": [
     {
       "type": "device",
       "name": "device",
       "filter": "driver_id=network-dock"
-    },
-    {
-      "name": "image",
-      "required": true,
-      "type": "autocomplete",
-      "title": {
-        "en": "Image",
-        "nl": "Afbeelding"
-      }
     },
     {
       "type": "dropdown",
@@ -49,22 +40,6 @@
     }
   ],
   "tokens": [
-    {
-      "type": "string",
-      "name": "dashboard",
-      "title": {
-        "en": "Dashboard",
-        "nl": "Dashboard"
-      }
-    },
-    {
-      "type": "string",
-      "name": "payload",
-      "title": {
-        "en": "Payload",
-        "nl": "Payload"
-      }
-    },
     {
       "type": "number",
       "name": "column",

@@ -113,6 +113,20 @@
                   "en": "released",
                   "nl": "losgelaten"
                 }
+              },
+              {
+                "id": "single",
+                "title": {
+                  "en": "single pressed",
+                  "nl": "één keer ingedrukt"
+                }
+              },
+              {
+                "id": "double",
+                "title": {
+                  "en": "double pressed",
+                  "nl": "dubbel ingedrukt"
+                }
               }
             ]
           }
@@ -246,6 +260,20 @@
                   "en": "released",
                   "nl": "losgelaten"
                 }
+              },
+              {
+                "id": "single",
+                "title": {
+                  "en": "single pressed",
+                  "nl": "één keer ingedrukt"
+                }
+              },
+              {
+                "id": "double",
+                "title": {
+                  "en": "double pressed",
+                  "nl": "dubbel ingedrukt"
+                }
               }
             ]
           }
@@ -322,6 +350,20 @@
                   "en": "released",
                   "nl": "losgelaten"
                 }
+              },
+              {
+                "id": "single",
+                "title": {
+                  "en": "single pressed",
+                  "nl": "één keer ingedrukt"
+                }
+              },
+              {
+                "id": "double",
+                "title": {
+                  "en": "double pressed",
+                  "nl": "dubbel ingedrukt"
+                }
               }
             ]
           }
@@ -390,6 +432,20 @@
                 "title": {
                   "en": "released",
                   "nl": "losgelaten"
+                }
+              },
+              {
+                "id": "single",
+                "title": {
+                  "en": "single pressed",
+                  "nl": "één keer ingedrukt"
+                }
+              },
+              {
+                "id": "double",
+                "title": {
+                  "en": "double pressed",
+                  "nl": "dubbel ingedrukt"
                 }
               }
             ]

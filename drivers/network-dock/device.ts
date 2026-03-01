@@ -252,9 +252,31 @@ module.exports = class NetworkDock extends Homey.Device {
     await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
   }
 
-  // private lastKeypressTime: number = 0;
-  // private singlePressEvent: Promise<void> | undefined;
-  async streamDeckEvent(event: 'up' | 'down', isTurnedOn: Boolean, control: StreamDeckButtonControlDefinition) {
+  private lastKeyPressTime: number = 0;
+  private lastKeyPressIndex: number = 0;
+  validateSingleDouble(control: StreamDeckButtonControlDefinition) {
+    const thisKeyPressTime = new Date().getTime();
+    if (thisKeyPressTime - this.lastKeyPressTime <= 250 && this.lastKeyPressIndex == control.index+1) {
+      this.streamDeckEvent('double', true, control).catch((e) => console.error('double event failed:', e));
+      this.lastKeyPressTime = 0;
+      this.lastKeyPressIndex = 0;
+    } else {
+      this.lastKeyPressTime = thisKeyPressTime;
+      this.lastKeyPressIndex = control.index+1;
+      new Promise<void>((resolve) => {
+        setTimeout(function() {
+          resolve()
+        }, 400);
+      })
+      .then(() => {
+        if (this.lastKeyPressTime > 0) {
+          this.streamDeckEvent('single', true, control).catch((e) => console.error('single event failed:', e));;
+        }
+      });
+    }
+  }
+
+  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: Boolean, control: StreamDeckButtonControlDefinition) {
 
     const button = this.dashboard?.items[control.index+1];
     var state = { action: event, variableId: '', imageId: '' }
@@ -271,23 +293,10 @@ module.exports = class NetworkDock extends Homey.Device {
       return
     }
 
-    // if (event === 'released') {
-    //   const thisKeypressTime = new Date().getTime();
-    //   this.log(thisKeypressTime - this.lastKeypressTime)
-    //   if (thisKeypressTime - this.lastKeypressTime <= 400) {
-    //     this.singlePressEvent?.ca
-    //     this.log('double press');
-    //     this.lastKeypressTime = 0;
-    //   } else {
-    //     this.lastKeypressTime = thisKeypressTime;
-    //     this.singlePressEvent = new Promise<void>((resolve) => {
-    //       setTimeout(function() {
-    //         console.log('single press');
-    //         resolve()
-    //       }, 400);
-    //     });
-    //   }
-    // }
+    if (event === 'down') {
+      this.validateSingleDouble(control);
+    }
+
     var actions: Promise<void>[] = []
 
     switch (button.kind) {

@@ -254,6 +254,7 @@
         });
       }
 
+      var intervalTimerId = null;
       function observeVariableNavigation() {
         const $createItemButton = document.getElementById("addVariable");
         const $saveItemButton = document.getElementById("saveVariableItem");
@@ -273,6 +274,7 @@
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.remove('actionVariable');
             $createItemDisplay.dataset.id = crypto.randomUUID();
+            $createItemDisplay.dataset.key = '';
             $createItemDisplay.querySelector('img').src = '';
             $createItemDisplay.value = '';
             $createItemDisplay.dataset.oldValue = '';
@@ -299,17 +301,33 @@
         $textSecondLine.addEventListener("change", textChangeEvent, false);
         $textSecondLine.addEventListener("keyup", textChangeEvent, false);
 
+        intervalTimerId = window.setInterval(updateImageEvent, 500);
+
         async function textChangeEvent() {
-          const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
+          if ($textFirstLine.value.trim() !== "") {
+            $createItemDisplay.classList.add("is-loading");
+          }
+        }
+
+        async function updateImageEvent() {
           if ($textFirstLine.value.trim() === "") {
+            $createItemDisplay.dataset.key = "";
             $createItemDisplay.classList.add("actionNone");
             $createItemDisplay.classList.remove("actionImage");
             $createItemDisplay.classList.remove("actionVariable");
-          } else {
+            $createItemDisplay.classList.remove("is-loading");
+            return
+          }
+
+          const key = $textFirstLine.value + "|" + $textSecondLine.value;
+          if ($createItemDisplay.dataset.key !== key) {
+            const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
+            $createItemDisplay.dataset.key = key;
             $createItemDisplay.classList.remove("actionNone");
             $createItemDisplay.classList.remove("actionImage");
             $createItemDisplay.classList.add("actionVariable");
             $createItemDisplay.querySelector('img').src = image;
+            $createItemDisplay.classList.remove("is-loading");
           }
         }
       }
@@ -899,6 +917,7 @@
             $createItemDisplay.classList.remove('actionNone');
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.add('actionVariable');
+            $createItemDisplay.dataset.key = variable.firstLine + "|" + variable.secondLine;
             document.getElementById("variableName").value = variable.name;
             document.getElementById("variableName").dataset.oldValue = variable.name;
             document.getElementById("selectTextFirstLine").value = variable.firstLine;

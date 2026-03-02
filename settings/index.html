@@ -306,7 +306,8 @@
         intervalTimerId = window.setInterval(updateImageEvent, 500);
 
         async function textChangeEvent() {
-          if ($textFirstLine.value.trim() !== "") {
+          const key = $textFirstLine.value + "|" + $textSecondLine.value;
+          if ($textFirstLine.value.trim() !== "" && $createItemDisplay.dataset.key !== key) {
             $createItemDisplay.classList.add("is-loading");
           }
         }
@@ -323,7 +324,6 @@
 
           const key = $textFirstLine.value + "|" + $textSecondLine.value;
           if ($createItemDisplay.dataset.key !== key) {
-            console.log("fetch " + key);
             $createItemDisplay.dataset.key = key;
             const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
             $createItemDisplay.classList.remove("actionNone");
@@ -945,6 +945,7 @@
             $createItemDisplay.classList.remove('actionNone');
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.add('actionVariable');
+            $createItemDisplay.classList.remove("is-loading");
             $createItemDisplay.dataset.key = variable.firstLine + "|" + variable.secondLine;
             document.getElementById("variableName").value = variable.name;
             document.getElementById("variableName").dataset.oldValue = variable.name;

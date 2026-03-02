@@ -28,5 +28,8 @@
   },
   "1.1.1": {
     "en": "Various variable bugfixes"
+  },
+  "1.1.2": {
+    "en": "Added the ability to act on single and double button presses"
   }
 }

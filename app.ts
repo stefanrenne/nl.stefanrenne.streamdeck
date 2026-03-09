@@ -66,9 +66,9 @@ module.exports = class StreamDeckApp extends Homey.App {
       const variable = this.store.getVariable(id);
 
       if (variable !== undefined) {
-        const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, secondLine);
+        const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, secondLine, variable.textColor, variable.backgroundColor);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });
-        this.store.setVariable(id, firstLine, secondLine, sample);
+        this.store.setVariable(id, firstLine, secondLine, variable.textColor, variable.backgroundColor, sample);
       }
       return {};
     });
@@ -83,9 +83,9 @@ module.exports = class StreamDeckApp extends Homey.App {
       const variable = this.store.getVariable(id);
       
       if (variable !== undefined) {
-        const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, variable.secondLine);
+        const jimp = await TextToImage.create(TextToImage.sampleSize, firstLine, variable.secondLine, variable.textColor, variable.backgroundColor);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });
-        this.store.setVariable(id, firstLine, variable.secondLine, sample);
+        this.store.setVariable(id, firstLine, variable.secondLine, variable.textColor, variable.backgroundColor, sample);
       }
       return {};
     });
@@ -100,9 +100,9 @@ module.exports = class StreamDeckApp extends Homey.App {
       const variable = this.store.getVariable(id);
       
       if (variable !== undefined) {
-        const jimp = await TextToImage.create(TextToImage.sampleSize, variable.firstLine, secondLine);
+        const jimp = await TextToImage.create(TextToImage.sampleSize, variable.firstLine, secondLine, variable.textColor, variable.backgroundColor);
         const sample = await jimp.getBase64("image/jpeg", { quality: 0.8, });
-        this.store.setVariable(id, variable.firstLine, secondLine, sample);
+        this.store.setVariable(id, variable.firstLine, secondLine, variable.textColor, variable.backgroundColor, sample);
       }
       return {};
     });

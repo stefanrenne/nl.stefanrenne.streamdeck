@@ -14,6 +14,8 @@ export interface Variable {
     readonly name: string;
     readonly firstLine: string;
     readonly secondLine: string | undefined;
+    readonly textColor: string;
+    readonly backgroundColor: string;
     readonly base64Sample: string | undefined;
 }
 
@@ -47,6 +49,8 @@ export interface DashboardVariableItem {
     readonly variableId: string;
     readonly firstLine: string;
     readonly secondLine: string | undefined;
+    readonly textColor: string;
+    readonly backgroundColor: string;
 }
 
 export interface Metadata {
@@ -57,6 +61,8 @@ export interface Metadata {
 interface StoredVariable {
     firstLine: string;
     secondLine: string;
+    textColor: string | undefined;
+    backgroundColor: string | undefined;
     sample: string;
 }
 
@@ -155,7 +161,7 @@ export class Store {
                 const variable = this.getVariable(row.variableId);
                 if (variable !== undefined) {
                     usedVariableIds.push(variable.id);
-                    result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine };
+                    result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine, textColor: variable.textColor, backgroundColor: variable.backgroundColor };
                     return result;
                 }
             }
@@ -205,11 +211,11 @@ export class Store {
         return this.cachedVariablesMetadata;
     }
 
-    setVariable(id: string, firstLine: string, secondLine: string | undefined, base64Sample: string) {
+    setVariable(id: string, firstLine: string, secondLine: string | undefined, textColor: string, backgroundColor: string, base64Sample: string) {
         if (this.cachedImages[id] !== undefined) {
             delete this.cachedImages[id];
         }
-        const variable: StoredVariable = { firstLine: firstLine, secondLine: secondLine ?? '', sample: base64Sample };
+        const variable: StoredVariable = { firstLine: firstLine, secondLine: secondLine ?? '', textColor: textColor, backgroundColor: backgroundColor, sample: base64Sample };
         this.homey.settings.set('variable-' + id, variable);
     }
 
@@ -229,8 +235,10 @@ export class Store {
 
         const firstLine = variable?.firstLine ?? ''
         const secondLine = variable?.secondLine ?? ''
+        const textColor = variable?.textColor ?? '#ffffff';
+        const backgroundColor = variable?.backgroundColor ?? '#000000';
 
-        const image: Variable = { id: metadata.id, name: metadata.name, firstLine: firstLine, secondLine: (secondLine === '') ? undefined : secondLine, base64Sample: variable?.sample }
+        const image: Variable = { id: metadata.id, name: metadata.name, firstLine: firstLine, secondLine: (secondLine === '') ? undefined : secondLine, textColor: textColor, backgroundColor: backgroundColor, base64Sample: variable?.sample }
         this.cachedVariables[id] = image;
         return image;
     }

@@ -193,16 +193,26 @@
         <div class="homey-form-group" style="margin-bottom: 10px">
           <label class="homey-form-label"><p style="margin: 0;" data-i18n="settings.variable.manage.inputLines"></p><span data-i18n="settings.variable.manage.inputLineHint"></span></label>
         </div>
-        <div class="deck1" style="float: left">
-          <div id="manage-variableItem-display" class="deck-item actionNone">
-            <p>1/1</p>
-            <img />
+        <div class="homey-form-group" style="margin:0; display: inline-block">
+          <div class="deck1" style="float: left">
+            <div id="manage-variableItem-display" class="deck-item actionNone">
+              <p>1/1</p>
+              <img />
+            </div>
           </div>
+          <fieldset class="homey-form-radio-set" style="float: left; margin-left: 20px; width: calc(100% - 130px);">
+            <input class="homey-form-input" id="selectTextFirstLine" type="text" value="" style="margin-top: 10px"/>
+            <input class="homey-form-input" id="selectTextSecondLine" type="text" value="" style="margin-top: 10px"/>
+          </fieldset>
         </div>
-        <fieldset class="homey-form-radio-set" style="float: left; margin-left: 20px; width: calc(100% - 130px);">
-          <input class="homey-form-input" id="selectTextFirstLine" type="text" value="" style="margin-top: 10px"/>
-          <input class="homey-form-input" id="selectTextSecondLine" type="text" value="" style="margin-top: 10px"/>
-        </fieldset>
+        <div class="homey-form-group" style="margin: 0; width:50%; float:left">
+          <label class="homey-form-label" for="backgroundColor">Background color</label>
+          <input class="homey-form-input form-control-color" id="backgroundColor" type="color" value=""/>
+        </div>
+        <div class="homey-form-group" style="margin: 0; width:50%; float:left">
+          <label class="homey-form-label" for="textColor">Text color</label>
+          <input class="homey-form-input form-control-color" id="textColor" type="color" value=""/>
+        </div>
       </div>
 
       <button id="saveVariableItem" class="homey-button-primary-full" data-i18n="settings.variable.manage.save"></button>
@@ -265,6 +275,8 @@
         const $createItemDisplay = document.getElementById("manage-variableItem-display");
         const $textFirstLine = document.getElementById("selectTextFirstLine");
         const $textSecondLine = document.getElementById("selectTextSecondLine");
+        const $textColor = document.getElementById("textColor");
+        const $backgroundColor = document.getElementById("backgroundColor");
         const $input = document.getElementById("variableName");
 
         $textFirstLine.placeholder = Homey.__('settings.variable.manage.inputFirstLine');
@@ -288,7 +300,7 @@
           if ($textFirstLine.value !== '' || $input.value !== '') {
             $saveItemButton.classList.add('is-loading');
             const name = ($input.value.trim() !== $input.dataset.oldValue) ? await validateVariableName(id, $input.value.trim() === '' ? $textFirstLine.value : $input.value) : $input.value.trim();
-            await storeVariable(id, name, $createItemDisplay.querySelector('img').src, $textFirstLine.value.trim(), $textSecondLine.value.trim());
+            await storeVariable(id, name, $createItemDisplay.querySelector('img').src, $textFirstLine.value.trim(), $textSecondLine.value.trim(), $textColor.value, $backgroundColor.value);
             await loadVariables();
             $saveItemButton.classList.remove('is-loading');
           }
@@ -306,7 +318,7 @@
         intervalTimerId = window.setInterval(updateImageEvent, 500);
 
         async function textChangeEvent() {
-          const key = $textFirstLine.value + "|" + $textSecondLine.value;
+          const key = $textFirstLine.value + "|" + $textSecondLine.value + "|" + $textColor.value + "|" + $backgroundColor.value;
           if ($textFirstLine.value.trim() !== "" && $createItemDisplay.dataset.key !== key) {
             $createItemDisplay.classList.add("is-loading");
           }
@@ -322,10 +334,10 @@
             return
           }
 
-          const key = $textFirstLine.value + "|" + $textSecondLine.value;
+          const key = $textFirstLine.value + "|" + $textSecondLine.value + "|" + $textColor.value + "|" + $backgroundColor.value;
           if ($createItemDisplay.dataset.key !== key) {
             $createItemDisplay.dataset.key = key;
-            const image = await getImageForText($textFirstLine.value, $textSecondLine.value);
+            const image = await getImageForText($textFirstLine.value, $textSecondLine.value, $textColor.value, $backgroundColor.value);
             $createItemDisplay.classList.remove("actionNone");
             $createItemDisplay.classList.remove("actionImage");
             $createItemDisplay.classList.add("actionVariable");
@@ -946,11 +958,13 @@
             $createItemDisplay.classList.remove('actionImage');
             $createItemDisplay.classList.add('actionVariable');
             $createItemDisplay.classList.remove("is-loading");
-            $createItemDisplay.dataset.key = variable.firstLine + "|" + variable.secondLine;
+            $createItemDisplay.dataset.key = variable.firstLine + "|" + variable.secondLine + "|" + variable.textColor + "|" + variable.backgroundColor;
             document.getElementById("variableName").value = variable.name;
             document.getElementById("variableName").dataset.oldValue = variable.name;
             document.getElementById("selectTextFirstLine").value = variable.firstLine;
             document.getElementById("selectTextSecondLine").value =  variable.secondLine;
+            document.getElementById("textColor").value = (variable.textColor !== undefined) ? variable.textColor : "#ffffff";
+            document.getElementById("backgroundColor").value =  (variable.backgroundColor !== undefined) ? variable.backgroundColor : "#000000";
             showView('variableItem');
           });
           $edit.appendChild($editMask);
@@ -1093,12 +1107,12 @@
       }
       
       var cachedTextImages = {};
-      async function getImageForText(firstLine, secondLine) {
-        const key = firstLine + "|" + secondLine
+      async function getImageForText(firstLine, secondLine, textColor, backgroundColor) {
+        const key = firstLine + "|" + secondLine + "|" + textColor + "|" + backgroundColor;
         if (cachedTextImages[key] !== undefined) {
           return cachedTextImages[key];
         }
-        const data = await Homey.api("POST", "/textToImage", { firstLine: firstLine, secondLine: secondLine });
+        const data = await Homey.api("POST", "/textToImage", { firstLine: firstLine, secondLine: secondLine, textColor: textColor, backgroundColor: backgroundColor });
         cachedTextImages[key] = data;
         return data;
       }
@@ -1216,10 +1230,10 @@
         return cachedVariables
       }
 
-      async function storeVariable(id, name, sample, firstLine, secondLine) {
+      async function storeVariable(id, name, sample, firstLine, secondLine, textColor, backgroundColor) {
         const variables = await getVariablesFromStore();
         const metadata = { id: id, name: name };
-        const variable = { sample: sample, firstLine: firstLine, secondLine: secondLine };
+        const variable = { sample: sample, firstLine: firstLine, secondLine: secondLine, textColor: textColor, backgroundColor: backgroundColor };
 
         var newVariables = variables.filter((item) => item.id !== id)
         newVariables.push(Object.assign({}, metadata, variable));

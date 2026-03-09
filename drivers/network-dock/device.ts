@@ -90,7 +90,7 @@ module.exports = class NetworkDock extends Homey.Device {
       const control = await this.getDisplayedControlForVariable(id);
       if (control !== undefined && this.streamDeck !== undefined) {
         const variable = this.store.getVariable(id);
-        await this.streamDeckSetText(this.streamDeck, control, variable?.firstLine ?? '', variable?.secondLine);
+        await this.streamDeckSetText(this.streamDeck, control, variable?.firstLine ?? '', variable?.secondLine, variable?.textColor, variable?.backgroundColor);
       }
     });
 
@@ -222,7 +222,7 @@ module.exports = class NetworkDock extends Homey.Device {
       const item = dashboard.items[i+1];
       switch (item?.kind) {
       case 'variable':
-        actions.push(this.streamDeckSetText(streamDeck, control, item.firstLine, item.secondLine).catch((e) => console.error('streamDeckSetImage failed:', e)));
+        actions.push(this.streamDeckSetText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('streamDeckSetImage failed:', e)));
         break;
       case 'image':
         actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('streamDeckSetImage failed:', e)));
@@ -234,8 +234,8 @@ module.exports = class NetworkDock extends Homey.Device {
     await Promise.all(actions);
   }
 
-  async streamDeckSetText(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined) {
-    const image = await TextToImage.create(control.pixelSize.width, firstLine, secondLine);
+  async streamDeckSetText(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined, textColor: string | undefined, backgroundColor: string | undefined) {
+    const image = await TextToImage.create(control.pixelSize.width, firstLine, secondLine, textColor, backgroundColor);
     await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
   }
 

@@ -34,5 +34,8 @@
   },
   "1.1.3": {
     "en": "Improved sample image creator for variable in app settings"
+  },
+  "1.1.4": {
+    "en": "Set text/background color for variables, act on ip adress changes and upgraded underlying library"
   }
 }

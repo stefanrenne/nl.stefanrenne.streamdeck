@@ -78,7 +78,9 @@
                 "inputLines": "Text to be displayed",
                 "inputLineHint": "This lines can also be changed from a flow",
                 "inputFirstLine": "First line text",
-                "inputSecondLine": "Optionele second line text"
+                "inputSecondLine": "Optionele second line text",
+                "backgroundColor": "Background color",
+                "textColor": "Text color"
             }
         }
     }

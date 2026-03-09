@@ -81,7 +81,9 @@
                 "inputLines": "Tekst die weergegeven moet worden",
                 "inputLineHint": "Deze tekst kan worden gewijzigd vanuit een flow",
                 "inputFirstLine": "Tekst op de eerste regel",
-                "inputSecondLine": "Optionele tekst op de tweede regel"
+                "inputSecondLine": "Optionele tekst op de tweede regel",
+                "backgroundColor": "Achtergrondkleur",
+                "textColor": "Tekstkleur"
             }
         }
     }

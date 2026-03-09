@@ -1,4 +1,4 @@
-import Homey, { FlowCardTriggerDevice } from 'homey';
+import Homey, { DiscoveryResultMDNSSD, FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Dashboard, Store } from '../../lib/storage';
@@ -35,12 +35,6 @@ module.exports = class NetworkDock extends Homey.Device {
 
     await this.updateSelectableDashboardOptions();
     await this.validateSelectedDashboardOption();
-
-
-    const ipAddress = this.getSetting('ipAddress');
-    this.log('NetworkDock has been initialized');
-
-    this.connectionManager.connectTo(ipAddress)
 
     this.connectionManager.on('error', async (message) => {
         await this.setUnavailable(message);
@@ -444,6 +438,23 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
       return {};
     });
+  }
+
+  /**
+   * Discovery result update
+   */
+  onDiscoveryResult(discoveryResult: DiscoveryResultMDNSSD) {
+    return discoveryResult.id === this.getData().id;
+  }
+
+  async onDiscoveryAvailable(discoveryResult: DiscoveryResultMDNSSD) {
+    const ipAddress = this.getSetting('ipAddress');
+    this.connectionManager.connectTo(ipAddress)
+  }
+
+  onDiscoveryAddressChanged(discoveryResult: DiscoveryResultMDNSSD) {
+    console.log("onDiscoveryAddressChanged to " + discoveryResult.address);
+    this.setSettings({'ipAddress': discoveryResult.address}).catch((e) => console.error('update ipAddress failed:', e));
   }
 
   map<A, B>(value: A | undefined, f: (value: A) => B): B | undefined {

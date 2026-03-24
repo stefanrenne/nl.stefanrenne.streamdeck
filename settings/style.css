@@ -82,15 +82,16 @@ td.center {
 .homey-button-danger-shadow.full {
     width: 100%;
 }
+.allignedradio {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    width: 100%; 
+}
 .allignedradio label.homey-form-radio {
-    margin: 0 0 0 20px !important; 
+    margin: 0 !important; 
     padding: 0 !important; 
-    float: left !important;
 }
-.allignedradio label.homey-form-radio:first-child {
-    margin-left: 0 !important;
-}
-.deck1, .deck3, .deck5, .deck6, .deck8 {
+.deck1, .deck3, .deck5, .deck8 {
     margin-top: 20px;
     margin-bottom: 20px;
     display: grid;
@@ -103,35 +104,29 @@ td.center {
 .deck1 {
     grid-template-columns: 90px;
     grid-auto-rows: 90px;
-    width: calc(20px + 90px);
     margin: 0;
 }
 .deck3 {
-    grid-template-columns: repeat(3, 90px);
-    grid-auto-rows: 90px;
-    width: calc(20px + (3 * 90px) + (2 * 5px));
+    grid-template-columns: repeat(3, calc((100% - (2 * 5px)) / 3));
+    width: 70%;
+    min-width: 310px;
 }
 .deck5 {
-    grid-template-columns: repeat(5, 70px);
-    grid-auto-rows: 70px;
-    width: calc(20px + (5 * 70px) + (4 * 5px));
-}
-.deck6 {
-    grid-template-columns: repeat(6, 50px);
-    grid-auto-rows: 50px;
-    width: calc(20px + (6 * 50px) + (5 * 5px));
+    grid-template-columns: repeat(5, calc((100% - (4 * 5px)) / 5));
+    width: 80%;
+    min-width: 350px;
 }
 .deck8 {
-    grid-template-columns: repeat(8, 50px);
-    grid-auto-rows: 50px;
-    width: calc(20px + (8 * 50px) + (7 * 5px));
+    grid-template-columns: repeat(8, calc((100% - (7 * 5px)) / 8));
+    width: 100%;
 }
-.deck3 .deck-item, .deck5 .deck-item, .deck6 .deck-item, .deck8 .deck-item {
+.deck3 .deck-item, .deck5 .deck-item .deck8 .deck-item {
     cursor: pointer;
 }
 .deck-item {
     background-color: black;
     border-radius: 5px;
+    aspect-ratio: 1;
 }
 .deck-item.actionImage p, .deck-item.actionVariable p {
     display: none;

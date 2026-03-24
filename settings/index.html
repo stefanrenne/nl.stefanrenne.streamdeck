@@ -79,7 +79,7 @@
         <label class="homey-form-label" for="dashboardName" data-i18n="settings.dashboard.manage.name"></label>
         <input class="homey-form-input" id="dashboardName" type="text" value=""/>
       </fieldset>
-      <fieldset class="homey-form-radio-set">
+      <fieldset class="homey-form-radio-set" style="width: 100%;">
         <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.manage.displayMode"></legend>
         <div class="allignedradio">
           <label class="homey-form-radio">
@@ -479,9 +479,9 @@
       }
 
       function deckDefaultText(i, columns) {
-        const row = (i % columns) + 1;
-        const column = Math.floor(i / columns) + 1;
-        return column + "/" + row;
+        const column = (i % columns) + 1;
+        const row = Math.floor(i / columns) + 1;
+        return row + "/" + column;
       }
 
       function showView(view) {

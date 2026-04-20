@@ -88,6 +88,12 @@
             <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.6Buttons"></span>
           </label>
           <label class="homey-form-radio">
+            <input class="homey-form-radio-input" id="displayMode8" type="radio" name="display-mode" value="8"/>
+            <span class="homey-form-radio-checkmark"></span>
+            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.8Buttons"></span>
+          </label>
+          <br/>
+          <label class="homey-form-radio">
             <input class="homey-form-radio-input" id="displayMode15" type="radio" name="display-mode" value="15"/>
             <span class="homey-form-radio-checkmark"></span>
             <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.15Buttons"></span>
@@ -386,7 +392,9 @@
           var displayMode = 15;
           if (document.getElementById("displayMode6").checked) {
             displayMode = 6
-          } else if (document.getElementById("displayMode32").checked) {
+          } else if (document.getElementById("displayMode8").checked) {
+            displayMode = 8
+          } else  if (document.getElementById("displayMode32").checked) {
             displayMode = 32;
           }
           await storeDashboard($deck.dataset.id, await validateDashboardName($deck.dataset.id, $input.value), displayMode, dashboardItems);
@@ -528,8 +536,9 @@
 
         showView('dashboard');
 
-        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : 3;
+        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : (numberItems == 8) ? 4 : 3;
         document.getElementById("displayMode6").checked = (numberItems == 6);
+        document.getElementById("displayMode8").checked = (numberItems == 8);
         document.getElementById("displayMode15").checked = (numberItems == 15);
         document.getElementById("displayMode32").checked = (numberItems == 32);
         $deck.classList.remove(...$deck.classList);
@@ -582,7 +591,7 @@
       }
 
       function changeDisplayModeManageDeck(numberItems) {
-        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : 3;
+        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : (numberItems == 8) ? 4 : 3;
         $deck.classList.remove(...$deck.classList);
         $deck.classList.add("deck" + columns);
         for (var i = 0; i < $deck.children.length; i++) {
@@ -649,11 +658,16 @@
 
       function observeCreateDashboardDisplayMode() {
         const $mode6 = document.getElementById("displayMode6");
+        const $mode8 = document.getElementById("displayMode8");
         const $mode15 = document.getElementById("displayMode15");
         const $mode32 = document.getElementById("displayMode32");
 
         $mode6.addEventListener("change", () => {
           changeDisplayModeManageDeck($mode6.value);
+        });
+
+        $mode8.addEventListener("change", () => {
+          changeDisplayModeManageDeck($mode8.value);
         });
 
         $mode15.addEventListener("change", () => {

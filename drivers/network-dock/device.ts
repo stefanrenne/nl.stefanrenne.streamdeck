@@ -3,9 +3,8 @@ import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefiniti
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Dashboard, Store } from '../../lib/storage';
 import { CardListener } from '../../lib/cardListener';
-import { TextToImage } from '../../lib/textToImage';
-import { Jimp } from 'jimp';
-import path from 'path';
+import { getButtonControlSize, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter';
+import { map } from '../../lib/helpers';
 
 module.exports = class NetworkDock extends Homey.Device {
 
@@ -49,7 +48,7 @@ module.exports = class NetworkDock extends Homey.Device {
         this.streamDeckDidConnect(streamDeck);
 
         const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
-        await this.streamDeckLoadDashboard(streamDeck, dashboardId);
+        await this.loadDashboard(dashboardId);
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable('No Stream Deck connected to Network Dock');
       }
@@ -62,7 +61,7 @@ module.exports = class NetworkDock extends Homey.Device {
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       if (selectedDashboardId === id) {
         this.log('selected dashboard updated');
-        await this.streamDeckLoadDashboard(this.streamDeck, id);
+        await this.loadDashboard(id);
       }
     });
 
@@ -90,7 +89,11 @@ module.exports = class NetworkDock extends Homey.Device {
       const control = await this.getDisplayedControlForVariable(id);
       if (control !== undefined && this.streamDeck !== undefined) {
         const variable = this.store.getVariable(id);
-        await this.streamDeckSetText(this.streamDeck, control, variable?.firstLine ?? '', variable?.secondLine, variable?.textColor, variable?.backgroundColor);
+        if (variable === undefined) {
+          await this.streamDeck.clearKey(control.index);
+        } else {
+          await renderText(this.streamDeck, control, variable.firstLine, variable.secondLine, variable.textColor, variable.backgroundColor);
+        }
       }
     });
 
@@ -114,7 +117,7 @@ module.exports = class NetworkDock extends Homey.Device {
     });
 
     this.registerCapabilityListener('dashboard', async (id: string) => {
-      await this.streamDeckLoadDashboard(this.streamDeck, id);
+      await this.loadDashboard(id);
       const dashboardName = (id === this.cardListener.emptyDashboard.id) ? this.cardListener.emptyDashboard.name : this.store.getDashboard(id)?.name
       if (dashboardName) {
         await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
@@ -149,7 +152,7 @@ module.exports = class NetworkDock extends Homey.Device {
         }
       });
 
-      const size = this.getButtonControlSize(streamDeck);
+      const size = getButtonControlSize(streamDeck);
       await this.setSettings({
         name: streamDeck.PRODUCT_NAME,
         serial: await streamDeck.getSerialNumber(),
@@ -163,7 +166,7 @@ module.exports = class NetworkDock extends Homey.Device {
     if (this.streamDeck === undefined) {
       return undefined;
     }
-    const dashboard: Dashboard | undefined = this.map(await this.getCapabilityValue('dashboard'), (dashboardId) => this.store.getDashboard(dashboardId));
+    const dashboard: Dashboard | undefined = map(await this.getCapabilityValue('dashboard'), (dashboardId) => this.store.getDashboard(dashboardId));
     if (dashboard === undefined) {
       return undefined;
     }
@@ -178,72 +181,26 @@ module.exports = class NetworkDock extends Homey.Device {
     return undefined
   }
 
-  async streamDeckLoadDefaultDashboard(streamDeck: StreamDeckTcp) {
-    	const panelDimensions = streamDeck.calculateFillPanelDimensions();
-      if (panelDimensions === null) {
-        await streamDeck?.clearPanel();
-        return
-      }
-      
-      const padding: number = 50
-    	const image = await Jimp.read(path.resolve(__dirname, 'assets/homey-logo.png')).then((jimp) => {
-        return jimp.scaleToFit({ w: panelDimensions.width - (padding * 2), h: panelDimensions.height - (padding * 2) })
-      });
-      
-      const background = new Jimp({ width: panelDimensions.width, height: panelDimensions.height })
-        .blit({ src: image, x: (panelDimensions.width - image.width) / 2, y: (panelDimensions.height - image.height) / 2 });
-
-      await streamDeck.fillPanelBuffer(background.bitmap.data, { format: 'rgba' }).catch((e) => console.error('fillPanelBuffer failed:', e));
-  }
-
-  async streamDeckLoadDashboard(streamDeck: StreamDeckTcp | undefined, id: string) {
-    if (streamDeck === undefined) {
+  async loadDashboard(id: string) {
+    if (this.streamDeck === undefined) {
       this.dashboard = undefined;
       return
     }
     const dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
     if (dashboard === undefined) {
       this.dashboard = undefined;
-      this.streamDeckLoadDefaultDashboard(streamDeck);
+      renderHomeyLogo(this.streamDeck);
       return
     }
 
     // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
-    const size = this.getButtonControlSize(streamDeck);
+    const size = getButtonControlSize(this.streamDeck);
     if (dashboard.displayMode < size.total) {
       this.store.updateDashboard(dashboard.id, size.total);
     }
 
     this.dashboard = dashboard;
-    const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
-
-    var actions: Promise<void>[] = []
-    for (const [i, control] of controls.entries()) {
-      const item = dashboard.items[i+1];
-      switch (item?.kind) {
-      case 'variable':
-        actions.push(this.streamDeckSetText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('streamDeckSetImage failed:', e)));
-        break;
-      case 'image':
-        actions.push(this.streamDeckSetImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('streamDeckSetImage failed:', e)));
-        break;
-      default:
-        actions.push(streamDeck.clearKey(control.index).catch((e) => console.error('clearKey failed:', e)));
-      }
-    }
-    await Promise.all(actions);
-  }
-
-  async streamDeckSetText(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined, textColor: string | undefined, backgroundColor: string | undefined) {
-    const image = await TextToImage.create(control.pixelSize.width, firstLine, secondLine, textColor, backgroundColor);
-    await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
-  }
-
-  async streamDeckSetImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
-    const image = await Jimp.fromBuffer(imageBuffer).then((jimp) => {
-      return jimp.resize({ w: control.pixelSize.width, h: control.pixelSize.height });
-    });
-    await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
+    await renderDashboard(this.streamDeck, dashboard);
   }
 
   private lastKeyPressTime: number = 0;
@@ -342,12 +299,14 @@ module.exports = class NetworkDock extends Homey.Device {
     newSettings: { [key: string]: boolean | string | number | undefined | null };
     changedKeys: string[];
   }): Promise<string | void> {
-    const oldIp = oldSettings['ipAddress'] as string;
-    const newIp = newSettings['ipAddress'] as string;
-    if (oldIp !== newIp) {
-      await this.streamDeck?.clearPanel();
-      this.connectionManager.disconnectFrom(oldIp);
-      this.connectionManager.connectTo(newIp);
+    if (changedKeys.includes('ipAddress')) {
+      const oldIp = oldSettings['ipAddress'] as string;
+      const newIp = newSettings['ipAddress'] as string;
+      if (oldIp !== newIp) {
+        await this.streamDeck?.clearPanel();
+        this.connectionManager.disconnectFrom(oldIp);
+        this.connectionManager.connectTo(newIp);
+      }
     }
   }  
   
@@ -360,22 +319,6 @@ module.exports = class NetworkDock extends Homey.Device {
       this.log('disconnect from ' + ipAddress);
       this.connectionManager.disconnectFrom(ipAddress);
     }
-  }
-
-  getButtonControlSize(streamDeck: StreamDeckTcp) {
-    return streamDeck.CONTROLS.reduce((result, control) => {
-        if (control as StreamDeckButtonControlDefinitionLcdFeedback) {
-          if (result.columns < (control.column + 1)) {
-            result.columns = control.column + 1
-            result.total = result.rows * result.columns;
-          }
-          if (result.rows < (control.row + 1)) {
-            result.rows = control.row + 1
-            result.total = result.rows * result.columns;
-          }
-        }
-        return result
-      }, {columns: 0, rows: 0, total: 0});
   }
 
   async validateSelectedDashboardOption() {
@@ -402,7 +345,7 @@ module.exports = class NetworkDock extends Homey.Device {
       await this.setCapabilityValue('dashboard', this.cardListener.emptyDashboard.id);
 
       // load the new dashboard
-      await this.streamDeckLoadDashboard(this.streamDeck, this.cardListener.emptyDashboard.id);
+      await this.loadDashboard(this.cardListener.emptyDashboard.id);
 
       // notifiy about the dashboard change
       await this.onDashboardChanged.trigger(this, { 'dashboard': this.cardListener.emptyDashboard.name })
@@ -435,7 +378,7 @@ module.exports = class NetworkDock extends Homey.Device {
       }
       await this.setCapabilityValue('dashboard', dashboardId);
       await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
-      await this.streamDeckLoadDashboard(this.streamDeck, dashboardId);
+      await this.loadDashboard(dashboardId);
       return {};
     });
   }
@@ -455,10 +398,5 @@ module.exports = class NetworkDock extends Homey.Device {
   onDiscoveryAddressChanged(discoveryResult: DiscoveryResultMDNSSD) {
     console.log("onDiscoveryAddressChanged to " + discoveryResult.address);
     this.setSettings({'ipAddress': discoveryResult.address}).catch((e) => console.error('update ipAddress failed:', e));
-  }
-
-  map<A, B>(value: A | undefined, f: (value: A) => B): B | undefined {
-    if (value === undefined) return undefined;
-    return f(value);
   }
 };

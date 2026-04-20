@@ -1,7 +1,6 @@
 'use strict';
 
 import { TextToImage } from './lib/textToImage';
-import { Jimp } from 'jimp';
 
 module.exports = {
   async textToImage({ homey, body }) {

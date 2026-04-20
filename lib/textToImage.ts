@@ -1,6 +1,5 @@
 'use strict';
 
-import Homey from 'homey/lib/Homey';
 import { Jimp, loadFont, HorizontalAlign, VerticalAlign, measureText, measureTextHeight } from 'jimp';
 import * as Font from "jimp/fonts";
 
@@ -8,13 +7,12 @@ export class TextToImage {
 
     static sampleSize = 192;
 
-    static async create(maxSize: number, firstLine: string, secondLine: string | undefined, textColor: string | undefined, backgroundColor: string | undefined) {
+    static async create(maxSize: number, firstLine: string, secondLine: string | undefined, textColor: string, backgroundColor: string) {
 
         const textPadding = 2;
         const dualtextLineHeight = maxSize / 2;
         const maxHeight = (secondLine === undefined) ? maxSize : dualtextLineHeight - (textPadding / 2);
         const maxWidth = maxSize - (2 * textPadding);
-        const textColorRgb = (textColor !== undefined) ? TextToImage.hex2rgb(textColor) : undefined;
 
         const image = new Jimp({ width: maxSize, height: maxSize, color: backgroundColor });
 
@@ -31,18 +29,14 @@ export class TextToImage {
         // text textLine 1
         const textLine1 = new Jimp({ width: maxSize, height: maxSize, color: 0x0 });
         textLine1.print({ font: textLine1Font, x: 0, y: yStart, text: { text: firstLine, alignmentX: HorizontalAlign.CENTER, alignmentY: VerticalAlign.TOP }, maxHeight: maxSize, maxWidth: maxSize });
-        if (textColorRgb !== undefined) {
-            textLine1.color([{ apply: 'xor', params: [textColorRgb] }]);            
-        }
+        textLine1.color([{ apply: 'xor', params: [TextToImage.hex2rgb(textColor)] }]);
         image.blit(textLine1);
 
         if (secondLine !== undefined && textLine2Font !== undefined) {
             // text textLine 2
             const textLine2 = new Jimp({ width: maxSize, height: maxSize, color: 0x0 });
             textLine2.print({ font: textLine2Font, x: 0, y: yStart + textPadding + textLine1Height, text: { text: secondLine, alignmentX: HorizontalAlign.CENTER, alignmentY: VerticalAlign.TOP }, maxHeight: maxSize, maxWidth: maxSize });
-            if (textColorRgb !== undefined) {
-                textLine2.color([{ apply: 'xor', params: [textColorRgb] }]);
-            }
+            textLine2.color([{ apply: 'xor', params: [TextToImage.hex2rgb(textColor)] }]);
             image.blit(textLine2);
         }
 

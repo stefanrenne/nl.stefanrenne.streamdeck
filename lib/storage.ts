@@ -100,7 +100,7 @@ export class Store {
     }
 
     updateDashboard(id: string, size: number) {
-        if (size !== 6 && size !== 15 && size !== 32) {
+        if (![6, 8, 15, 32].includes(size)) {
             return
         }
 

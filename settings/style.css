@@ -34,7 +34,7 @@ td a.copy {
     background-color: darksalmon;
 }
 td a.copy span {
-    -webkit-mask-image: url('./pencil.svg');
+    -webkit-mask-image: url('./copy.svg');
     mask-image: url('./copy.svg');
     background-color: white;
 }
@@ -91,7 +91,7 @@ td.center {
     margin: 0 !important; 
     padding: 0 !important; 
 }
-.deck1, .deck3, .deck5, .deck8 {
+.deck1, .deck3, .deck4, .deck5, .deck8 {
     margin-top: 20px;
     margin-bottom: 20px;
     display: grid;
@@ -111,6 +111,11 @@ td.center {
     width: 70%;
     min-width: 310px;
 }
+.deck4 {
+    grid-template-columns: repeat(4, calc((100% - (3 * 5px)) / 4));
+    width: 70%;
+    min-width: 310px;
+}
 .deck5 {
     grid-template-columns: repeat(5, calc((100% - (4 * 5px)) / 5));
     width: 80%;
@@ -120,7 +125,7 @@ td.center {
     grid-template-columns: repeat(8, calc((100% - (7 * 5px)) / 8));
     width: 100%;
 }
-.deck3 .deck-item, .deck5 .deck-item .deck8 .deck-item {
+.deck3 .deck-item, .deck4 .deck-item, .deck5 .deck-item .deck8 .deck-item {
     cursor: pointer;
 }
 .deck-item {

@@ -6,7 +6,7 @@
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
   },
   "dependencies": {
-    "@elgato-stream-deck/node": "^7.6.0",
+    "@elgato-stream-deck/node": "^7.6.2",
     "@elgato-stream-deck/tcp": "^7.6.2",
     "homey-api": "^3.18.2",
     "jimp": "^1.6.1",

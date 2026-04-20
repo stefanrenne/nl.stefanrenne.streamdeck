@@ -8,7 +8,7 @@
   "dependencies": {
     "@elgato-stream-deck/node": "^7.6.0",
     "@elgato-stream-deck/tcp": "^7.6.0",
-    "homey-api": "^3.16.1",
+    "homey-api": "^3.18.2",
     "jimp": "^1.6.1",
     "path": "^0.12.7"
   },

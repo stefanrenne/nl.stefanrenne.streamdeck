@@ -37,5 +37,8 @@
   },
   "1.1.4": {
     "en": "Set text/background color for variables, act on ip adress changes and upgraded underlying library"
+  },
+  "1.1.5": {
+    "en": "Added support for Streamdeck Neo"
   }
 }

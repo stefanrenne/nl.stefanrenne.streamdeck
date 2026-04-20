@@ -9,7 +9,7 @@
     "@elgato-stream-deck/node": "^7.6.0",
     "@elgato-stream-deck/tcp": "^7.6.0",
     "homey-api": "^3.16.1",
-    "jimp": "^1.6.0",
+    "jimp": "^1.6.1",
     "path": "^0.12.7"
   },
   "devDependencies": {

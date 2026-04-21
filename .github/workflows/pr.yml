@@ -1,7 +1,5 @@
-name: Validate Homey App
+name: Pull Request
 on:
-  workflow_dispatch:
-  push:
   pull_request:
 
 permissions:
@@ -22,7 +20,7 @@ jobs:
           level: verified
 
   dependabot:
-    needs: [build] # <-- important!
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

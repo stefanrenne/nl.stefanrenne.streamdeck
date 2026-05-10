@@ -18,11 +18,8 @@
                 "titleAdd": "Dashboard Aanmaken",
                 "titleEdit": "Dashboard Aanpassen",
                 "name": "Naam",
-                "displayMode": "Weergavemodus",
-                "6Buttons": "6 knoppen",
-                "8Buttons": "8 knoppen",
-                "15Buttons": "15 knoppen",
-                "32Buttons": "32 knoppen",
+                "displayColomns": "Kolommen",
+                "displayRows": "Rijen",
                 "save": "Opslaan",
                 "cancel": "Annuleren"
             },

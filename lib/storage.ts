@@ -22,7 +22,8 @@ export interface Variable {
 export interface Dashboard {
     readonly id: string;
     readonly name: string;
-    readonly displayMode: number;
+    readonly columns: number;
+    readonly rows: number;
     readonly items: { [item: number] : DashboardItem; };
     readonly usedVariableIds: string[];
 }
@@ -67,7 +68,9 @@ interface StoredVariable {
 }
 
 interface StoredDashboard {
-    displayMode: number;
+    name: string;
+    columns: number;
+    rows: number;
     items: StoredDashboardItem[];
 }
 
@@ -99,21 +102,24 @@ export class Store {
         this.cachedImages = {};
     }
 
-    updateDashboard(id: string, size: number) {
-        if (![6, 8, 15, 32].includes(size)) {
+    updateDashboard(id: string, columns: number, rows: number) {
+
+        const isValid = ((columns === 8 && rows === 4) || (columns === 5 && rows === 3) || (columns === 4 && rows === 2) || (columns === 3 && rows === 2));
+        if (!isValid) {
             return
         }
 
         //update cache
         const cache = this.cachedDashboards[id];
         if (cache !== undefined) {
-            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  displayMode: size, items: cache.items, usedVariableIds: cache.usedVariableIds };
+            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  columns: cache.columns, rows: cache.rows, items: cache.items, usedVariableIds: cache.usedVariableIds };
         }
 
         //write cache back to store
         var data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
         if (data !== undefined) {
-            data.displayMode = size;
+            data.columns = columns;
+            data.rows = rows;
             this.homey.settings.set('dashboard-' + id, data);
         }
     }
@@ -170,7 +176,7 @@ export class Store {
             return result;
         }, defaultItems);
 
-        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, displayMode: data.displayMode, items: items, usedVariableIds: usedVariableIds };
+        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, columns: data.columns, rows: data.rows, items: items, usedVariableIds: usedVariableIds };
         this.cachedDashboards[id] = dashboard;
         return dashboard;
 

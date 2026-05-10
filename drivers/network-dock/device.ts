@@ -195,8 +195,8 @@ module.exports = class NetworkDock extends Homey.Device {
 
     // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
     const size = getButtonControlSize(this.streamDeck);
-    if (dashboard.displayMode < size.total) {
-      this.store.updateDashboard(dashboard.id, size.total);
+    if (dashboard.columns != size.columns || dashboard.rows != size.rows) {
+      this.store.updateDashboard(dashboard.id, size.columns, size.rows);
     }
 
     this.dashboard = dashboard;

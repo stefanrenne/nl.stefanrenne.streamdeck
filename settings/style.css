@@ -125,7 +125,7 @@ td.center {
     grid-template-columns: repeat(8, calc((100% - (7 * 5px)) / 8));
     width: 100%;
 }
-.deck3 .deck-item, .deck4 .deck-item, .deck5 .deck-item .deck8 .deck-item {
+.deck3 .deck-item, .deck4 .deck-item, .deck5 .deck-item, .deck8 .deck-item {
     cursor: pointer;
 }
 .deck-item {

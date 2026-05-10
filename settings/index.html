@@ -80,29 +80,22 @@
         <input class="homey-form-input" id="dashboardName" type="text" value=""/>
       </fieldset>
       <fieldset class="homey-form-radio-set" style="width: 100%;">
-        <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.manage.displayMode"></legend>
-        <div class="allignedradio">
-          <label class="homey-form-radio">
-            <input class="homey-form-radio-input" id="displayMode6" type="radio" name="display-mode" value="6"/>
-            <span class="homey-form-radio-checkmark"></span>
-            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.6Buttons"></span>
-          </label>
-          <label class="homey-form-radio">
-            <input class="homey-form-radio-input" id="displayMode8" type="radio" name="display-mode" value="8"/>
-            <span class="homey-form-radio-checkmark"></span>
-            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.8Buttons"></span>
-          </label>
-          <br/>
-          <label class="homey-form-radio">
-            <input class="homey-form-radio-input" id="displayMode15" type="radio" name="display-mode" value="15"/>
-            <span class="homey-form-radio-checkmark"></span>
-            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.15Buttons"></span>
-          </label>
-          <label class="homey-form-radio">
-            <input class="homey-form-radio-input" id="displayMode32" type="radio" name="display-mode" value="32"/>
-            <span class="homey-form-radio-checkmark"></span>
-            <span class="homey-form-radio-text" data-i18n="settings.dashboard.manage.32Buttons"></span>
-          </label>
+        <div style="float: left;">
+          <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.manage.displayColomns"></legend>
+          <ul id="selectColomn" class="pagination" style="margin: 0">
+            <li class="page-item active"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            <li class="page-item"><a class="page-link" href="#">8</a></li>
+          </ul>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+          <legend class="homey-form-radio-set-title" data-i18n="settings.dashboard.manage.displayRows"></legend>
+          <ul id="selectRow" class="pagination" style="margin: 0">
+            <li class="page-item active"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+          </ul>
         </div>
       </fieldset>
 
@@ -363,7 +356,7 @@
         const $cancelItemButton = document.getElementById("cancelDashboardItem");
 
         $startButton.addEventListener("click", async () => {
-          await this.createDeckItems(15);
+          await this.createDeckItems(5, 3);
         });
         $cancelButton.addEventListener("click", () => {
           showView('main');
@@ -389,15 +382,8 @@
               }
             );
           }
-          var displayMode = 15;
-          if (document.getElementById("displayMode6").checked) {
-            displayMode = 6
-          } else if (document.getElementById("displayMode8").checked) {
-            displayMode = 8
-          } else  if (document.getElementById("displayMode32").checked) {
-            displayMode = 32;
-          }
-          await storeDashboard($deck.dataset.id, await validateDashboardName($deck.dataset.id, $input.value), displayMode, dashboardItems);
+
+          await storeDashboard($deck.dataset.id, await validateDashboardName($deck.dataset.id, $input.value), getSelectedColomn(), getSelectedRow(), dashboardItems);
           await loadDashboards();
 
           showView('main');
@@ -530,17 +516,22 @@
         }
       }
 
-      async function createDeckItems(numberItems, dashboardId = undefined, name = undefined, items = []) {
+      async function createDeckItems(columns, rows, dashboardId = undefined, name = undefined, items = []) {
         document.getElementById("dashboardName").value = name ?? ""
         document.getElementById("manage-dashboard").querySelector('h1').innerHTML = (dashboardId === undefined) ? Homey.__('settings.dashboard.manage.titleAdd') : Homey.__('settings.dashboard.manage.titleEdit');
 
         showView('dashboard');
 
-        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : (numberItems == 8) ? 4 : 3;
-        document.getElementById("displayMode6").checked = (numberItems == 6);
-        document.getElementById("displayMode8").checked = (numberItems == 8);
-        document.getElementById("displayMode15").checked = (numberItems == 15);
-        document.getElementById("displayMode32").checked = (numberItems == 32);
+        // select row item
+        const $selectRow = document.getElementById("selectRow");
+        $selectRow.querySelector(".active")?.classList.remove("active");
+        [...$selectRow.querySelectorAll("li")].find(($li) => $li.querySelector("a").innerHTML === String(rows))?.classList.add("active");
+
+        // Select column item
+        const $selectColomn = document.getElementById("selectColomn");
+        $selectColomn.querySelector(".active")?.classList.remove("active");
+        [...$selectColomn.querySelectorAll("li")].find(($li) => $li.querySelector("a").innerHTML === String(columns))?.classList.add("active");
+
         $deck.classList.remove(...$deck.classList);
         $deck.classList.add("deck" + columns);
         $deck.dataset.id = dashboardId ?? ""
@@ -552,7 +543,7 @@
           const $item = document.createElement('div');
           $item.classList.add("deck-item");
           $item.id = "deckItem" + id;
-          if (i >= numberItems) {
+          if (i >= (columns * rows)) {
             $item.classList.add("hidden");
           }
           $deck.appendChild($item);
@@ -590,8 +581,8 @@
         }
       }
 
-      function changeDisplayModeManageDeck(numberItems) {
-        const columns = (numberItems == 32) ? 8 : (numberItems == 15) ? 5 : (numberItems == 8) ? 4 : 3;
+      function changeDisplayModeManageDeck(columns, rows) {
+        const numberItems = columns * rows;
         $deck.classList.remove(...$deck.classList);
         $deck.classList.add("deck" + columns);
         for (var i = 0; i < $deck.children.length; i++) {
@@ -656,26 +647,64 @@
         showView('dashboardItem');
       }
 
+      function getSelectedRow() {
+        return document.getElementById("selectRow").querySelector(".active a").innerHTML
+      }
+
+      function getSelectedColomn() {
+        return document.getElementById("selectColomn").querySelector(".active a").innerHTML
+      }
+
+      function validateColomnAndRow(colomn, row) {
+        return (colomn === "8" && row === "4") || (colomn === "5" && row === "3") || (colomn === "4" && row === "2") || (colomn === "3" && row === "2");
+      }
+
       function observeCreateDashboardDisplayMode() {
-        const $mode6 = document.getElementById("displayMode6");
-        const $mode8 = document.getElementById("displayMode8");
-        const $mode15 = document.getElementById("displayMode15");
-        const $mode32 = document.getElementById("displayMode32");
+        const $selectColomn = document.getElementById("selectColomn");
+        const $selectRow = document.getElementById("selectRow");
+        const colomnValues = [...$selectColomn.querySelectorAll("a")].map(($link) => $link.innerHTML);
+        const rowValues = [...$selectRow.querySelectorAll("a")].map(($link) => $link.innerHTML);
 
-        $mode6.addEventListener("change", () => {
-          changeDisplayModeManageDeck($mode6.value);
+        $selectColomn.querySelectorAll("a").forEach(($link) => {
+          $link.addEventListener("click", () => {
+            if (!$link.parentElement.classList.contains("active")) {
+              $selectColomn.querySelector(".active")?.classList.remove("active");
+              $link.parentElement.classList.add("active");
+
+              const selectedRow = getSelectedRow();
+              const selectedColomn = $link.innerHTML;
+              const i = rowValues.indexOf(selectedRow);
+              const before = rowValues.slice(0, i).reverse();
+              const after = rowValues.slice(i);
+              const validatedRow = after.concat(before).find((row) => validateColomnAndRow(selectedColomn, row));
+              if (validatedRow !== selectedRow) {
+                $selectRow.querySelector(".active")?.classList.remove("active");
+                [...$selectRow.querySelectorAll("li")].find(($li) => $li.querySelector("a").innerHTML === validatedRow)?.classList.add("active");
+              }
+              changeDisplayModeManageDeck(parseInt(selectedColomn), parseInt(validatedRow));
+            }
+          });
         });
 
-        $mode8.addEventListener("change", () => {
-          changeDisplayModeManageDeck($mode8.value);
-        });
+        $selectRow.querySelectorAll("a").forEach(($link) => {
+          $link.addEventListener("click", () => {
+            if (!$link.parentElement.classList.contains("active")) {
+              $selectRow.querySelector(".active")?.classList.remove("active");
+              $link.parentElement.classList.add("active");
 
-        $mode15.addEventListener("change", () => {
-          changeDisplayModeManageDeck($mode15.value);
-        });
-
-        $mode32.addEventListener("change", () => {
-          changeDisplayModeManageDeck($mode32.value);
+              const selectedRow = $link.innerHTML;
+              const selectedColomn = getSelectedColomn();
+              const i = colomnValues.indexOf(selectedColomn);
+              const before = colomnValues.slice(0, i).reverse();
+              const after = colomnValues.slice(i);
+              const validatedColomn = after.concat(before).find((colomn) => validateColomnAndRow(colomn, selectedRow));
+              if (validatedColomn !== selectedColomn) {
+                $selectColomn.querySelector(".active")?.classList.remove("active");
+                [...$selectColomn.querySelectorAll("li")].find(($li) => $li.querySelector("a").innerHTML === validatedColomn)?.classList.add("active");
+              }
+              changeDisplayModeManageDeck(parseInt(validatedColomn), parseInt(selectedRow));
+            }
+          });
         });
       }
 
@@ -776,7 +805,7 @@
             return false;
           });
           if (didUpdateDashboards) {
-            await storeDashboardItem(metadata.id, dashboard.displayMode, newItems);
+            await storeDashboardItem(metadata.id, dashboard.columns, dashboard.rows, newItems);
           }
         }
 
@@ -915,7 +944,7 @@
             return false;
           });
           if (didUpdateDashboards) {
-            await storeDashboardItem(metadata.id, dashboard.displayMode, newItems);
+            await storeDashboardItem(metadata.id, dashboard.columns, dashboard.rows, newItems);
           }
         }
 
@@ -1058,8 +1087,40 @@
       async function loadDashboards() {
         const $container = document.getElementById("dashboardContainer");
         $container.innerHTML = '';
-        const dashboards = await getDashboardsFromStore();
+        var dashboards = await getDashboardsFromStore();
+        
+        /* Validate Existing Dashboard */
+        for (const metadata of Object.values(dashboards)) {
+          var didUpdateDashboards = false;
+          var dashboard = await getDashboardFromStore(metadata.id);
+          if (dashboard.displayMode !== undefined && (dashboard.columns === undefined || dashboard.rows === undefined)) {
+            didUpdateDashboards = true;
 
+            switch (dashboard.displayMode) {
+              case 6:
+                dashboard.columns = 3;
+                dashboard.rows = 2;
+                break;
+              case 8:
+                dashboard.columns = 4;
+                dashboard.rows = 2;
+                break;
+              case 32:
+                dashboard.columns = 8;
+                dashboard.rows = 4;
+                break;
+              default:
+                dashboard.columns = 5;
+                dashboard.rows = 3;
+                break;
+            }
+          }
+          if (didUpdateDashboards) {
+            await storeDashboardItem(metadata.id, dashboard.columns, dashboard.rows, dashboard.items);
+          }
+        }
+
+        dashboards = await getDashboardsFromStore();
         for (const metadata of Object.values(dashboards)) {
           const $row = document.createElement('tr');
 
@@ -1078,7 +1139,7 @@
           $editMask = document.createElement('span');
           $edit.addEventListener('click', async () => {
             const dashboard = await getDashboardFromStore(metadata.id);
-            await createDeckItems(dashboard.displayMode, metadata.id, metadata.name, dashboard.items);
+            await createDeckItems(dashboard.columns, dashboard.rows, metadata.id, metadata.name, dashboard.items);
           });
           $edit.appendChild($editMask);
           $actionColumn.appendChild($edit);
@@ -1093,7 +1154,7 @@
           $copyMask = document.createElement('span');
           $copy.addEventListener('click', async () => {
             const dashboard = await getDashboardFromStore(metadata.id);
-            await createDeckItems(dashboard.displayMode, undefined, undefined, dashboard.items);
+            await createDeckItems(dashboard.columns, dashboard.rows, undefined, undefined, dashboard.items);
           });
           $copy.appendChild($copyMask);
           $actionColumn.appendChild($copy);
@@ -1132,7 +1193,7 @@
       }
 
       var cachedDashboard = {};
-      async function storeDashboard(id, name, displayMode, items) {
+      async function storeDashboard(id, name, columns, rows, items) {
         const dashboardId = (id === undefined || id === "") ? crypto.randomUUID() : id;
 
         const oldDashboards = await getDashboardsFromStore();
@@ -1141,11 +1202,11 @@
         cachedDashboards = newDashboards;
         await Homey.set('dashboards', newDashboards);
 
-        await storeDashboardItem(dashboardId, displayMode, items);
+        await storeDashboardItem(dashboardId, columns, rows, items);
       }
 
-      async function storeDashboardItem(id, displayMode, items) {
-        const dashboardData = { 'displayMode': displayMode, 'items': items };
+      async function storeDashboardItem(id, columns, rows, items) {
+        const dashboardData = { 'columns': columns, 'rows': rows, 'items': items };
         cachedDashboard[id] = dashboardData;
         await Homey.set('dashboard-' + id, dashboardData);
       }

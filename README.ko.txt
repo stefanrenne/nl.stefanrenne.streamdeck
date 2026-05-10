@@ -1,20 +1,45 @@
-LAN을 통해 Stream Deck에서 Homey를 즉시 제어하세요.
-모든 LCD 버튼을 강력한 스마트 홈 트리거로 활용하세요.
+Stream Deck에서 Homey 스마트 홈을 직접 제어하세요 — 로컬 네트워크를 통해 즉시, 클라우드 의존 없이.
+
+Stream Deck의 모든 LCD 버튼이 강력하고 맞춤 설정 가능한 스마트 홈 트리거가 됩니다. 버튼을 누르면 Homey가 플로우를 실행합니다: 조명 켜기/끄기, 장면 조정, 문 잠금 또는 설정한 모든 자동화 실행.
+
+---
+
+기능:
+
+대시보드
+버튼을 여러 이름의 대시보드로 구성하고 Homey 플로우에서 전환하세요. "아침" 대시보드, "영화의 밤" 대시보드 또는 루틴에 맞는 어떤 레이아웃이든 만들어 — 그런 다음 시간, 재실 여부 또는 다른 트리거에 따라 Homey가 자동으로 전환하게 하세요.
+
+사용자 정의 이미지
+JPG 또는 PNG 이미지를 업로드하고 버튼에 할당하세요. 각 버튼에 명확하고 개인화된 아이콘을 부여해 항상 한눈에 기능을 알 수 있게 하세요.
+
+동적 변수
+두 줄의 실시간 텍스트를 표시하는 변수 버튼을 만드세요 — 온도, 기기 상태, 카운트다운 또는 플로우에서 생성하는 모든 값. 플로우 액션을 통해 실시간으로 텍스트를 업데이트해 Stream Deck이 항상 집 안의 상황을 반영하게 하세요.
+
+플로우 연동
+- 트리거: 어떤 Homey 플로우에서든 버튼 누름(눌림, 놓임, 한 번 누름, 두 번 누름)에 반응하세요. 각 트리거는 버튼의 대시보드, 이미지 이름, 텍스트 줄, 페이로드, 열, 행을 토큰으로 제공합니다.
+- 조건: 현재 활성화된 대시보드를 기반으로 플로우를 분기하세요.
+- 액션: 어떤 대시보드로든 전환하거나 변수 버튼의 텍스트를 업데이트하세요 — 첫 번째 줄, 두 번째 줄 또는 둘 다.
+
+자동 검색
+앱이 mDNS를 통해 로컬 네트워크에서 Stream Deck Network Dock을 자동으로 감지하므로 설정이 몇 초면 완료됩니다.
+
+---
 
 구성:
-원하는 방식으로 설정하세요.
-사용자 정의 이미지를 업로드하고, 맞춤형 대시보드를 만들고, 모든 버튼 누름에 고유한 페이로드를 지정하세요.
-한 번의 탭 — Homey가 나머지를 처리합니다.
+
+Homey의 앱 설정을 열어 대시보드, 이미지, 변수를 관리하세요. Stream Deck Studio 소프트웨어를 사용해 페이로드를 할당하고 각 버튼을 Homey 설정에 연결하세요.
+
+---
 
 요구 사항:
 - Stream Deck Studio
-- Stream Deck Network Dock, 다음 장치 중 하나:
-	- Stream Deck Module 6
-	- Stream Deck Module 15
-	- Stream Deck Module 32
-	- Stream Deck Mini
-	- Stream Deck Classic
-	- Stream Deck Scissor Keys
-	- Stream Deck XL
-	- Stream Deck neo (LCD 버튼만 지원)
-	- Stream Deck + (LCD 버튼만 지원)
+- Stream Deck Network Dock, 다음 기기 중 하나:
+    - Stream Deck Module 6
+    - Stream Deck Module 15
+    - Stream Deck Module 32
+    - Stream Deck Mini
+    - Stream Deck Classic
+    - Stream Deck Scissor Keys
+    - Stream Deck XL
+    - Stream Deck neo (LCD 버튼만 지원)
+    - Stream Deck + (LCD 버튼만 지원)

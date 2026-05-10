@@ -2,11 +2,33 @@
 	"id": "update_variable",
 	"title": {
 	   "en": "Update variable",
-	   "nl": "Wijzig variabel"
+	   "nl": "Wijzig variabel",
+	   "de": "Variable aktualisieren",
+	   "fr": "Mettre à jour la variable",
+	   "it": "Aggiorna variabile",
+	   "sv": "Uppdatera variabel",
+	   "no": "Oppdater variabel",
+	   "es": "Actualizar variable",
+	   "da": "Opdater variabel",
+	   "ru": "Обновить переменную",
+	   "pl": "Zaktualizuj zmienną",
+	   "ko": "변수 업데이트",
+	   "ar": "تحديث المتغير"
 	},
 	"titleFormatted": {
 	   "en": "Update [[variable]] to [[firstLine]], [[secondLine]]",
-	   "nl": "Wijzig [[variable]] naar [[firstLine]], [[secondLine]]"
+	   "nl": "Wijzig [[variable]] naar [[firstLine]], [[secondLine]]",
+	   "de": "[[variable]] auf [[firstLine]], [[secondLine]] aktualisieren",
+	   "fr": "Mettre à jour [[variable]] à [[firstLine]], [[secondLine]]",
+	   "it": "Aggiorna [[variable]] a [[firstLine]], [[secondLine]]",
+	   "sv": "Uppdatera [[variable]] till [[firstLine]], [[secondLine]]",
+	   "no": "Oppdater [[variable]] til [[firstLine]], [[secondLine]]",
+	   "es": "Actualizar [[variable]] a [[firstLine]], [[secondLine]]",
+	   "da": "Opdater [[variable]] til [[firstLine]], [[secondLine]]",
+	   "ru": "Обновить [[variable]] до [[firstLine]], [[secondLine]]",
+	   "pl": "Zaktualizuj [[variable]] do [[firstLine]], [[secondLine]]",
+	   "ko": "[[variable]]을(를) [[firstLine]], [[secondLine]]으로 업데이트",
+	   "ar": "تحديث [[variable]] إلى [[firstLine]]، [[secondLine]]"
 	},
     "args": [
         {
@@ -15,7 +37,18 @@
             "type": "autocomplete",
             "title": {
                 "en": "Variable",
-                "nl": "Variabel"
+                "nl": "Variabel",
+                "de": "Variable",
+                "fr": "Variable",
+                "it": "Variabile",
+                "sv": "Variabel",
+                "no": "Variabel",
+                "es": "Variable",
+                "da": "Variabel",
+                "ru": "Переменная",
+                "pl": "Zmienna",
+                "ko": "변수",
+                "ar": "متغير"
             }
         },
         {
@@ -24,7 +57,18 @@
             "type": "text",
             "title": {
                 "en": "First line text",
-                "nl": "Tekst op de eerste regel"
+                "nl": "Tekst op de eerste regel",
+                "de": "Text der ersten Zeile",
+                "fr": "Texte de la première ligne",
+                "it": "Testo della prima riga",
+                "sv": "Text på första raden",
+                "no": "Tekst på første linje",
+                "es": "Texto de la primera línea",
+                "da": "Tekst på første linje",
+                "ru": "Текст первой строки",
+                "pl": "Tekst pierwszej linii",
+                "ko": "첫 번째 줄 텍스트",
+                "ar": "نص السطر الأول"
             }
         },
         {
@@ -33,7 +77,18 @@
             "type": "text",
             "title": {
                 "en": "Second line text",
-                "nl": "Tekst op de tweede regel"
+                "nl": "Tekst op de tweede regel",
+                "de": "Text der zweiten Zeile",
+                "fr": "Texte de la deuxième ligne",
+                "it": "Testo della seconda riga",
+                "sv": "Text på andra raden",
+                "no": "Tekst på andre linje",
+                "es": "Texto de la segunda línea",
+                "da": "Tekst på anden linje",
+                "ru": "Текст второй строки",
+                "pl": "Tekst drugiej linii",
+                "ko": "두 번째 줄 텍스트",
+                "ar": "نص السطر الثاني"
             }
         }
 	]

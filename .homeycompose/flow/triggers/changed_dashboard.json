@@ -2,7 +2,18 @@
 	"id": "changed_dashboard",
 	"title": {
 	   "en": "Dashboard has changed",
-	   "nl": "Dashboard is veranderd"
+	   "nl": "Dashboard is veranderd",
+	   "de": "Dashboard hat sich geändert",
+	   "fr": "Le tableau de bord a changé",
+	   "it": "Il dashboard è cambiato",
+	   "sv": "Instrumentpanelen har ändrats",
+	   "no": "Instrumentbordet har endret seg",
+	   "es": "El panel ha cambiado",
+	   "da": "Dashboardet er ændret",
+	   "ru": "Панель изменилась",
+	   "pl": "Pulpit został zmieniony",
+	   "ko": "대시보드가 변경되었습니다",
+	   "ar": "تغيرت لوحة التحكم"
 	},
     "args": [
         {
@@ -17,7 +28,18 @@
             "name": "dashboard",
             "title": {
                 "en": "Dashboard",
-                "nl": "Dashboard"
+                "nl": "Dashboard",
+                "de": "Dashboard",
+                "fr": "Tableau de bord",
+                "it": "Dashboard",
+                "sv": "Instrumentpanel",
+                "no": "Instrumentbord",
+                "es": "Panel",
+                "da": "Dashboard",
+                "ru": "Панель",
+                "pl": "Pulpit",
+                "ko": "대시보드",
+                "ar": "لوحة التحكم"
             }
         }
     ]

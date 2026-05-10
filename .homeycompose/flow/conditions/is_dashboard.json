@@ -2,11 +2,33 @@
 	"id": "is_dashboard",
 	"title": {
 	   "en": "Dashboard !{{is|is not}} exactly [[Value]]",
-	   "nl": "Dashboard !{{is|is niet}} precies [[Value]]"
+	   "nl": "Dashboard !{{is|is niet}} precies [[Value]]",
+	   "de": "Dashboard !{{ist|ist nicht}} genau [[Value]]",
+	   "fr": "Le tableau de bord !{{est|n'est pas}} exactement [[Value]]",
+	   "it": "Dashboard !{{è|non è}} esattamente [[Value]]",
+	   "sv": "Instrumentpanelen !{{är|är inte}} exakt [[Value]]",
+	   "no": "Instrumentbordet !{{er|er ikke}} nøyaktig [[Value]]",
+	   "es": "El panel !{{es|no es}} exactamente [[Value]]",
+	   "da": "Dashboardet !{{er|er ikke}} præcis [[Value]]",
+	   "ru": "Панель !{{является|не является}} именно [[Value]]",
+	   "pl": "Pulpit !{{jest|nie jest}} dokładnie [[Value]]",
+	   "ko": "대시보드 !{{가|가 아닌}} 정확히 [[Value]]",
+	   "ar": "لوحة التحكم !{{هي|ليست}} بالضبط [[Value]]"
 	},
 	"titleFormatted": {
 	   "en": "Dashboard !{{is|is not}} exactly [[dashboard]]",
-	   "nl": "Dashboard !{{is|is niet}} precies [[dashboard]]"
+	   "nl": "Dashboard !{{is|is niet}} precies [[dashboard]]",
+	   "de": "Dashboard !{{ist|ist nicht}} genau [[dashboard]]",
+	   "fr": "Le tableau de bord !{{est|n'est pas}} exactement [[dashboard]]",
+	   "it": "Dashboard !{{è|non è}} esattamente [[dashboard]]",
+	   "sv": "Instrumentpanelen !{{är|är inte}} exakt [[dashboard]]",
+	   "no": "Instrumentbordet !{{er|er ikke}} nøyaktig [[dashboard]]",
+	   "es": "El panel !{{es|no es}} exactamente [[dashboard]]",
+	   "da": "Dashboardet !{{er|er ikke}} præcis [[dashboard]]",
+	   "ru": "Панель !{{является|не является}} именно [[dashboard]]",
+	   "pl": "Pulpit !{{jest|nie jest}} dokładnie [[dashboard]]",
+	   "ko": "대시보드 !{{가|가 아닌}} 정확히 [[dashboard]]",
+	   "ar": "لوحة التحكم !{{هي|ليست}} بالضبط [[dashboard]]"
 	},
     "args": [
         {
@@ -20,7 +42,18 @@
             "type": "autocomplete",
             "title": {
                 "en": "Dashboard",
-                "nl": "Dashboard"
+                "nl": "Dashboard",
+                "de": "Dashboard",
+                "fr": "Tableau de bord",
+                "it": "Dashboard",
+                "sv": "Instrumentpanel",
+                "no": "Instrumentbord",
+                "es": "Panel",
+                "da": "Dashboard",
+                "ru": "Панель",
+                "pl": "Pulpit",
+                "ko": "대시보드",
+                "ar": "لوحة التحكم"
             }
         }
 	]

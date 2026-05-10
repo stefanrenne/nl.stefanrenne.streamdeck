@@ -1,6 +1,18 @@
 {
   "name": {
-    "en": "Network Dock"
+    "en": "Network Dock",
+    "nl": "Network Dock",
+    "de": "Network Dock",
+    "fr": "Network Dock",
+    "it": "Network Dock",
+    "sv": "Network Dock",
+    "no": "Network Dock",
+    "es": "Network Dock",
+    "da": "Network Dock",
+    "ru": "Network Dock",
+    "pl": "Network Dock",
+    "ko": "Network Dock",
+    "ar": "Network Dock"
   },
   "class": "button",
   "capabilities": [
@@ -25,7 +37,7 @@
       "id": "list_devices",
       "template": "list_devices",
       "navigation": {
-        "next": "add_devices" 
+        "next": "add_devices"
       }
     },
     {

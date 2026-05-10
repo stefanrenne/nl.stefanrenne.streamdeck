@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Informazioni",
+            "dashboards": "Dashboard",
+            "images": "Immagini",
+            "variables": "Variabili"
+        },
+        "dashboard": {
+            "name": "Nome",
+            "action": "Azione",
+            "add": "Crea dashboard",
+            "editTitle": "Modifica",
+            "copyTitle": "Crea copia",
+            "deleteTitle": "Elimina",
+            "confirmDelete": "Sei sicuro di voler eliminare la dashboard '__name__'?",
+            "manage": {
+                "titleAdd": "Crea dashboard",
+                "titleEdit": "Modifica dashboard",
+                "name": "Nome",
+                "displayColomns": "Colonne visualizzate",
+                "displayRows": "Righe visualizzate",
+                "save": "Salva",
+                "cancel": "Annulla"
+            },
+            "item": {
+                "title": "Seleziona elemento",
+                "selectImage": "Seleziona immagine",
+                "selectImageError": "Nessuna immagine disponibile. Puoi caricare un'immagine nella scheda 'Immagini'.",
+                "selectVariable": "Seleziona variabile",
+                "selectVariableError": "Nessuna variabile disponibile. Puoi creare una variabile nella scheda 'Variabili'.",
+                "displayMode": "Azione",
+                "none": "Vuoto",
+                "variable": "Variabile",
+                "image": "Immagine",
+                "save": "Salva",
+                "cancel": "Annulla",
+                "payload": {
+                    "title": "Payload",
+                    "description": "Qui puoi definire dati aggiuntivi che verranno esposti a un flusso quando premi un pulsante."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "In questa scheda puoi caricare un'immagine. Le immagini possono poi essere assegnate alle posizioni del dashboard dello Stream Deck.",
+            "title": "Immagine",
+            "name": "Nome",
+            "action": "Azione",
+            "add": "Carica immagine",
+            "editTitle": "Modifica",
+            "deleteTitle": "Elimina",
+            "confirmDelete": "Sei sicuro di voler eliminare l'immagine '__name__'?",
+            "manage": {
+                "title": "Modifica immagine",
+                "name": "Nome",
+                "save": "Salva",
+                "cancel": "Annulla"
+            }
+        },
+        "variable": {
+            "emptyError": "In questa scheda puoi creare una variabile. Le variabili sono pulsanti con una o due righe di testo, e quelle righe possono essere aggiornate da un flusso.",
+            "title": "Variabile",
+            "name": "Nome",
+            "action": "Azione",
+            "add": "Crea variabile",
+            "editTitle": "Modifica",
+            "deleteTitle": "Elimina",
+            "confirmDelete": "Sei sicuro di voler eliminare la variabile '__name__'?",
+            "manage": {
+                "titleAdd": "Crea variabile",
+                "titleEdit": "Modifica variabile",
+                "inputName": "Nome",
+                "inputNameHint": "Nome univoco usato per aggiornare la variabile da un flusso",
+                "save": "Salva",
+                "cancel": "Annulla",
+                "inputLines": "Testo da visualizzare",
+                "inputLineHint": "Queste righe possono essere modificate anche da un flusso",
+                "inputFirstLine": "Testo della prima riga",
+                "inputSecondLine": "Testo opzionale della seconda riga",
+                "backgroundColor": "Colore di sfondo",
+                "textColor": "Colore del testo"
+            }
+        }
+    }
+}

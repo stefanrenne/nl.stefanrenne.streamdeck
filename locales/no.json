@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Om",
+            "dashboards": "Instrumentbord",
+            "images": "Bilder",
+            "variables": "Variabler"
+        },
+        "dashboard": {
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Opprett instrumentbord",
+            "editTitle": "Rediger",
+            "copyTitle": "Lag kopi",
+            "deleteTitle": "Slett",
+            "confirmDelete": "Er du sikker på at du vil slette instrumentbordet '__name__'?",
+            "manage": {
+                "titleAdd": "Opprett instrumentbord",
+                "titleEdit": "Rediger instrumentbord",
+                "name": "Navn",
+                "displayColomns": "Vis kolonner",
+                "displayRows": "Vis rader",
+                "save": "Lagre",
+                "cancel": "Avbryt"
+            },
+            "item": {
+                "title": "Velg element",
+                "selectImage": "Velg bilde",
+                "selectImageError": "Ingen bilder tilgjengelig. Du kan laste opp et bilde i fanen 'Bilder'.",
+                "selectVariable": "Velg variabel",
+                "selectVariableError": "Ingen variabler tilgjengelig. Du kan opprette en variabel i fanen 'Variabler'.",
+                "displayMode": "Handling",
+                "none": "Tom",
+                "variable": "Variabel",
+                "image": "Bilde",
+                "save": "Lagre",
+                "cancel": "Avbryt",
+                "payload": {
+                    "title": "Nyttelast",
+                    "description": "Her kan du definere tilleggsdata som vil bli eksponert for en flyt når du trykker på en knapp."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "I denne fanen kan du laste opp et bilde. Bilder kan deretter tildeles posisjoner på Stream Deck-instrumentbordet.",
+            "title": "Bilde",
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Last opp bilde",
+            "editTitle": "Rediger",
+            "deleteTitle": "Slett",
+            "confirmDelete": "Er du sikker på at du vil slette bildet '__name__'?",
+            "manage": {
+                "title": "Rediger bilde",
+                "name": "Navn",
+                "save": "Lagre",
+                "cancel": "Avbryt"
+            }
+        },
+        "variable": {
+            "emptyError": "I denne fanen kan du opprette en variabel. Variabler er knapper med én eller to tekstlinjer, og disse tekstlinjene kan oppdateres fra en flyt.",
+            "title": "Variabel",
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Opprett variabel",
+            "editTitle": "Rediger",
+            "deleteTitle": "Slett",
+            "confirmDelete": "Er du sikker på at du vil slette variabelen '__name__'?",
+            "manage": {
+                "titleAdd": "Opprett variabel",
+                "titleEdit": "Rediger variabel",
+                "inputName": "Navn",
+                "inputNameHint": "Unikt navn som brukes til å oppdatere variabelen fra en flyt",
+                "save": "Lagre",
+                "cancel": "Avbryt",
+                "inputLines": "Tekst som skal vises",
+                "inputLineHint": "Disse linjene kan også endres fra en flyt",
+                "inputFirstLine": "Tekst på første linje",
+                "inputSecondLine": "Valgfri tekst på andre linje",
+                "backgroundColor": "Bakgrunnsfarge",
+                "textColor": "Tekstfarge"
+            }
+        }
+    }
+}

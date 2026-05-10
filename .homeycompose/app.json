@@ -7,11 +7,34 @@
     "local"
   ],
   "name": {
-    "en": "Stream Deck"
+    "en": "Stream Deck",
+    "nl": "Stream Deck",
+    "de": "Stream Deck",
+    "fr": "Stream Deck",
+    "it": "Stream Deck",
+    "sv": "Stream Deck",
+    "no": "Stream Deck",
+    "es": "Stream Deck",
+    "da": "Stream Deck",
+    "ru": "Stream Deck",
+    "pl": "Stream Deck",
+    "ko": "Stream Deck",
+    "ar": "Stream Deck"
   },
   "description": {
     "en": "Stream Deck meets smart home magic",
-    "nl": "Maak van je Stream Deck pure smart-home magie."
+    "nl": "Maak van je Stream Deck pure smart-home magie.",
+    "de": "Stream Deck trifft Smart-Home-Magie.",
+    "fr": "Stream Deck rencontre la magie de la maison connectée.",
+    "it": "Stream Deck incontra la magia della casa intelligente.",
+    "sv": "Stream Deck möter smart hem-magi.",
+    "no": "Stream Deck møter smarthjem-magi.",
+    "es": "Stream Deck se une a la magia del hogar inteligente.",
+    "da": "Stream Deck møder smart home-magi.",
+    "ru": "Stream Deck встречает магию умного дома.",
+    "pl": "Stream Deck spotyka magię inteligentnego domu.",
+    "ko": "Stream Deck이 스마트 홈 마법을 만나다.",
+    "ar": "Stream Deck يلتقي بسحر المنزل الذكي."
   },
   "category": [
     "tools"
@@ -37,6 +60,126 @@
       "network",
       "lcd",
       "button"
+    ],
+    "nl": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "netwerk",
+      "lcd",
+      "knop"
+    ],
+    "de": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "netzwerk",
+      "lcd",
+      "taste"
+    ],
+    "fr": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "réseau",
+      "lcd",
+      "bouton"
+    ],
+    "it": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "rete",
+      "lcd",
+      "pulsante"
+    ],
+    "sv": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "nätverk",
+      "lcd",
+      "knapp"
+    ],
+    "no": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "nettverk",
+      "lcd",
+      "knapp"
+    ],
+    "es": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "red",
+      "lcd",
+      "botón"
+    ],
+    "da": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "netværk",
+      "lcd",
+      "knap"
+    ],
+    "ru": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "сеть",
+      "lcd",
+      "кнопка"
+    ],
+    "pl": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "sieć",
+      "lcd",
+      "przycisk"
+    ],
+    "ko": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "네트워크",
+      "lcd",
+      "버튼"
+    ],
+    "ar": [
+      "stream",
+      "deck",
+      "streamdeck",
+      "elgato",
+      "lan",
+      "شبكة",
+      "lcd",
+      "زر"
     ]
   },
   "source": "https://github.com/stefanrenne/nl.stefanrenne.streamdeck",
@@ -51,6 +194,9 @@
       },
       {
         "name": "🇳🇱 Stefan Renne"
+      },
+      {
+        "name": "🇩🇪🇫🇷🇮🇹🇸🇪🇳🇴🇪🇸🇩🇰🇷🇺🇵🇱🇰🇷🇸🇦 Claude"
       }
     ],
     "developers": [

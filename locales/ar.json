@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "حول",
+            "dashboards": "لوحات التحكم",
+            "images": "الصور",
+            "variables": "المتغيرات"
+        },
+        "dashboard": {
+            "name": "الاسم",
+            "action": "الإجراء",
+            "add": "إنشاء لوحة تحكم",
+            "editTitle": "تعديل",
+            "copyTitle": "إنشاء نسخة",
+            "deleteTitle": "حذف",
+            "confirmDelete": "هل أنت متأكد أنك تريد حذف لوحة التحكم '__name__'؟",
+            "manage": {
+                "titleAdd": "إنشاء لوحة تحكم",
+                "titleEdit": "تعديل لوحة التحكم",
+                "name": "الاسم",
+                "displayColomns": "عرض الأعمدة",
+                "displayRows": "عرض الصفوف",
+                "save": "حفظ",
+                "cancel": "إلغاء"
+            },
+            "item": {
+                "title": "تحديد عنصر",
+                "selectImage": "تحديد صورة",
+                "selectImageError": "لا توجد صور متاحة. يمكنك رفع صورة من تبويب 'الصور'.",
+                "selectVariable": "تحديد متغير",
+                "selectVariableError": "لا توجد متغيرات متاحة. يمكنك إنشاء متغير من تبويب 'المتغيرات'.",
+                "displayMode": "الإجراء",
+                "none": "فارغ",
+                "variable": "متغير",
+                "image": "صورة",
+                "save": "حفظ",
+                "cancel": "إلغاء",
+                "payload": {
+                    "title": "البيانات المرسلة",
+                    "description": "يمكنك هنا تحديد بيانات إضافية ستكون متاحة للتدفق عند الضغط على زر."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "في هذا التبويب يمكنك رفع صورة. يمكن بعد ذلك تخصيص الصور لمواضع لوحة تحكم Stream Deck.",
+            "title": "صورة",
+            "name": "الاسم",
+            "action": "الإجراء",
+            "add": "رفع صورة",
+            "editTitle": "تعديل",
+            "deleteTitle": "حذف",
+            "confirmDelete": "هل أنت متأكد أنك تريد حذف الصورة '__name__'؟",
+            "manage": {
+                "title": "تعديل الصورة",
+                "name": "الاسم",
+                "save": "حفظ",
+                "cancel": "إلغاء"
+            }
+        },
+        "variable": {
+            "emptyError": "في هذا التبويب يمكنك إنشاء متغير. المتغيرات هي أزرار تحتوي على سطر أو سطرين من النص، ويمكن تحديث هذه الأسطر من تدفق.",
+            "title": "متغير",
+            "name": "الاسم",
+            "action": "الإجراء",
+            "add": "إنشاء متغير",
+            "editTitle": "تعديل",
+            "deleteTitle": "حذف",
+            "confirmDelete": "هل أنت متأكد أنك تريد حذف المتغير '__name__'؟",
+            "manage": {
+                "titleAdd": "إنشاء متغير",
+                "titleEdit": "تعديل المتغير",
+                "inputName": "الاسم",
+                "inputNameHint": "اسم فريد يُستخدم لتحديث المتغير من تدفق",
+                "save": "حفظ",
+                "cancel": "إلغاء",
+                "inputLines": "النص المراد عرضه",
+                "inputLineHint": "يمكن أيضاً تغيير هذه الأسطر من تدفق",
+                "inputFirstLine": "نص السطر الأول",
+                "inputSecondLine": "نص السطر الثاني (اختياري)",
+                "backgroundColor": "لون الخلفية",
+                "textColor": "لون النص"
+            }
+        }
+    }
+}

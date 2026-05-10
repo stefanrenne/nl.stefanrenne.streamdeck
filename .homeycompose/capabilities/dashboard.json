@@ -1,8 +1,19 @@
 {
     "type": "enum",
-    "title": { 
-        "en": "Dashboard", 
-        "nl": "Dashboard"
+    "title": {
+        "en": "Dashboard",
+        "nl": "Dashboard",
+        "de": "Dashboard",
+        "fr": "Tableau de bord",
+        "it": "Dashboard",
+        "sv": "Instrumentpanel",
+        "no": "Instrumentbord",
+        "es": "Panel",
+        "da": "Dashboard",
+        "ru": "Панель",
+        "pl": "Pulpit",
+        "ko": "대시보드",
+        "ar": "لوحة التحكم"
     },
     "getable": true,
     "setable": true,

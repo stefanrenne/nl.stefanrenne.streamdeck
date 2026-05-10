@@ -3,7 +3,18 @@
     "type": "group",
     "label": {
       "en": "Device information",
-      "nl": "Apparaatinformatie"
+      "nl": "Apparaatinformatie",
+      "de": "Geräteinformationen",
+      "fr": "Informations sur l'appareil",
+      "it": "Informazioni sul dispositivo",
+      "sv": "Enhetsinformation",
+      "no": "Enhetsinformasjon",
+      "es": "Información del dispositivo",
+      "da": "Enhedsinformation",
+      "ru": "Информация об устройстве",
+      "pl": "Informacje o urządzeniu",
+      "ko": "장치 정보",
+      "ar": "معلومات الجهاز"
     },
     "children": [
       {
@@ -11,7 +22,18 @@
         "type": "text",
         "label": {
           "en": "IP Address",
-          "nl": "IP-adres"
+          "nl": "IP-adres",
+          "de": "IP-Adresse",
+          "fr": "Adresse IP",
+          "it": "Indirizzo IP",
+          "sv": "IP-adress",
+          "no": "IP-adresse",
+          "es": "Dirección IP",
+          "da": "IP-adresse",
+          "ru": "IP-адрес",
+          "pl": "Adres IP",
+          "ko": "IP 주소",
+          "ar": "عنوان IP"
         },
         "value": ""
       },
@@ -20,7 +42,18 @@
         "type": "label",
         "label": {
           "en": "Connected Device",
-          "nl": "Aangesloten Apparaat"
+          "nl": "Aangesloten Apparaat",
+          "de": "Verbundenes Gerät",
+          "fr": "Appareil connecté",
+          "it": "Dispositivo connesso",
+          "sv": "Ansluten enhet",
+          "no": "Tilkoblet enhet",
+          "es": "Dispositivo conectado",
+          "da": "Tilsluttet enhed",
+          "ru": "Подключённое устройство",
+          "pl": "Podłączone urządzenie",
+          "ko": "연결된 장치",
+          "ar": "الجهاز المتصل"
         },
         "value": ""
       },
@@ -29,7 +62,18 @@
         "type": "label",
         "label": {
           "en": "Serial number",
-          "nl": "Serienummer"
+          "nl": "Serienummer",
+          "de": "Seriennummer",
+          "fr": "Numéro de série",
+          "it": "Numero di serie",
+          "sv": "Serienummer",
+          "no": "Serienummer",
+          "es": "Número de serie",
+          "da": "Serienummer",
+          "ru": "Серийный номер",
+          "pl": "Numer seryjny",
+          "ko": "일련번호",
+          "ar": "الرقم التسلسلي"
         },
         "value": ""
       },
@@ -38,7 +82,18 @@
         "type": "label",
         "label": {
           "en": "Firmware Version",
-          "nl": "Firmwareversie"
+          "nl": "Firmwareversie",
+          "de": "Firmware-Version",
+          "fr": "Version du firmware",
+          "it": "Versione firmware",
+          "sv": "Firmware-version",
+          "no": "Fastvareversjon",
+          "es": "Versión de firmware",
+          "da": "Firmwareversion",
+          "ru": "Версия прошивки",
+          "pl": "Wersja oprogramowania",
+          "ko": "펌웨어 버전",
+          "ar": "إصدار البرنامج الثابت"
         },
         "value": ""
       },
@@ -47,7 +102,18 @@
         "type": "number",
         "label": {
           "en": "Columns",
-          "nl": "Kolommen"
+          "nl": "Kolommen",
+          "de": "Spalten",
+          "fr": "Colonnes",
+          "it": "Colonne",
+          "sv": "Kolumner",
+          "no": "Kolonner",
+          "es": "Columnas",
+          "da": "Kolonner",
+          "ru": "Столбцы",
+          "pl": "Kolumny",
+          "ko": "열",
+          "ar": "الأعمدة"
         },
         "value": 0,
         "min": 0
@@ -57,7 +123,18 @@
         "type": "number",
         "label": {
           "en": "Rows",
-          "nl": "Rijen"
+          "nl": "Rijen",
+          "de": "Zeilen",
+          "fr": "Lignes",
+          "it": "Righe",
+          "sv": "Rader",
+          "no": "Rader",
+          "es": "Filas",
+          "da": "Rækker",
+          "ru": "Строки",
+          "pl": "Wiersze",
+          "ko": "행",
+          "ar": "الصفوف"
         },
         "value": 0,
         "min": 0

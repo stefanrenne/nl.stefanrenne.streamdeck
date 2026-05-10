@@ -2,11 +2,33 @@
 	"id": "set_dashboard",
 	"title": {
 	   "en": "Set Dashboard to [[Value]]",
-	   "nl": "Stel het dashboard in op [[Value]]"
+	   "nl": "Stel het dashboard in op [[Value]]",
+	   "de": "Dashboard auf [[Value]] einstellen",
+	   "fr": "Définir le tableau de bord sur [[Value]]",
+	   "it": "Imposta il dashboard su [[Value]]",
+	   "sv": "Ställ in instrumentpanelen till [[Value]]",
+	   "no": "Sett instrumentbordet til [[Value]]",
+	   "es": "Establecer el panel en [[Value]]",
+	   "da": "Indstil dashboardet til [[Value]]",
+	   "ru": "Установить панель на [[Value]]",
+	   "pl": "Ustaw pulpit na [[Value]]",
+	   "ko": "대시보드를 [[Value]]로 설정",
+	   "ar": "تعيين لوحة التحكم إلى [[Value]]"
 	},
 	"titleFormatted": {
 	   "en": "Set Dashboard to [[dashboard]]",
-	   "nl": "Stel het dashboard in op [[dashboard]]"
+	   "nl": "Stel het dashboard in op [[dashboard]]",
+	   "de": "Dashboard auf [[dashboard]] einstellen",
+	   "fr": "Définir le tableau de bord sur [[dashboard]]",
+	   "it": "Imposta il dashboard su [[dashboard]]",
+	   "sv": "Ställ in instrumentpanelen till [[dashboard]]",
+	   "no": "Sett instrumentbordet til [[dashboard]]",
+	   "es": "Establecer el panel en [[dashboard]]",
+	   "da": "Indstil dashboardet til [[dashboard]]",
+	   "ru": "Установить панель на [[dashboard]]",
+	   "pl": "Ustaw pulpit na [[dashboard]]",
+	   "ko": "대시보드를 [[dashboard]]로 설정",
+	   "ar": "تعيين لوحة التحكم إلى [[dashboard]]"
 	},
     "args": [
         {
@@ -20,7 +42,18 @@
             "type": "autocomplete",
             "title": {
                 "en": "Dashboard",
-                "nl": "Dashboard"
+                "nl": "Dashboard",
+                "de": "Dashboard",
+                "fr": "Tableau de bord",
+                "it": "Dashboard",
+                "sv": "Instrumentpanel",
+                "no": "Instrumentbord",
+                "es": "Panel",
+                "da": "Dashboard",
+                "ru": "Панель",
+                "pl": "Pulpit",
+                "ko": "대시보드",
+                "ar": "لوحة التحكم"
             }
         }
 	]

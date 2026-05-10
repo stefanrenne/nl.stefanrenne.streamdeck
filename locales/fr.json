@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "À propos",
+            "dashboards": "Tableaux de bord",
+            "images": "Images",
+            "variables": "Variables"
+        },
+        "dashboard": {
+            "name": "Nom",
+            "action": "Action",
+            "add": "Créer un tableau de bord",
+            "editTitle": "Modifier",
+            "copyTitle": "Créer une copie",
+            "deleteTitle": "Supprimer",
+            "confirmDelete": "Êtes-vous sûr de vouloir supprimer le tableau de bord '__name__' ?",
+            "manage": {
+                "titleAdd": "Créer un tableau de bord",
+                "titleEdit": "Modifier le tableau de bord",
+                "name": "Nom",
+                "displayColomns": "Colonnes affichées",
+                "displayRows": "Lignes affichées",
+                "save": "Enregistrer",
+                "cancel": "Annuler"
+            },
+            "item": {
+                "title": "Sélectionner un élément",
+                "selectImage": "Sélectionner une image",
+                "selectImageError": "Aucune image disponible. Vous pouvez télécharger une image dans l'onglet 'Images'.",
+                "selectVariable": "Sélectionner une variable",
+                "selectVariableError": "Aucune variable disponible. Vous pouvez créer une variable dans l'onglet 'Variables'.",
+                "displayMode": "Action",
+                "none": "Vide",
+                "variable": "Variable",
+                "image": "Image",
+                "save": "Enregistrer",
+                "cancel": "Annuler",
+                "payload": {
+                    "title": "Charge utile",
+                    "description": "Vous pouvez définir ici des données supplémentaires qui seront exposées à un flux lorsque vous appuyez sur un bouton."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "Dans cet onglet, vous pouvez télécharger une image. Les images peuvent ensuite être assignées aux positions du tableau de bord Stream Deck.",
+            "title": "Image",
+            "name": "Nom",
+            "action": "Action",
+            "add": "Télécharger une image",
+            "editTitle": "Modifier",
+            "deleteTitle": "Supprimer",
+            "confirmDelete": "Êtes-vous sûr de vouloir supprimer l'image '__name__' ?",
+            "manage": {
+                "title": "Modifier l'image",
+                "name": "Nom",
+                "save": "Enregistrer",
+                "cancel": "Annuler"
+            }
+        },
+        "variable": {
+            "emptyError": "Dans cet onglet, vous pouvez créer une variable. Les variables sont des boutons avec une ou deux lignes de texte, et ces lignes peuvent être mises à jour depuis un flux.",
+            "title": "Variable",
+            "name": "Nom",
+            "action": "Action",
+            "add": "Créer une variable",
+            "editTitle": "Modifier",
+            "deleteTitle": "Supprimer",
+            "confirmDelete": "Êtes-vous sûr de vouloir supprimer la variable '__name__' ?",
+            "manage": {
+                "titleAdd": "Créer une variable",
+                "titleEdit": "Modifier la variable",
+                "inputName": "Nom",
+                "inputNameHint": "Nom unique utilisé pour mettre à jour la variable depuis un flux",
+                "save": "Enregistrer",
+                "cancel": "Annuler",
+                "inputLines": "Texte à afficher",
+                "inputLineHint": "Ces lignes peuvent aussi être modifiées depuis un flux",
+                "inputFirstLine": "Texte de la première ligne",
+                "inputSecondLine": "Texte optionnel de la deuxième ligne",
+                "backgroundColor": "Couleur de fond",
+                "textColor": "Couleur du texte"
+            }
+        }
+    }
+}

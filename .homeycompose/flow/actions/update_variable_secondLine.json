@@ -2,11 +2,33 @@
 	"id": "update_variable_secondline",
 	"title": {
 	   "en": "Update only the text of the second line of the variable.",
-	   "nl": "Wijzig alleen de tekst op de tweede regel van de variabele bij."
+	   "nl": "Wijzig alleen de tekst op de tweede regel van de variabele bij.",
+	   "de": "Nur den Text der zweiten Zeile der Variable aktualisieren.",
+	   "fr": "Mettre à jour uniquement le texte de la deuxième ligne de la variable.",
+	   "it": "Aggiorna solo il testo della seconda riga della variabile.",
+	   "sv": "Uppdatera bara texten på variabelns andra rad.",
+	   "no": "Oppdater bare teksten på andre linje i variabelen.",
+	   "es": "Actualizar solo el texto de la segunda línea de la variable.",
+	   "da": "Opdater kun teksten på variablens anden linje.",
+	   "ru": "Обновить только текст второй строки переменной.",
+	   "pl": "Zaktualizuj tylko tekst drugiej linii zmiennej.",
+	   "ko": "변수의 두 번째 줄 텍스트만 업데이트합니다.",
+	   "ar": "تحديث نص السطر الثاني فقط من المتغير."
 	},
 	"titleFormatted": {
 	   "en": "Update only the [[variable]]'s second line text to [[secondLine]]",
-	   "nl": "Wijzig alleen [[variable]]'s text op de tweede regel naar [[secondLine]]"
+	   "nl": "Wijzig alleen [[variable]]'s text op de tweede regel naar [[secondLine]]",
+	   "de": "Nur den Text der zweiten Zeile von [[variable]] auf [[secondLine]] aktualisieren",
+	   "fr": "Mettre à jour uniquement le texte de la deuxième ligne de [[variable]] à [[secondLine]]",
+	   "it": "Aggiorna solo il testo della seconda riga di [[variable]] a [[secondLine]]",
+	   "sv": "Uppdatera bara [[variable]]s andra rads text till [[secondLine]]",
+	   "no": "Oppdater bare teksten på [[variable]]s andre linje til [[secondLine]]",
+	   "es": "Actualizar solo el texto de la segunda línea de [[variable]] a [[secondLine]]",
+	   "da": "Opdater kun teksten på [[variable]]s anden linje til [[secondLine]]",
+	   "ru": "Обновить только текст второй строки [[variable]] до [[secondLine]]",
+	   "pl": "Zaktualizuj tylko tekst drugiej linii [[variable]] do [[secondLine]]",
+	   "ko": "[[variable]]의 두 번째 줄 텍스트만 [[secondLine]]으로 업데이트",
+	   "ar": "تحديث نص السطر الثاني فقط من [[variable]] إلى [[secondLine]]"
 	},
     "args": [
         {
@@ -15,7 +37,18 @@
             "type": "autocomplete",
             "title": {
                 "en": "Variable",
-                "nl": "Variabel"
+                "nl": "Variabel",
+                "de": "Variable",
+                "fr": "Variable",
+                "it": "Variabile",
+                "sv": "Variabel",
+                "no": "Variabel",
+                "es": "Variable",
+                "da": "Variabel",
+                "ru": "Переменная",
+                "pl": "Zmienna",
+                "ko": "변수",
+                "ar": "متغير"
             }
         },
         {
@@ -24,7 +57,18 @@
             "type": "text",
             "title": {
                 "en": "Optional second line text",
-                "nl": "Optionele tekst op de tweede regel"
+                "nl": "Optionele tekst op de tweede regel",
+                "de": "Optionaler Text der zweiten Zeile",
+                "fr": "Texte optionnel de la deuxième ligne",
+                "it": "Testo opzionale della seconda riga",
+                "sv": "Valfri text på andra raden",
+                "no": "Valgfri tekst på andre linje",
+                "es": "Texto opcional de la segunda línea",
+                "da": "Valgfri tekst på anden linje",
+                "ru": "Необязательный текст второй строки",
+                "pl": "Opcjonalny tekst drugiej linii",
+                "ko": "두 번째 줄 텍스트 (선택 사항)",
+                "ar": "نص السطر الثاني (اختياري)"
             }
         }
 	]

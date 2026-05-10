@@ -2,11 +2,33 @@
   "id": "variable_button_action",
   "title": {
     "en": "Variable button action",
-    "nl": "Variabel knop actie"
+    "nl": "Variabel knop actie",
+    "de": "Variablentastenaktion",
+    "fr": "Action du bouton variable",
+    "it": "Azione pulsante variabile",
+    "sv": "Variabelknappåtgärd",
+    "no": "Variabelknapphandling",
+    "es": "Acción del botón de variable",
+    "da": "Variabelknaphandling",
+    "ru": "Действие кнопки переменной",
+    "pl": "Akcja przycisku zmiennej",
+    "ko": "변수 버튼 동작",
+    "ar": "إجراء زر المتغير"
   },
 	"titleFormatted": {
     "en": "[[variable]] button [[action]]",
-    "nl": "[[variable]] knop [[action]]"
+    "nl": "[[variable]] knop [[action]]",
+    "de": "[[variable]] Taste [[action]]",
+    "fr": "[[variable]] bouton [[action]]",
+    "it": "[[variable]] pulsante [[action]]",
+    "sv": "[[variable]] knapp [[action]]",
+    "no": "[[variable]] knapp [[action]]",
+    "es": "[[variable]] botón [[action]]",
+    "da": "[[variable]] knap [[action]]",
+    "ru": "[[variable]] кнопка [[action]]",
+    "pl": "[[variable]] przycisk [[action]]",
+    "ko": "[[variable]] 버튼 [[action]]",
+    "ar": "[[variable]] زر [[action]]"
 	},
   "args": [
     {
@@ -19,44 +41,110 @@
       "required": true,
       "type": "autocomplete",
       "title": {
-          "en": "Variable",
-          "nl": "Variabel"
+        "en": "Variable",
+        "nl": "Variabel",
+        "de": "Variable",
+        "fr": "Variable",
+        "it": "Variabile",
+        "sv": "Variabel",
+        "no": "Variabel",
+        "es": "Variable",
+        "da": "Variabel",
+        "ru": "Переменная",
+        "pl": "Zmienna",
+        "ko": "변수",
+        "ar": "متغير"
       }
     },
     {
       "type": "dropdown",
       "name": "action",
-      "title": { 
+      "title": {
         "en": "Action",
-        "nl": "Actie"
+        "nl": "Actie",
+        "de": "Aktion",
+        "fr": "Action",
+        "it": "Azione",
+        "sv": "Åtgärd",
+        "no": "Handling",
+        "es": "Acción",
+        "da": "Handling",
+        "ru": "Действие",
+        "pl": "Akcja",
+        "ko": "동작",
+        "ar": "الإجراء"
       },
       "values": [
-        { 
-          "id": "down", 
-          "title": { 
+        {
+          "id": "down",
+          "title": {
             "en": "pressed",
-            "nl": "ingedrukt" 
+            "nl": "ingedrukt",
+            "de": "gedrückt",
+            "fr": "appuyé",
+            "it": "premuto",
+            "sv": "tryckt",
+            "no": "trykket",
+            "es": "presionado",
+            "da": "trykket",
+            "ru": "нажата",
+            "pl": "wciśnięty",
+            "ko": "눌림",
+            "ar": "مضغوط"
           }
         },
-        { 
-          "id": "up", 
-          "title": { 
+        {
+          "id": "up",
+          "title": {
             "en": "released",
-            "nl": "losgelaten" 
+            "nl": "losgelaten",
+            "de": "losgelassen",
+            "fr": "relâché",
+            "it": "rilasciato",
+            "sv": "släppt",
+            "no": "sluppet",
+            "es": "soltado",
+            "da": "frigivet",
+            "ru": "отпущена",
+            "pl": "zwolniony",
+            "ko": "놓임",
+            "ar": "محرر"
           }
         },
-        { 
-          "id": "single", 
-          "title": { 
+        {
+          "id": "single",
+          "title": {
             "en": "single pressed",
-            "nl": "één keer ingedrukt" 
+            "nl": "één keer ingedrukt",
+            "de": "einmal gedrückt",
+            "fr": "appui simple",
+            "it": "premuto una volta",
+            "sv": "enkelklickat",
+            "no": "enkelt trykket",
+            "es": "presionado una vez",
+            "da": "enkelt tryk",
+            "ru": "одиночное нажатие",
+            "pl": "pojedyncze wciśnięcie",
+            "ko": "한 번 누름",
+            "ar": "ضغطة واحدة"
           }
         },
-        { 
-          "id": "double", 
-          "title": { 
+        {
+          "id": "double",
+          "title": {
             "en": "double pressed",
-            "nl": "dubbel ingedrukt" 
+            "nl": "dubbel ingedrukt",
+            "de": "doppelt gedrückt",
+            "fr": "double appui",
+            "it": "premuto due volte",
+            "sv": "dubbelklickat",
+            "no": "dobbelt trykket",
+            "es": "presionado dos veces",
+            "da": "dobbelt tryk",
+            "ru": "двойное нажатие",
+            "pl": "podwójne wciśnięcie",
+            "ko": "두 번 누름",
+            "ar": "ضغطة مزدوجة"
           }
         }
       ]
@@ -68,7 +156,18 @@
       "name": "dashboard",
       "title": {
         "en": "Dashboard",
-        "nl": "Dashboard"
+        "nl": "Dashboard",
+        "de": "Dashboard",
+        "fr": "Tableau de bord",
+        "it": "Dashboard",
+        "sv": "Instrumentpanel",
+        "no": "Instrumentbord",
+        "es": "Panel",
+        "da": "Dashboard",
+        "ru": "Панель",
+        "pl": "Pulpit",
+        "ko": "대시보드",
+        "ar": "لوحة التحكم"
       }
     },
     {
@@ -76,7 +175,18 @@
       "name": "textFirstLine",
       "title": {
         "en": "Text on the first line",
-        "nl": "Tekst op de eerste regel"
+        "nl": "Tekst op de eerste regel",
+        "de": "Text in der ersten Zeile",
+        "fr": "Texte sur la première ligne",
+        "it": "Testo sulla prima riga",
+        "sv": "Text på första raden",
+        "no": "Tekst på første linje",
+        "es": "Texto en la primera línea",
+        "da": "Tekst på første linje",
+        "ru": "Текст в первой строке",
+        "pl": "Tekst w pierwszej linii",
+        "ko": "첫 번째 줄 텍스트",
+        "ar": "النص في السطر الأول"
       }
     },
     {
@@ -84,7 +194,18 @@
       "name": "textSecondLine",
       "title": {
         "en": "Text on the second line",
-        "nl": "Tekst op de tweede regel"
+        "nl": "Tekst op de tweede regel",
+        "de": "Text in der zweiten Zeile",
+        "fr": "Texte sur la deuxième ligne",
+        "it": "Testo sulla seconda riga",
+        "sv": "Text på andra raden",
+        "no": "Tekst på andre linje",
+        "es": "Texto en la segunda línea",
+        "da": "Tekst på anden linje",
+        "ru": "Текст во второй строке",
+        "pl": "Tekst w drugiej linii",
+        "ko": "두 번째 줄 텍스트",
+        "ar": "النص في السطر الثاني"
       }
     },
     {
@@ -92,7 +213,18 @@
       "name": "payload",
       "title": {
         "en": "Payload",
-        "nl": "Payload"
+        "nl": "Payload",
+        "de": "Payload",
+        "fr": "Charge utile",
+        "it": "Payload",
+        "sv": "Nyttolast",
+        "no": "Nyttelast",
+        "es": "Carga útil",
+        "da": "Nyttelast",
+        "ru": "Данные",
+        "pl": "Ładunek",
+        "ko": "페이로드",
+        "ar": "البيانات المرسلة"
       }
     },
     {
@@ -100,7 +232,18 @@
       "name": "column",
       "title": {
         "en": "Column",
-        "nl": "Kolom"
+        "nl": "Kolom",
+        "de": "Spalte",
+        "fr": "Colonne",
+        "it": "Colonna",
+        "sv": "Kolumn",
+        "no": "Kolonne",
+        "es": "Columna",
+        "da": "Kolonne",
+        "ru": "Столбец",
+        "pl": "Kolumna",
+        "ko": "열",
+        "ar": "العمود"
       }
     },
     {
@@ -108,7 +251,18 @@
       "name": "row",
       "title": {
         "en": "Row",
-        "nl": "Rij"
+        "nl": "Rij",
+        "de": "Zeile",
+        "fr": "Ligne",
+        "it": "Riga",
+        "sv": "Rad",
+        "no": "Rad",
+        "es": "Fila",
+        "da": "Række",
+        "ru": "Строка",
+        "pl": "Wiersz",
+        "ko": "행",
+        "ar": "الصف"
       }
     }
   ]

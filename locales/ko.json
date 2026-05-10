@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "정보",
+            "dashboards": "대시보드",
+            "images": "이미지",
+            "variables": "변수"
+        },
+        "dashboard": {
+            "name": "이름",
+            "action": "작업",
+            "add": "대시보드 만들기",
+            "editTitle": "편집",
+            "copyTitle": "복사본 만들기",
+            "deleteTitle": "삭제",
+            "confirmDelete": "대시보드 '__name__'을(를) 삭제하시겠습니까?",
+            "manage": {
+                "titleAdd": "대시보드 만들기",
+                "titleEdit": "대시보드 편집",
+                "name": "이름",
+                "displayColomns": "표시 열",
+                "displayRows": "표시 행",
+                "save": "저장",
+                "cancel": "취소"
+            },
+            "item": {
+                "title": "항목 선택",
+                "selectImage": "이미지 선택",
+                "selectImageError": "사용 가능한 이미지가 없습니다. '이미지' 탭에서 이미지를 업로드할 수 있습니다.",
+                "selectVariable": "변수 선택",
+                "selectVariableError": "사용 가능한 변수가 없습니다. '변수' 탭에서 변수를 만들 수 있습니다.",
+                "displayMode": "작업",
+                "none": "비어 있음",
+                "variable": "변수",
+                "image": "이미지",
+                "save": "저장",
+                "cancel": "취소",
+                "payload": {
+                    "title": "페이로드",
+                    "description": "버튼을 누를 때 플로우에 전달될 추가 데이터를 여기서 정의할 수 있습니다."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "이 탭에서 이미지를 업로드할 수 있습니다. 업로드된 이미지는 Stream Deck 대시보드 위치에 할당할 수 있습니다.",
+            "title": "이미지",
+            "name": "이름",
+            "action": "작업",
+            "add": "이미지 업로드",
+            "editTitle": "편집",
+            "deleteTitle": "삭제",
+            "confirmDelete": "이미지 '__name__'을(를) 삭제하시겠습니까?",
+            "manage": {
+                "title": "이미지 편집",
+                "name": "이름",
+                "save": "저장",
+                "cancel": "취소"
+            }
+        },
+        "variable": {
+            "emptyError": "이 탭에서 변수를 만들 수 있습니다. 변수는 한두 줄의 텍스트가 있는 버튼이며, 해당 텍스트 줄은 플로우에서 업데이트할 수 있습니다.",
+            "title": "변수",
+            "name": "이름",
+            "action": "작업",
+            "add": "변수 만들기",
+            "editTitle": "편집",
+            "deleteTitle": "삭제",
+            "confirmDelete": "변수 '__name__'을(를) 삭제하시겠습니까?",
+            "manage": {
+                "titleAdd": "변수 만들기",
+                "titleEdit": "변수 편집",
+                "inputName": "이름",
+                "inputNameHint": "플로우에서 변수를 업데이트하는 데 사용되는 고유한 이름",
+                "save": "저장",
+                "cancel": "취소",
+                "inputLines": "표시할 텍스트",
+                "inputLineHint": "이 줄은 플로우에서도 변경할 수 있습니다",
+                "inputFirstLine": "첫 번째 줄 텍스트",
+                "inputSecondLine": "두 번째 줄 텍스트 (선택 사항)",
+                "backgroundColor": "배경색",
+                "textColor": "텍스트 색상"
+            }
+        }
+    }
+}

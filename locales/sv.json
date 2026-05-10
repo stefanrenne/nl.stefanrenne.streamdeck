@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Om",
+            "dashboards": "Instrumentpaneler",
+            "images": "Bilder",
+            "variables": "Variabler"
+        },
+        "dashboard": {
+            "name": "Namn",
+            "action": "Åtgärd",
+            "add": "Skapa instrumentpanel",
+            "editTitle": "Redigera",
+            "copyTitle": "Skapa kopia",
+            "deleteTitle": "Ta bort",
+            "confirmDelete": "Är du säker på att du vill ta bort instrumentpanelen '__name__'?",
+            "manage": {
+                "titleAdd": "Skapa instrumentpanel",
+                "titleEdit": "Redigera instrumentpanel",
+                "name": "Namn",
+                "displayColomns": "Visa kolumner",
+                "displayRows": "Visa rader",
+                "save": "Spara",
+                "cancel": "Avbryt"
+            },
+            "item": {
+                "title": "Välj objekt",
+                "selectImage": "Välj bild",
+                "selectImageError": "Inga bilder tillgängliga. Du kan ladda upp en bild i fliken 'Bilder'.",
+                "selectVariable": "Välj variabel",
+                "selectVariableError": "Inga variabler tillgängliga. Du kan skapa en variabel i fliken 'Variabler'.",
+                "displayMode": "Åtgärd",
+                "none": "Tom",
+                "variable": "Variabel",
+                "image": "Bild",
+                "save": "Spara",
+                "cancel": "Avbryt",
+                "payload": {
+                    "title": "Nyttolast",
+                    "description": "Här kan du definiera ytterligare data som exponeras för ett flöde när du trycker på en knapp."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "I den här fliken kan du ladda upp en bild. Bilder kan sedan tilldelas positioner på Stream Deck-instrumentpanelen.",
+            "title": "Bild",
+            "name": "Namn",
+            "action": "Åtgärd",
+            "add": "Ladda upp bild",
+            "editTitle": "Redigera",
+            "deleteTitle": "Ta bort",
+            "confirmDelete": "Är du säker på att du vill ta bort bilden '__name__'?",
+            "manage": {
+                "title": "Redigera bild",
+                "name": "Namn",
+                "save": "Spara",
+                "cancel": "Avbryt"
+            }
+        },
+        "variable": {
+            "emptyError": "I den här fliken kan du skapa en variabel. Variabler är knappar med en eller två textrader, och dessa textrader kan uppdateras från ett flöde.",
+            "title": "Variabel",
+            "name": "Namn",
+            "action": "Åtgärd",
+            "add": "Skapa variabel",
+            "editTitle": "Redigera",
+            "deleteTitle": "Ta bort",
+            "confirmDelete": "Är du säker på att du vill ta bort variabeln '__name__'?",
+            "manage": {
+                "titleAdd": "Skapa variabel",
+                "titleEdit": "Redigera variabel",
+                "inputName": "Namn",
+                "inputNameHint": "Unikt namn som används för att uppdatera variabeln från ett flöde",
+                "save": "Spara",
+                "cancel": "Avbryt",
+                "inputLines": "Text att visa",
+                "inputLineHint": "Dessa rader kan också ändras från ett flöde",
+                "inputFirstLine": "Text på första raden",
+                "inputSecondLine": "Valfri text på andra raden",
+                "backgroundColor": "Bakgrundsfärg",
+                "textColor": "Textfärg"
+            }
+        }
+    }
+}

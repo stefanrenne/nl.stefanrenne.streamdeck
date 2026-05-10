@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "O aplikacji",
+            "dashboards": "Pulpity",
+            "images": "Obrazy",
+            "variables": "Zmienne"
+        },
+        "dashboard": {
+            "name": "Nazwa",
+            "action": "Akcja",
+            "add": "Utwórz pulpit",
+            "editTitle": "Edytuj",
+            "copyTitle": "Utwórz kopię",
+            "deleteTitle": "Usuń",
+            "confirmDelete": "Czy na pewno chcesz usunąć pulpit '__name__'?",
+            "manage": {
+                "titleAdd": "Utwórz pulpit",
+                "titleEdit": "Edytuj pulpit",
+                "name": "Nazwa",
+                "displayColomns": "Wyświetl kolumny",
+                "displayRows": "Wyświetl wiersze",
+                "save": "Zapisz",
+                "cancel": "Anuluj"
+            },
+            "item": {
+                "title": "Wybierz element",
+                "selectImage": "Wybierz obraz",
+                "selectImageError": "Brak dostępnych obrazów. Możesz przesłać obraz w zakładce 'Obrazy'.",
+                "selectVariable": "Wybierz zmienną",
+                "selectVariableError": "Brak dostępnych zmiennych. Możesz utworzyć zmienną w zakładce 'Zmienne'.",
+                "displayMode": "Akcja",
+                "none": "Pusty",
+                "variable": "Zmienna",
+                "image": "Obraz",
+                "save": "Zapisz",
+                "cancel": "Anuluj",
+                "payload": {
+                    "title": "Ładunek",
+                    "description": "Tutaj możesz zdefiniować dodatkowe dane, które zostaną przekazane do przepływu po naciśnięciu przycisku."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "W tej zakładce możesz przesłać obraz. Obrazy można następnie przypisać do pozycji na pulpicie Stream Deck.",
+            "title": "Obraz",
+            "name": "Nazwa",
+            "action": "Akcja",
+            "add": "Prześlij obraz",
+            "editTitle": "Edytuj",
+            "deleteTitle": "Usuń",
+            "confirmDelete": "Czy na pewno chcesz usunąć obraz '__name__'?",
+            "manage": {
+                "title": "Edytuj obraz",
+                "name": "Nazwa",
+                "save": "Zapisz",
+                "cancel": "Anuluj"
+            }
+        },
+        "variable": {
+            "emptyError": "W tej zakładce możesz utworzyć zmienną. Zmienne to przyciski z jedną lub dwiema liniami tekstu, które można aktualizować z przepływu.",
+            "title": "Zmienna",
+            "name": "Nazwa",
+            "action": "Akcja",
+            "add": "Utwórz zmienną",
+            "editTitle": "Edytuj",
+            "deleteTitle": "Usuń",
+            "confirmDelete": "Czy na pewno chcesz usunąć zmienną '__name__'?",
+            "manage": {
+                "titleAdd": "Utwórz zmienną",
+                "titleEdit": "Edytuj zmienną",
+                "inputName": "Nazwa",
+                "inputNameHint": "Unikalna nazwa używana do aktualizacji zmiennej z przepływu",
+                "save": "Zapisz",
+                "cancel": "Anuluj",
+                "inputLines": "Tekst do wyświetlenia",
+                "inputLineHint": "Te linie można również zmienić z przepływu",
+                "inputFirstLine": "Tekst pierwszej linii",
+                "inputSecondLine": "Opcjonalny tekst drugiej linii",
+                "backgroundColor": "Kolor tła",
+                "textColor": "Kolor tekstu"
+            }
+        }
+    }
+}

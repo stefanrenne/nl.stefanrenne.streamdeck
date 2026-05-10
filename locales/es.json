@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Acerca de",
+            "dashboards": "Paneles",
+            "images": "Imágenes",
+            "variables": "Variables"
+        },
+        "dashboard": {
+            "name": "Nombre",
+            "action": "Acción",
+            "add": "Crear panel",
+            "editTitle": "Editar",
+            "copyTitle": "Crear copia",
+            "deleteTitle": "Eliminar",
+            "confirmDelete": "¿Estás seguro de que quieres eliminar el panel '__name__'?",
+            "manage": {
+                "titleAdd": "Crear panel",
+                "titleEdit": "Editar panel",
+                "name": "Nombre",
+                "displayColomns": "Columnas visibles",
+                "displayRows": "Filas visibles",
+                "save": "Guardar",
+                "cancel": "Cancelar"
+            },
+            "item": {
+                "title": "Seleccionar elemento",
+                "selectImage": "Seleccionar imagen",
+                "selectImageError": "No hay imágenes disponibles. Puedes subir una imagen en la pestaña 'Imágenes'.",
+                "selectVariable": "Seleccionar variable",
+                "selectVariableError": "No hay variables disponibles. Puedes crear una variable en la pestaña 'Variables'.",
+                "displayMode": "Acción",
+                "none": "Vacío",
+                "variable": "Variable",
+                "image": "Imagen",
+                "save": "Guardar",
+                "cancel": "Cancelar",
+                "payload": {
+                    "title": "Carga útil",
+                    "description": "Aquí puedes definir datos adicionales que se expondrán a un flujo cuando pulses un botón."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "En esta pestaña puedes subir una imagen. Las imágenes pueden asignarse a posiciones del panel de Stream Deck.",
+            "title": "Imagen",
+            "name": "Nombre",
+            "action": "Acción",
+            "add": "Subir imagen",
+            "editTitle": "Editar",
+            "deleteTitle": "Eliminar",
+            "confirmDelete": "¿Estás seguro de que quieres eliminar la imagen '__name__'?",
+            "manage": {
+                "title": "Editar imagen",
+                "name": "Nombre",
+                "save": "Guardar",
+                "cancel": "Cancelar"
+            }
+        },
+        "variable": {
+            "emptyError": "En esta pestaña puedes crear una variable. Las variables son botones con una o dos líneas de texto, y esas líneas pueden actualizarse desde un flujo.",
+            "title": "Variable",
+            "name": "Nombre",
+            "action": "Acción",
+            "add": "Crear variable",
+            "editTitle": "Editar",
+            "deleteTitle": "Eliminar",
+            "confirmDelete": "¿Estás seguro de que quieres eliminar la variable '__name__'?",
+            "manage": {
+                "titleAdd": "Crear variable",
+                "titleEdit": "Editar variable",
+                "inputName": "Nombre",
+                "inputNameHint": "Nombre único utilizado para actualizar la variable desde un flujo",
+                "save": "Guardar",
+                "cancel": "Cancelar",
+                "inputLines": "Texto a mostrar",
+                "inputLineHint": "Estas líneas también pueden cambiarse desde un flujo",
+                "inputFirstLine": "Texto de la primera línea",
+                "inputSecondLine": "Texto opcional de la segunda línea",
+                "backgroundColor": "Color de fondo",
+                "textColor": "Color del texto"
+            }
+        }
+    }
+}

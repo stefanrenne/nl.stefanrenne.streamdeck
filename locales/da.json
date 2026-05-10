@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Om",
+            "dashboards": "Dashboards",
+            "images": "Billeder",
+            "variables": "Variabler"
+        },
+        "dashboard": {
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Opret dashboard",
+            "editTitle": "Rediger",
+            "copyTitle": "Opret kopi",
+            "deleteTitle": "Slet",
+            "confirmDelete": "Er du sikker på, at du vil slette dashboardet '__name__'?",
+            "manage": {
+                "titleAdd": "Opret dashboard",
+                "titleEdit": "Rediger dashboard",
+                "name": "Navn",
+                "displayColomns": "Vis kolonner",
+                "displayRows": "Vis rækker",
+                "save": "Gem",
+                "cancel": "Annuller"
+            },
+            "item": {
+                "title": "Vælg element",
+                "selectImage": "Vælg billede",
+                "selectImageError": "Ingen billeder tilgængelige. Du kan uploade et billede under fanen 'Billeder'.",
+                "selectVariable": "Vælg variabel",
+                "selectVariableError": "Ingen variabler tilgængelige. Du kan oprette en variabel under fanen 'Variabler'.",
+                "displayMode": "Handling",
+                "none": "Tom",
+                "variable": "Variabel",
+                "image": "Billede",
+                "save": "Gem",
+                "cancel": "Annuller",
+                "payload": {
+                    "title": "Nyttelast",
+                    "description": "Her kan du definere yderligere data, der vil blive eksponeret for et flow, når du trykker på en knap."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "Under denne fane kan du uploade et billede. Billeder kan derefter tildeles positioner på Stream Deck-dashboardet.",
+            "title": "Billede",
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Upload billede",
+            "editTitle": "Rediger",
+            "deleteTitle": "Slet",
+            "confirmDelete": "Er du sikker på, at du vil slette billedet '__name__'?",
+            "manage": {
+                "title": "Rediger billede",
+                "name": "Navn",
+                "save": "Gem",
+                "cancel": "Annuller"
+            }
+        },
+        "variable": {
+            "emptyError": "Under denne fane kan du oprette en variabel. Variabler er knapper med én eller to tekstlinjer, og disse tekstlinjer kan opdateres fra et flow.",
+            "title": "Variabel",
+            "name": "Navn",
+            "action": "Handling",
+            "add": "Opret variabel",
+            "editTitle": "Rediger",
+            "deleteTitle": "Slet",
+            "confirmDelete": "Er du sikker på, at du vil slette variablen '__name__'?",
+            "manage": {
+                "titleAdd": "Opret variabel",
+                "titleEdit": "Rediger variabel",
+                "inputName": "Navn",
+                "inputNameHint": "Unikt navn, der bruges til at opdatere variablen fra et flow",
+                "save": "Gem",
+                "cancel": "Annuller",
+                "inputLines": "Tekst der skal vises",
+                "inputLineHint": "Disse linjer kan også ændres fra et flow",
+                "inputFirstLine": "Tekst på første linje",
+                "inputSecondLine": "Valgfri tekst på anden linje",
+                "backgroundColor": "Baggrundsfarve",
+                "textColor": "Tekstfarve"
+            }
+        }
+    }
+}

@@ -2,11 +2,33 @@
   "id": "off_button_action",
 	"title": {
     "en": "Disabled button action",
-    "nl": "Uitgeschakelde knop actie"
+    "nl": "Uitgeschakelde knop actie",
+    "de": "Deaktivierte Tastenaktion",
+    "fr": "Action du bouton désactivé",
+    "it": "Azione pulsante disabilitato",
+    "sv": "Inaktiverad knappåtgärd",
+    "no": "Deaktivert knapphandling",
+    "es": "Acción del botón desactivado",
+    "da": "Deaktiveret knaphandling",
+    "ru": "Действие отключённой кнопки",
+    "pl": "Akcja wyłączonego przycisku",
+    "ko": "비활성화된 버튼 동작",
+    "ar": "إجراء الزر المعطل"
 	},
 	"titleFormatted": {
     "en": "Disabled button [[action]]",
-    "nl": "Uitgeschakelde knop [[action]]"
+    "nl": "Uitgeschakelde knop [[action]]",
+    "de": "Deaktivierte Taste [[action]]",
+    "fr": "Bouton désactivé [[action]]",
+    "it": "Pulsante disabilitato [[action]]",
+    "sv": "Inaktiverad knapp [[action]]",
+    "no": "Deaktivert knapp [[action]]",
+    "es": "Botón desactivado [[action]]",
+    "da": "Deaktiveret knap [[action]]",
+    "ru": "Отключённая кнопка [[action]]",
+    "pl": "Wyłączony przycisk [[action]]",
+    "ko": "비활성화된 버튼 [[action]]",
+    "ar": "الزر المعطل [[action]]"
 	},
   "args": [
     {
@@ -17,37 +39,92 @@
     {
       "type": "dropdown",
       "name": "action",
-      "title": { 
+      "title": {
         "en": "Action",
-        "nl": "Actie"
+        "nl": "Actie",
+        "de": "Aktion",
+        "fr": "Action",
+        "it": "Azione",
+        "sv": "Åtgärd",
+        "no": "Handling",
+        "es": "Acción",
+        "da": "Handling",
+        "ru": "Действие",
+        "pl": "Akcja",
+        "ko": "동작",
+        "ar": "الإجراء"
       },
       "values": [
-        { 
-          "id": "down", 
-          "title": { 
+        {
+          "id": "down",
+          "title": {
             "en": "pressed",
-            "nl": "ingedrukt" 
+            "nl": "ingedrukt",
+            "de": "gedrückt",
+            "fr": "appuyé",
+            "it": "premuto",
+            "sv": "tryckt",
+            "no": "trykket",
+            "es": "presionado",
+            "da": "trykket",
+            "ru": "нажата",
+            "pl": "wciśnięty",
+            "ko": "눌림",
+            "ar": "مضغوط"
           }
         },
-        { 
-          "id": "up", 
-          "title": { 
+        {
+          "id": "up",
+          "title": {
             "en": "released",
-            "nl": "losgelaten" 
+            "nl": "losgelaten",
+            "de": "losgelassen",
+            "fr": "relâché",
+            "it": "rilasciato",
+            "sv": "släppt",
+            "no": "sluppet",
+            "es": "soltado",
+            "da": "frigivet",
+            "ru": "отпущена",
+            "pl": "zwolniony",
+            "ko": "놓임",
+            "ar": "محرر"
           }
         },
-        { 
-          "id": "single", 
-          "title": { 
+        {
+          "id": "single",
+          "title": {
             "en": "single pressed",
-            "nl": "één keer ingedrukt" 
+            "nl": "één keer ingedrukt",
+            "de": "einmal gedrückt",
+            "fr": "appui simple",
+            "it": "premuto una volta",
+            "sv": "enkelklickat",
+            "no": "enkelt trykket",
+            "es": "presionado una vez",
+            "da": "enkelt tryk",
+            "ru": "одиночное нажатие",
+            "pl": "pojedyncze wciśnięcie",
+            "ko": "한 번 누름",
+            "ar": "ضغطة واحدة"
           }
         },
-        { 
-          "id": "double", 
-          "title": { 
+        {
+          "id": "double",
+          "title": {
             "en": "double pressed",
-            "nl": "dubbel ingedrukt" 
+            "nl": "dubbel ingedrukt",
+            "de": "doppelt gedrückt",
+            "fr": "double appui",
+            "it": "premuto due volte",
+            "sv": "dubbelklickat",
+            "no": "dobbelt trykket",
+            "es": "presionado dos veces",
+            "da": "dobbelt tryk",
+            "ru": "двойное нажатие",
+            "pl": "podwójne wciśnięcie",
+            "ko": "두 번 누름",
+            "ar": "ضغطة مزدوجة"
           }
         }
       ]
@@ -59,7 +136,18 @@
       "name": "column",
       "title": {
         "en": "Column",
-        "nl": "Kolom"
+        "nl": "Kolom",
+        "de": "Spalte",
+        "fr": "Colonne",
+        "it": "Colonna",
+        "sv": "Kolumn",
+        "no": "Kolonne",
+        "es": "Columna",
+        "da": "Kolonne",
+        "ru": "Столбец",
+        "pl": "Kolumna",
+        "ko": "열",
+        "ar": "العمود"
       }
     },
     {
@@ -67,7 +155,18 @@
       "name": "row",
       "title": {
         "en": "Row",
-        "nl": "Rij"
+        "nl": "Rij",
+        "de": "Zeile",
+        "fr": "Ligne",
+        "it": "Riga",
+        "sv": "Rad",
+        "no": "Rad",
+        "es": "Fila",
+        "da": "Række",
+        "ru": "Строка",
+        "pl": "Wiersz",
+        "ko": "행",
+        "ar": "الصف"
       }
     }
   ]

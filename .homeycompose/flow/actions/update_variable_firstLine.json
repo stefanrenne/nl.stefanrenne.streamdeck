@@ -2,11 +2,33 @@
 	"id": "update_variable_firstline",
 	"title": {
 	   "en": "Update only the text of the first line of the variable.",
-	   "nl": "Wijzig alleen de tekst op de eerste regel van de variabele bij."
+	   "nl": "Wijzig alleen de tekst op de eerste regel van de variabele bij.",
+	   "de": "Nur den Text der ersten Zeile der Variable aktualisieren.",
+	   "fr": "Mettre à jour uniquement le texte de la première ligne de la variable.",
+	   "it": "Aggiorna solo il testo della prima riga della variabile.",
+	   "sv": "Uppdatera bara texten på variabelns första rad.",
+	   "no": "Oppdater bare teksten på første linje i variabelen.",
+	   "es": "Actualizar solo el texto de la primera línea de la variable.",
+	   "da": "Opdater kun teksten på variablens første linje.",
+	   "ru": "Обновить только текст первой строки переменной.",
+	   "pl": "Zaktualizuj tylko tekst pierwszej linii zmiennej.",
+	   "ko": "변수의 첫 번째 줄 텍스트만 업데이트합니다.",
+	   "ar": "تحديث نص السطر الأول فقط من المتغير."
 	},
 	"titleFormatted": {
 	   "en": "Update only the [[variable]]'s first line text to [[firstLine]]",
-	   "nl": "Wijzig alleen [[variable]]'s text op de eerste regel naar [[firstLine]]"
+	   "nl": "Wijzig alleen [[variable]]'s text op de eerste regel naar [[firstLine]]",
+	   "de": "Nur den Text der ersten Zeile von [[variable]] auf [[firstLine]] aktualisieren",
+	   "fr": "Mettre à jour uniquement le texte de la première ligne de [[variable]] à [[firstLine]]",
+	   "it": "Aggiorna solo il testo della prima riga di [[variable]] a [[firstLine]]",
+	   "sv": "Uppdatera bara [[variable]]s första rads text till [[firstLine]]",
+	   "no": "Oppdater bare teksten på [[variable]]s første linje til [[firstLine]]",
+	   "es": "Actualizar solo el texto de la primera línea de [[variable]] a [[firstLine]]",
+	   "da": "Opdater kun teksten på [[variable]]s første linje til [[firstLine]]",
+	   "ru": "Обновить только текст первой строки [[variable]] до [[firstLine]]",
+	   "pl": "Zaktualizuj tylko tekst pierwszej linii [[variable]] do [[firstLine]]",
+	   "ko": "[[variable]]의 첫 번째 줄 텍스트만 [[firstLine]]으로 업데이트",
+	   "ar": "تحديث نص السطر الأول فقط من [[variable]] إلى [[firstLine]]"
 	},
     "args": [
         {
@@ -15,7 +37,18 @@
             "type": "autocomplete",
             "title": {
                 "en": "Variable",
-                "nl": "Variabel"
+                "nl": "Variabel",
+                "de": "Variable",
+                "fr": "Variable",
+                "it": "Variabile",
+                "sv": "Variabel",
+                "no": "Variabel",
+                "es": "Variable",
+                "da": "Variabel",
+                "ru": "Переменная",
+                "pl": "Zmienna",
+                "ko": "변수",
+                "ar": "متغير"
             }
         },
         {
@@ -24,7 +57,18 @@
             "type": "text",
             "title": {
                 "en": "First line text",
-                "nl": "Tekst op de eerste regel"
+                "nl": "Tekst op de eerste regel",
+                "de": "Text der ersten Zeile",
+                "fr": "Texte de la première ligne",
+                "it": "Testo della prima riga",
+                "sv": "Text på första raden",
+                "no": "Tekst på første linje",
+                "es": "Texto de la primera línea",
+                "da": "Tekst på første linje",
+                "ru": "Текст первой строки",
+                "pl": "Tekst pierwszej linii",
+                "ko": "첫 번째 줄 텍스트",
+                "ar": "نص السطر الأول"
             }
         }
 	]

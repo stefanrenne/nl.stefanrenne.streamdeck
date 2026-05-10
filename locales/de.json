@@ -1,0 +1,85 @@
+{
+    "settings": {
+        "tab": {
+            "about": "Über",
+            "dashboards": "Dashboards",
+            "images": "Bilder",
+            "variables": "Variablen"
+        },
+        "dashboard": {
+            "name": "Name",
+            "action": "Aktion",
+            "add": "Dashboard erstellen",
+            "editTitle": "Bearbeiten",
+            "copyTitle": "Kopie erstellen",
+            "deleteTitle": "Löschen",
+            "confirmDelete": "Möchtest du das Dashboard '__name__' wirklich löschen?",
+            "manage": {
+                "titleAdd": "Dashboard erstellen",
+                "titleEdit": "Dashboard bearbeiten",
+                "name": "Name",
+                "displayColomns": "Spalten anzeigen",
+                "displayRows": "Zeilen anzeigen",
+                "save": "Speichern",
+                "cancel": "Abbrechen"
+            },
+            "item": {
+                "title": "Element auswählen",
+                "selectImage": "Bild auswählen",
+                "selectImageError": "Keine Bilder verfügbar. Du kannst ein Bild im Tab 'Bilder' hochladen.",
+                "selectVariable": "Variable auswählen",
+                "selectVariableError": "Keine Variablen verfügbar. Du kannst eine Variable im Tab 'Variablen' erstellen.",
+                "displayMode": "Aktion",
+                "none": "Leer",
+                "variable": "Variable",
+                "image": "Bild",
+                "save": "Speichern",
+                "cancel": "Abbrechen",
+                "payload": {
+                    "title": "Payload",
+                    "description": "Hier kannst du zusätzliche Daten definieren, die einem Flow zur Verfügung gestellt werden, wenn du eine Taste drückst."
+                }
+            }
+        },
+        "image": {
+            "emptyError": "In diesem Tab kannst du ein Bild hochladen. Bilder können dann Stream-Deck-Dashboard-Positionen zugewiesen werden.",
+            "title": "Bild",
+            "name": "Name",
+            "action": "Aktion",
+            "add": "Bild hochladen",
+            "editTitle": "Bearbeiten",
+            "deleteTitle": "Löschen",
+            "confirmDelete": "Möchtest du das Bild '__name__' wirklich löschen?",
+            "manage": {
+                "title": "Bild bearbeiten",
+                "name": "Name",
+                "save": "Speichern",
+                "cancel": "Abbrechen"
+            }
+        },
+        "variable": {
+            "emptyError": "In diesem Tab kannst du eine Variable erstellen. Variablen sind Tasten mit einer oder zwei Textzeilen, die aus einem Flow heraus aktualisiert werden können.",
+            "title": "Variable",
+            "name": "Name",
+            "action": "Aktion",
+            "add": "Variable erstellen",
+            "editTitle": "Bearbeiten",
+            "deleteTitle": "Löschen",
+            "confirmDelete": "Möchtest du die Variable '__name__' wirklich löschen?",
+            "manage": {
+                "titleAdd": "Variable erstellen",
+                "titleEdit": "Variable bearbeiten",
+                "inputName": "Name",
+                "inputNameHint": "Eindeutiger Name, der verwendet wird, um die Variable aus einem Flow heraus zu aktualisieren",
+                "save": "Speichern",
+                "cancel": "Abbrechen",
+                "inputLines": "Anzuzeigender Text",
+                "inputLineHint": "Diese Zeilen können auch aus einem Flow heraus geändert werden",
+                "inputFirstLine": "Text der ersten Zeile",
+                "inputSecondLine": "Optionaler Text der zweiten Zeile",
+                "backgroundColor": "Hintergrundfarbe",
+                "textColor": "Textfarbe"
+            }
+        }
+    }
+}

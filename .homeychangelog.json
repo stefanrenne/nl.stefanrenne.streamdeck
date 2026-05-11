@@ -40,5 +40,8 @@
   },
   "1.1.5": {
     "en": "Added support for Streamdeck Neo"
+  },
+  "1.1.6": {
+    "en": "Improved translations and UI polish"
   }
 }

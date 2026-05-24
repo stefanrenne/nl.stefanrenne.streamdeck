@@ -231,7 +231,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
     const button = this.dashboard?.items[control.index+1];
     var state = { action: event, variableId: '', imageId: '' }
-    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1 }
+    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
     
     if (!isTurnedOn) {
       await this.onOffButtonAction.trigger(this, tokens, state);

@@ -264,6 +264,25 @@
         "ko": "행",
         "ar": "الصف"
       }
+    },
+    {
+      "type": "string",
+      "name": "item",
+      "title": {
+        "en": "Item",
+        "nl": "Item",
+        "de": "Element",
+        "fr": "Élément",
+        "it": "Elemento",
+        "sv": "Objekt",
+        "no": "Element",
+        "es": "Elemento",
+        "da": "Element",
+        "ru": "Элемент",
+        "pl": "Element",
+        "ko": "항목",
+        "ar": "عنصر"
+      }
     }
   ]
 }

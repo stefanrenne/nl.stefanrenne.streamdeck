@@ -475,7 +475,7 @@
       function deckDefaultText(i, columns) {
         const column = (i % columns) + 1;
         const row = Math.floor(i / columns) + 1;
-        return row + "/" + column;
+        return String.fromCharCode(64 + row) + column;
       }
 
       function showView(view) {

@@ -43,5 +43,8 @@
   },
   "1.1.6": {
     "en": "Improved translations and UI polish"
+  },
+  "1.1.7": {
+    "en": "Various dependency updates"
   }
 }

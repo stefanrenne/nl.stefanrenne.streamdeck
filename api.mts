@@ -1,9 +1,7 @@
-'use strict';
+import { TextToImage } from './lib/textToImage.mjs';
 
-import { TextToImage } from './lib/textToImage';
-
-module.exports = {
-  async textToImage({ homey, body }) {
+export default {
+  async textToImage({ body }: { body: { firstLine: string; secondLine?: string; textColor?: string; backgroundColor?: string } }) {
     const firstLine = body.firstLine;
     const secondLine = (body.secondLine !== undefined && body.secondLine !== "") ? body.secondLine : undefined;
     const textColor = (body.textColor !== undefined) ? body.textColor : "#ffffff";

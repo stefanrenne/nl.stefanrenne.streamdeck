@@ -1,6 +1,6 @@
 import Homey from 'homey';
 
-module.exports = class NetworkDockDriver extends Homey.Driver {
+export default class NetworkDockDriver extends Homey.Driver {
   
   async onInit() {
     this.log('NetworkDockDriver has been initialized');

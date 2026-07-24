@@ -1,9 +1,9 @@
 import Homey from 'homey';
-import { Store } from './lib/storage';
-import { CardListener } from './lib/cardListener';
-import { TextToImage } from './lib/textToImage';
+import { Store } from './lib/storage.mjs';
+import { CardListener } from './lib/cardListener.mjs';
+import { TextToImage } from './lib/textToImage.mjs';
 
-module.exports = class StreamDeckApp extends Homey.App {
+export default class StreamDeckApp extends Homey.App {
 
   private store = new Store(this.homey);
   private cardListener = new CardListener(this.homey, this.store);

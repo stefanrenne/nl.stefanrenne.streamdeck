@@ -4,8 +4,8 @@ import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-strea
 import { StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Jimp } from 'jimp';
 import path from 'path';
-import { TextToImage } from './textToImage';
-import { Dashboard } from './storage';
+import { TextToImage } from './textToImage.mjs';
+import { Dashboard } from './storage.mjs';
 
 export function getButtonControlSize(streamDeck: StreamDeckTcp) {
     return streamDeck.CONTROLS.reduce((result, control) => {
@@ -38,7 +38,7 @@ export async function renderImage(streamDeck: StreamDeckTcp, control: StreamDeck
 export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dashboard) {
     const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
 
-    var actions: Promise<void>[] = []
+    const actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
         const item = dashboard.items[i+1];
         switch (item?.kind) {
@@ -65,9 +65,9 @@ export async function renderPincodeDashboard(streamDeck: StreamDeckTcp) {
     const startColumnOffset = Math.floor((size.columns-3)/2);
     const startRowOffset = Math.ceil((size.rows-3)/2);
             
-    var items: { [item: number]: Number | undefined; } = [];
-    var number = 0;
-    for (var i = 0; i < size.total; i++) {
+    const items: { [item: number]: number | undefined; } = [];
+    let number = 0;
+    for (let i = 0; i < size.total; i++) {
         const column = (i % size.columns) + 1;
         const row = Math.floor(i / size.rows) + 1;      
         if ([1,2,3].includes(row-startRowOffset) && [1,2,3].includes(column-startColumnOffset)) {
@@ -79,7 +79,7 @@ export async function renderPincodeDashboard(streamDeck: StreamDeckTcp) {
     }
 
     const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
-    var actions: Promise<void>[] = []
+    const actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
         const item = items[i+1];
         if (item === undefined) {

@@ -1,12 +1,12 @@
 import Homey, { DiscoveryResultMDNSSD, FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
-import { Dashboard, Store } from '../../lib/storage';
-import { CardListener } from '../../lib/cardListener';
-import { getButtonControlSize, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter';
-import { map } from '../../lib/helpers';
+import { Dashboard, Store } from '../../lib/storage.mjs';
+import { CardListener } from '../../lib/cardListener.mjs';
+import { getButtonControlSize, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter.mjs';
+import { map } from '../../lib/helpers.mjs';
 
-module.exports = class NetworkDock extends Homey.Device {
+export default class NetworkDock extends Homey.Device {
 
   private store = new Store(this.homey);
   private cardListener = new CardListener(this.homey, this.store);
@@ -45,7 +45,7 @@ module.exports = class NetworkDock extends Homey.Device {
       if (streamDeck.CONTROLS.length > 0) {
         this.streamDeck = streamDeck
         await this.setAvailable();
-        this.streamDeckDidConnect(streamDeck);
+        await this.streamDeckDidConnect(streamDeck);
 
         const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
         await this.loadDashboard(dashboardId);
@@ -56,7 +56,7 @@ module.exports = class NetworkDock extends Homey.Device {
 
     this.homey.settings.on('set-dashboard', async (id: string) => {
       this.store.invalidateDashboard(id);
-      this.updateSelectableDashboardOptions();
+      await this.updateSelectableDashboardOptions();
 
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       if (selectedDashboardId === id) {
@@ -73,7 +73,7 @@ module.exports = class NetworkDock extends Homey.Device {
       }
 
       this.store.invalidateDashboard(id);
-      this.updateSelectableDashboardOptions();
+      await this.updateSelectableDashboardOptions();
     });
 
     this.homey.settings.on('set-image', async (id: string) => {
@@ -108,12 +108,12 @@ module.exports = class NetworkDock extends Homey.Device {
     this.registerCapabilityListener('onoff', async (value: boolean) => {
       const number: number = value ? 100 : 0;
       await this.streamDeck?.setBrightness(number);
-      this.setCapabilityValue('dim', number);
+      await this.setCapabilityValue('dim', number);
     });
 
     this.registerCapabilityListener('dim', async (value: number) => {
       await this.streamDeck?.setBrightness(value * 100);
-      this.setCapabilityValue('onoff', value > 0);
+      await this.setCapabilityValue('onoff', value > 0);
     });
 
     this.registerCapabilityListener('dashboard', async (id: string) => {
@@ -189,7 +189,7 @@ module.exports = class NetworkDock extends Homey.Device {
     const dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
     if (dashboard === undefined) {
       this.dashboard = undefined;
-      renderHomeyLogo(this.streamDeck);
+      await renderHomeyLogo(this.streamDeck);
       return
     }
 
@@ -214,7 +214,7 @@ module.exports = class NetworkDock extends Homey.Device {
     } else {
       this.lastKeyPressTime = thisKeyPressTime;
       this.lastKeyPressIndex = control.index+1;
-      new Promise<void>((resolve) => {
+      void new Promise<void>((resolve) => {
         setTimeout(function() {
           resolve()
         }, 400);
@@ -227,11 +227,11 @@ module.exports = class NetworkDock extends Homey.Device {
     }
   }
 
-  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: Boolean, control: StreamDeckButtonControlDefinition) {
+  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: boolean, control: StreamDeckButtonControlDefinition) {
 
     const button = this.dashboard?.items[control.index+1];
-    var state = { action: event, variableId: '', imageId: '' }
-    var tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
+    const state = { action: event, variableId: '', imageId: '' }
+    const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
     
     if (!isTurnedOn) {
       await this.onOffButtonAction.trigger(this, tokens, state);
@@ -248,7 +248,7 @@ module.exports = class NetworkDock extends Homey.Device {
       this.validateSingleDouble(control);
     }
 
-    var actions: Promise<void>[] = []
+    const actions: Promise<void>[] = []
 
     switch (button.kind) {
     case 'variable':
@@ -325,7 +325,7 @@ module.exports = class NetworkDock extends Homey.Device {
     const selectedDashboardId = await this.getCapabilityValue('dashboard');
     const allDashboardIds = this.store.getDashboardMetadata().map((metadata) => metadata.id);
     if (selectedDashboardId === undefined || !allDashboardIds.includes(selectedDashboardId)) {
-      this.loadEmptyDashboardOptions();
+      await this.loadEmptyDashboardOptions();
     }
   }
 

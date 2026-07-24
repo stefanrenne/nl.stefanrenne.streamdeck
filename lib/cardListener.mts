@@ -1,7 +1,7 @@
 'use strict';
 
-import { Store } from './storage';
-import Homey from 'homey/lib/Homey';
+import { Store } from './storage.mjs';
+import Homey from 'homey/lib/Homey.js';
 import { FlowCardAction, FlowCardTriggerDevice, FlowCardCondition } from 'homey';
 
 export class CardListener {
@@ -17,7 +17,7 @@ export class CardListener {
     
     // Autocomplete Listeners
     registerVariableAutocompleteListenerForCard(card: FlowCardTriggerDevice | FlowCardAction) {
-        card.registerArgumentAutocompleteListener('variable', (query: string, args: any) => {
+        card.registerArgumentAutocompleteListener('variable', (query: string) => {
             return this.store
                 .getVariables()
                 .filter((variable) => {
@@ -31,7 +31,7 @@ export class CardListener {
     }
       
     registerImageAutocompleteListenerForCard(card: FlowCardTriggerDevice) {
-        card.registerArgumentAutocompleteListener('image', (query: string, args: any) => {
+        card.registerArgumentAutocompleteListener('image', (query: string) => {
             return this.store
                 .getImages()
                 .filter((image) => {
@@ -45,7 +45,7 @@ export class CardListener {
     }
   
     registerDashboardAutocompleteListenerForCard(card: FlowCardCondition | FlowCardAction) {
-        card.registerArgumentAutocompleteListener('dashboard', (query: string, args: any) => {
+        card.registerArgumentAutocompleteListener('dashboard', (query: string) => {
 
             const selectableOptions = this.store.getDashboardMetadata().map(dashboard => {
                 return this.createAutocompleteValue(dashboard.id, dashboard.name)

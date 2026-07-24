@@ -1,6 +1,6 @@
 'use strict';
 
-import Homey from 'homey/lib/Homey';
+import Homey from 'homey/lib/Homey.js';
 
 export interface Image {
     readonly id: string;
@@ -116,7 +116,7 @@ export class Store {
         }
 
         //write cache back to store
-        var data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
+        const data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
         if (data !== undefined) {
             data.columns = columns;
             data.rows = rows;
@@ -150,7 +150,7 @@ export class Store {
             return undefined
         }
 
-        var usedVariableIds: string[] = [];
+        const usedVariableIds: string[] = [];
         const defaultItems: { [item: number] : DashboardItem; } = Object.fromEntries(Array.from({length: 32}, (_, i) => [i + 1, { kind: 'empty', payload: '' }]));
         const items: { [item: number] : DashboardItem; } = data.items.reduce((result, row) => {
             const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');

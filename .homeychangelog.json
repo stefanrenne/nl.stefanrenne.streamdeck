@@ -46,5 +46,8 @@
   },
   "1.1.7": {
     "en": "Various dependency updates"
+  },
+  "1.1.8": {
+    "en": "Fixed the get firmware version timeout crash"
   }
 }

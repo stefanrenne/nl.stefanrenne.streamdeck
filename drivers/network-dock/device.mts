@@ -153,13 +153,32 @@ export default class NetworkDock extends Homey.Device {
       });
 
       const size = getButtonControlSize(streamDeck);
-      await this.setSettings({
+      // Serial and firmware are informational only, and are fetched over TCP
+      // feature reports that can time out even when the dock is otherwise
+      // connected. Never let that failure bubble up and crash the app.
+      const [serial, firmware] = await Promise.all([
+        streamDeck.getSerialNumber().catch((e) => {
+          this.log('device - failed to read serial number: ' + e);
+          return undefined;
+        }),
+        streamDeck.getFirmwareVersion().catch((e) => {
+          this.log('device - failed to read firmware version: ' + e);
+          return undefined;
+        }),
+      ]);
+
+      const settings: { [key: string]: string | number } = {
         name: streamDeck.PRODUCT_NAME,
-        serial: await streamDeck.getSerialNumber(),
-        firmware: await streamDeck.getFirmwareVersion(),
         columns: size.columns,
-        rows: size.rows
-      });
+        rows: size.rows,
+      };
+      if (serial !== undefined) {
+        settings.serial = serial;
+      }
+      if (firmware !== undefined) {
+        settings.firmware = firmware;
+      }
+      await this.setSettings(settings);
   }
 
   async getDisplayedControlForVariable(variableId: string) {

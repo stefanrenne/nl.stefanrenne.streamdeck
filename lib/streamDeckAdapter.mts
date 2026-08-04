@@ -4,6 +4,9 @@ import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-strea
 import { StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Jimp } from 'jimp';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { TextToImage } from './textToImage.mjs';
 import { Dashboard } from './storage.mjs';
 

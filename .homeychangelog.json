@@ -49,5 +49,8 @@
   },
   "1.1.8": {
     "en": "Fixed the get firmware version timeout crash"
+  },
+  "1.1.9": {
+    "en": "Fixed homey logo dashboard crash"
   }
 }

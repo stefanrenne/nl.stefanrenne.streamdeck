@@ -3,5 +3,12 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": ".homeybuild/"
-  }
+  },
+  "exclude": [
+    "node_modules",
+    ".homeybuild",
+    "test",
+    "eslint.config.mjs",
+    "vitest.config.mjs"
+  ]
 }

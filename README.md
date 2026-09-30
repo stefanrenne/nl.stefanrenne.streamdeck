@@ -36,12 +36,14 @@ The app automatically detects your Stream Deck Network Dock on the local network
 | Turned on / off | Fires when the Stream Deck is turned on or off | — |
 | Brightness changed | Fires when the brightness level changes | `dim` (0–1) |
 | Dashboard has changed | Fires when the active dashboard changes | `dashboard` |
-| Button action | Fires on any button event | `dashboard`, `imageName`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row` |
-| Image button action | Fires when a button assigned to an image is triggered | `dashboard`, `payload`, `column`, `row` |
-| Variable button action | Fires when a button assigned to a variable is triggered | `dashboard`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row` |
-| Disabled button action | Fires when any button is triggered while the Stream Deck is turned off | `column`, `row` |
+| Button action | Fires on any button event | `dashboard`, `imageName`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` |
+| Image button action | Fires when a button assigned to an image is triggered | `dashboard`, `payload`, `column`, `row`, `item` |
+| Variable button action | Fires when a button assigned to a variable is triggered | `dashboard`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` |
+| Disabled button action | Fires when any button is pressed or released while the Stream Deck is turned off | `column`, `row`, `item` |
 
-All button triggers support filtering by action type: **pressed** (down), **released** (up), **single pressed**, or **double pressed**.
+All button triggers support filtering by action type: **pressed** (down), **released** (up), **single pressed**, or **double pressed**. A double press is two presses on the same button within 250 ms; a single press fires 400 ms after a press that wasn't followed by a second one.
+
+`column` and `row` start at 1. `item` names the button the same way the dashboard editor does: a row letter plus a column number (`A1` is top left, `B3` is the second row, third column). `payload` is the free text you entered for that button in the dashboard editor.
 
 ### Conditions (And)
 | Card | Description |

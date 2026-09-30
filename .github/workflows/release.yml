@@ -30,12 +30,17 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
+      - run: npm run lint
+      - run: npm test
       - name: Update Homey App Version
         uses: athombv/github-action-homey-app-version@master
         id: update_app_version
         with:
           version: ${{ inputs.version }}
           changelog: ${{ inputs.changelog }}
+      # package.json isn't read by Homey, but test/manifest.test.mts requires it to match the app version.
+      - name: Sync package.json version
+        run: npm version "${{ steps.update_app_version.outputs.version }}" --no-git-tag-version --allow-same-version
       - name: Commit & Push
         run: |
           git config --local user.name "github-actions[bot]"

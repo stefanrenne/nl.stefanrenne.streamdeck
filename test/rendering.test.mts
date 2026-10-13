@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { intToRGBA } from 'jimp'
 import { TextToImage } from '../lib/textToImage.mjs'
 import { getButtonControlSize, renderDashboard, renderHomeyLogo } from '../lib/streamDeckAdapter.mjs'
@@ -70,6 +70,19 @@ describe('renderDashboard', () => {
     await renderDashboard(asDeck(deck), { ...dashboardWith({}), columns: 4, rows: 2 })
 
     expect(deck.clearedKeys().sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
+  })
+
+  it('logs a failed text key as renderText, not renderImage', async () => {
+    const deck = new FakeStreamDeck(lcdButtons(3, 2))
+    deck.fillKeyBuffer.mockRejectedValueOnce(new Error('tcp timeout'))
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    await renderDashboard(asDeck(deck), dashboardWith({
+      1: { kind: 'variable', name: 'Temp', payload: '', variableId: 'v', firstLine: '21°', secondLine: undefined, textColor: '#fff', backgroundColor: '#000' },
+    }))
+
+    expect(error).toHaveBeenCalledWith('renderText failed:', expect.any(Error))
+    error.mockRestore()
   })
 
   it('keeps going when one key fails to render', async () => {

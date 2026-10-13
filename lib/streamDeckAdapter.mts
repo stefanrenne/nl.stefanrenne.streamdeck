@@ -53,7 +53,7 @@ export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dash
         const item = dashboard.items[i+1];
         switch (item?.kind) {
         case 'variable':
-        actions.push(renderText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('renderImage failed:', e)));
+        actions.push(renderText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('renderText failed:', e)));
         break;
         case 'image':
         actions.push(renderImage(streamDeck, control, item.imageBuffer).catch((e) => console.error('renderImage failed:', e)));

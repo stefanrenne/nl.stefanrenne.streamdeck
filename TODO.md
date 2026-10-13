@@ -12,8 +12,6 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Cleanup
 
-- [ ] `renderDashboard` in `lib/streamDeckAdapter.mts` logs a failed `renderText` as `renderImage failed:`. Use the right label.
-
 ## Docs / store listing
 
 - [?] **README.txt is a feature list.** `README.txt` and its 12 translations list features, Flow cards, configuration and requirements. App Store Guidelines 1.3 reject that kind of description (see CLAUDE.md). Shorten all 13 to the core pitch plus a GitHub pointer when the next release is prepared.

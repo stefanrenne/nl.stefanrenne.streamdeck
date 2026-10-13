@@ -52,5 +52,8 @@
   },
   "1.1.9": {
     "en": "Fixed homey logo dashboard crash"
+  },
+  "1.2.0": {
+    "en": "Your Stream Deck now gets its brightness from Homey when it connects, and reconnects by itself when the dock gets a new IP address. The Stream Deck Neo now uses its full 4×2 layout. Disabled-button flows respect the action you choose, including single and double press. Images, variables and dashboards are listed by name in Flow cards."
   }
 }

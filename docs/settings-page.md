@@ -20,6 +20,7 @@ An empty Images or Variables tab shows the `emptyError` message instead of the t
 - A grid of keys labelled `A1`, `A2`… (`deckDefaultText`). Clicking a key opens the item editor, where the key can be None, Variable or Image, with a chosen image/variable and a free-text **payload**.
 - Save builds `items` from the grid (`item` is the 1-based position), escapes the quotes in payloads, and writes `dashboards` + `dashboard-<id>`.
 - Names are made unique by appending `-1`, `-2`… (`validateName`). An empty dashboard name becomes `dashboard`.
+- Names are stored as typed (image names come from file names) and are always written to the page with `textContent`, never `innerHTML`. `settings.test.mts` checks this.
 
 ## Images
 
@@ -41,6 +42,5 @@ The editor has a name, first and second line, and text and background colours. T
 
 ## Known issues
 
-- Names of images, variables and dashboards are written with `innerHTML`. Image names come from file names, so HTML in a name is rendered.
 - `columns`/`rows` are saved as strings (see [data-model.md](data-model.md)).
 - The `variables` list stores every variable's full data, including its base64 `sample`, next to `variable-<id>`.

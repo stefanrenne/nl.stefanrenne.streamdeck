@@ -842,7 +842,7 @@
 
           $nameColumn = document.createElement('td');
           $nameColumn.classList.add('text');
-          $nameColumn.innerHTML = image.name;
+          $nameColumn.textContent = image.name;
           $row.appendChild($nameColumn);
 
           $actionColumn = document.createElement('td');
@@ -982,7 +982,7 @@
 
           $nameColumn = document.createElement('td');
           $nameColumn.classList.add('text');
-          $nameColumn.innerHTML = variable.name;
+          $nameColumn.textContent = variable.name;
           $row.appendChild($nameColumn);
 
           $actionColumn = document.createElement('td');
@@ -1070,7 +1070,7 @@
           $item.appendChild($nameBackground);
           $nameBackground.classList.add("name-item");
           const $name = document.createElement('p');
-          $name.innerHTML = variable.name;
+          $name.textContent = variable.name;
           $nameBackground.appendChild($name);
 
           $item.addEventListener('click', async () => {
@@ -1126,7 +1126,7 @@
 
           $nameColumn = document.createElement('td');
           $nameColumn.classList.add('text');
-          $nameColumn.innerHTML = metadata.name;
+          $nameColumn.textContent = metadata.name;
           $row.appendChild($nameColumn);
 
           $actionColumn = document.createElement('td');

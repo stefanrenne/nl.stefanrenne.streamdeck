@@ -50,8 +50,9 @@ This uses the global `setTimeout`, not `homey.setTimeout`.
 
 ## Brightness
 
-- `dim` (0–1): `setBrightness(value * 100)`, and `onoff = value > 0`.
+- `dim` (0–1): `setBrightness(Math.round(value * 100))`, and `onoff = value > 0`. The deck takes a whole percentage.
 - `onoff`: `setBrightness(100 | 0)`, and sets `dim` to `1` or `0`.
+- On every `connected`, the device sends the current brightness (`dim`, or 0 when `onoff` is false). A failure is logged and doesn't stop the dashboard from loading.
 - `onAdded` sets `dim = 1` and `onoff = true`.
 
 ## Known issues

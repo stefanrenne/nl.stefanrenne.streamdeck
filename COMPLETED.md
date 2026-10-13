@@ -4,6 +4,7 @@ Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep 
 
 ## 2026-10-13
 
+- **Brightness wasn't sent to the deck on connect.** `setBrightness` was only called from the `onoff`/`dim` listeners, so after pairing (`onAdded` uses `setCapabilityValue`, which doesn't run listeners), a reconnect or a power cycle, Homey showed 100% while the deck kept its own brightness. The `connected` handler now sends the current value. `dim * 100` is also rounded, because the deck truncates fractions (0.29 → 28). Found by the user on a real deck. Tests: `device.test.mts` "applies the stored brightness when the deck connects", "applies brightness 0 on connect when the deck is turned off", "rounds dim to a whole percentage".
 - **`onoff` wrote 0/100 to `dim`** (since `a95f9c8`). The `onoff` listener used one value for both `setBrightness` (0–100) and the `dim` capability (0–1), so turning the deck on set `dim` to 100. It now sets `dim` to `1`/`0` and passes `dim * 100` to the deck. Test: `device.test.mts` "onoff sets dim to 1 or 0 (regression a95f9c8)".
 - **Unused `homey-api` dependency.** Listed in `dependencies` but never imported (the app uses the SDK's `this.homey`). It pulled in `socket.io-client` → `engine.io-client` → `parseuri` (GHSA-6fx8-h7jm-663j, moderate ReDoS). Removed in `df5f5f0`; `npm audit` is clean.
 

@@ -364,6 +364,23 @@ describe('brightness', () => {
     expect(deck.setBrightness).toHaveBeenLastCalledWith(100)
   })
 
+  it('applies the stored brightness when the deck connects', async () => {
+    expect(deck.setBrightness).toHaveBeenCalledWith(100)
+  })
+
+  it('applies brightness 0 on connect when the deck is turned off', async () => {
+    device = createDevice({ dashboard: '0', onoff: false, dim: 0.6 })
+    await device.onInit()
+    const other = new FakeStreamDeck(lcdButtons(5, 3))
+    await connect(other)
+    expect(other.setBrightness).toHaveBeenCalledWith(0)
+  })
+
+  it('rounds dim to a whole percentage', async () => {
+    await device.capabilityListeners.get('dim')?.(0.29)
+    expect(deck.setBrightness).toHaveBeenLastCalledWith(29)
+  })
+
   it('onoff sets dim to 1 or 0 (regression a95f9c8)', async () => {
     await device.capabilityListeners.get('onoff')?.(false)
     expect(device.getCapabilityValue('dim')).toBe(0)

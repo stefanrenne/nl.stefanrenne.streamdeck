@@ -47,6 +47,13 @@ export default class NetworkDock extends Homey.Device {
         await this.setAvailable();
         await this.streamDeckDidConnect(streamDeck);
 
+        // Homey's dim value is only sent when it changes, so after a reconnect
+        // or power cycle the deck would keep its own brightness. A failure
+        // here must not stop the dashboard from loading.
+        const on: boolean = this.getCapabilityValue('onoff') ?? true;
+        await this.applyBrightness(on ? this.getCapabilityValue('dim') ?? 1 : 0)
+          .catch((e) => this.log('setBrightness failed: ' + e));
+
         const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
         await this.loadDashboard(dashboardId);
       } else if (this.streamDeck == undefined) {
@@ -107,12 +114,12 @@ export default class NetworkDock extends Homey.Device {
 
     this.registerCapabilityListener('onoff', async (value: boolean) => {
       const dim: number = value ? 1 : 0;
-      await this.streamDeck?.setBrightness(dim * 100);
+      await this.applyBrightness(dim);
       await this.setCapabilityValue('dim', dim);
     });
 
     this.registerCapabilityListener('dim', async (value: number) => {
-      await this.streamDeck?.setBrightness(value * 100);
+      await this.applyBrightness(value);
       await this.setCapabilityValue('onoff', value > 0);
     });
 
@@ -125,6 +132,10 @@ export default class NetworkDock extends Homey.Device {
     });
   }
   
+  async applyBrightness(dim: number) {
+    await this.streamDeck?.setBrightness(Math.round(dim * 100));
+  }
+
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
       this.log('device - connected');
 

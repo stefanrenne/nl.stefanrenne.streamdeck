@@ -89,3 +89,18 @@ describe('release metadata', () => {
     expect(readJson('.homeychangelog.json')[version]?.en).toBeTruthy()
   })
 })
+
+describe('dependencies', () => {
+  // See TODO.md: 7.8.0 never connects to the dock when the app runs in Docker
+  // (as on a Homey), so the Stream Deck libraries stay on 7.7.x until that's fixed.
+  it('keeps @elgato-stream-deck on 7.7.x (regression a9698f4, 3213ada)', () => {
+    const pkg = readJson('package.json')
+    const lock = readJson('package-lock.json')
+    for (const name of ['@elgato-stream-deck/node', '@elgato-stream-deck/tcp']) {
+      expect(pkg.dependencies[name]).toMatch(/^~7\.7\.\d+$/)
+    }
+    for (const name of ['node', 'tcp', 'core']) {
+      expect(lock.packages[`node_modules/@elgato-stream-deck/${name}`].version).toMatch(/^7\.7\./)
+    }
+  })
+})

@@ -10,6 +10,10 @@
 
 ## Connection lifecycle
 
+The connection uses `@elgato-stream-deck/tcp`, pinned to `~7.7.1`: 7.8.0 never connects when the app runs in Docker, as it does on a Homey (see `TODO.md`). Dependabot ignores `>=7.8.0` for `@elgato-stream-deck/*`, and `manifest.test.mts` checks the pin.
+
+The driver logs the discovery results on init and on every new result. The device logs `onInit` (id and `ipAddress`), every `onDiscoveryResult` (found id, address, and whether it matches), `onDiscoveryAvailable`, `onDiscoveryAddressChanged` and connection manager errors, so a device that never connects shows where it stops.
+
 | Event | What happens |
 |---|---|
 | `onDiscoveryAvailable` | `connectionManager.connectTo(getSetting('ipAddress'))` |

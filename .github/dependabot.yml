@@ -9,3 +9,8 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
+      # 7.8.0 never connects to the Network Dock when the app runs in Docker
+      # (as on a Homey). See TODO.md before allowing it again.
+      - dependency-name: "@elgato-stream-deck/*"
+        versions: [">=7.8.0"]

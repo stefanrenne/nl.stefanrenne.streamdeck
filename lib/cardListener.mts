@@ -4,6 +4,8 @@ import { Store } from './storage.mjs';
 import Homey from 'homey/lib/Homey.js';
 import { FlowCardAction, FlowCardTriggerDevice, FlowCardCondition } from 'homey';
 
+const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+
 export class CardListener {
 
     private homey: Homey;
@@ -23,7 +25,7 @@ export class CardListener {
                 .filter((variable) => {
                     return query.length == 0 || variable.name.toLowerCase().includes(query.toLowerCase());
                 })
-                .sort()
+                .sort(byName)
                 .map((variable) => {
                     return this.createAutocompleteValue(variable.id, variable.name, variable.base64Sample);
                 });
@@ -37,7 +39,7 @@ export class CardListener {
                 .filter((image) => {
                     return query.length == 0 || image.name.toLowerCase().includes(query.toLowerCase());
                 })
-                .sort()
+                .sort(byName)
                 .map(button => {
                     return this.createAutocompleteValue(button.id, button.name, button.base64Image);
                 });
@@ -47,9 +49,9 @@ export class CardListener {
     registerDashboardAutocompleteListenerForCard(card: FlowCardCondition | FlowCardAction) {
         card.registerArgumentAutocompleteListener('dashboard', (query: string) => {
 
-            const selectableOptions = this.store.getDashboardMetadata().map(dashboard => {
+            const selectableOptions = [...this.store.getDashboardMetadata()].sort(byName).map(dashboard => {
                 return this.createAutocompleteValue(dashboard.id, dashboard.name)
-            }).sort();
+            });
             
             return [this.emptyDashboard]
                 .concat(selectableOptions)

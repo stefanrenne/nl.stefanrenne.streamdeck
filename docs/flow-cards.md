@@ -35,7 +35,7 @@ The variable actions are registered in `app.mts`. They do nothing if the variabl
 
 - `image` / `variable`: filtered case-insensitively on the name, with the image (or the variable's `sample`) as the preview.
 - `dashboard`: `{ id: '0', name: 'Homey' }` first, then every dashboard, filtered on the name.
-- The `.sort()` calls in these listeners sort objects and don't change the order: results come back in the order stored in settings.
+- Results are sorted by name, case-insensitively (`localeCompare` with `sensitivity: 'base'`). For dashboards, the "Homey" entry always comes first.
 
 ## Adding a card
 

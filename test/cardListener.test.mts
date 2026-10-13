@@ -21,6 +21,24 @@ type Register = (card: never) => void
 const register = (method: Register) => method.call(listener, card as never)
 
 describe('autocomplete', () => {
+  it('lists images, variables and dashboards by name, with Homey first', async () => {
+    const fake = createFakeHomey()
+    seedSettings(fake.settings, {
+      images: [{ id: 'i-tv', name: 'tv' }, { id: 'i-amp', name: 'Amp' }, { id: 'i-lamp', name: 'Lamp' }],
+      variables: [{ id: 'v-z', name: 'Zone' }, { id: 'v-a', name: 'attic' }],
+      dashboards: [{ id: 'd-z', name: 'Zolder' }, { id: 'd-a', name: 'Avond' }],
+    })
+    listener = new CardListener(fake.homey as unknown as ConstructorParameters<typeof CardListener>[0], createStore(fake.homey))
+    register(listener.registerImageAutocompleteListenerForCard)
+    register(listener.registerVariableAutocompleteListenerForCard)
+    register(listener.registerDashboardAutocompleteListenerForCard)
+    const names = async (arg: string) => (await card.autocomplete(arg, '') as { name: string }[]).map((option) => option.name)
+
+    expect(await names('image')).toEqual(['Amp', 'Lamp', 'tv'])
+    expect(await names('variable')).toEqual(['attic', 'Zone'])
+    expect(await names('dashboard')).toEqual(['Homey', 'Avond', 'Zolder'])
+  })
+
   it('images: filters case-insensitively and includes the image as preview', async () => {
     register(listener.registerImageAutocompleteListenerForCard)
     expect(await card.autocomplete('image', 'lA')).toEqual([{ id: 'img-lamp', name: 'Lamp', description: '', image: RED_PIXEL_PNG }])

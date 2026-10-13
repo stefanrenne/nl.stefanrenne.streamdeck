@@ -12,7 +12,6 @@ All drawing goes through `lib/streamDeckAdapter.mts`, which pushes raw RGBA buff
 | `renderText(deck, control, first, second, textColor, bg)` | `TextToImage.create(control.pixelSize.width, …)` → `fillKeyBuffer(index, rgba)` |
 | `renderImage(deck, control, buffer)` | decodes the stored image with jimp, resizes it to `pixelSize`, then `fillKeyBuffer` |
 | `renderHomeyLogo(deck)` | `assets/homey-logo.png`, scaled to fit the panel minus 50 px padding and centered on black, then `fillPanelBuffer`. If `calculateFillPanelDimensions()` is `null`, it calls `clearPanel()` instead. |
-| `renderPincodeDashboard(deck)` | **Unused.** An unfinished pincode keypad. Its early return is inverted, and it divides by `rows` where it means `columns`. |
 
 The logo path is resolved from `import.meta.url` (`fileURLToPath`). In ESM there is no `__dirname`, and using it crashed the Homey dashboard in 1.1.8 (fix 345f453).
 

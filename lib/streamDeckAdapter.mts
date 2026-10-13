@@ -65,42 +65,6 @@ export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dash
     await Promise.all(actions);
 }
 
-export async function renderPincodeDashboard(streamDeck: StreamDeckTcp) {
-    // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
-    const size = getButtonControlSize(streamDeck);
-    if (size.columns >= 3 && size.rows >= 3) {
-        return
-    }
-
-    const startColumnOffset = Math.floor((size.columns-3)/2);
-    const startRowOffset = Math.ceil((size.rows-3)/2);
-            
-    const items: { [item: number]: number | undefined; } = [];
-    let number = 0;
-    for (let i = 0; i < size.total; i++) {
-        const column = (i % size.columns) + 1;
-        const row = Math.floor(i / size.rows) + 1;      
-        if ([1,2,3].includes(row-startRowOffset) && [1,2,3].includes(column-startColumnOffset)) {
-        number += 1;
-        items[i+1] = number;
-        } else {
-        items[i+1] = undefined;
-        }
-    }
-
-    const controls = getLcdButtonControls(streamDeck)
-    const actions: Promise<void>[] = []
-    for (const [i, control] of controls.entries()) {
-        const item = items[i+1];
-        if (item === undefined) {
-        actions.push(streamDeck.clearKey(control.index).catch((e) => console.error('clearKey failed:', e)));
-        } else {
-        actions.push(renderText(streamDeck, control, item.toString(), undefined, "#ffffff", "#000000").catch((e) => console.error('renderText failed:', e)));
-        }
-    }
-    await Promise.all(actions);
-}
-
 export async function renderHomeyLogo(streamDeck: StreamDeckTcp) {
     const panelDimensions = streamDeck.calculateFillPanelDimensions();
     if (panelDimensions === null) {

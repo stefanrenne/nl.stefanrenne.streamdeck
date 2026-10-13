@@ -37,11 +37,8 @@ describe('getButtonControlSize', () => {
     expect(getButtonControlSize(asDeck(new FakeStreamDeck(lcdButtons(columns, rows))))).toEqual({ columns, rows, total: columns * rows })
   })
 
-  // See TODO.md: `control as X` is a cast, not a type check, so the Neo's RGB buttons and LCD segment count as a third row.
-  it.todo('ignores non-LCD controls, so a Stream Deck Neo is 4x2')
-
-  it('currently reports the Neo as 4x3 (documents the bug above)', () => {
-    expect(getButtonControlSize(asDeck(new FakeStreamDeck(neoControls())))).toMatchObject({ columns: 4, rows: 3 })
+  it('ignores non-LCD controls, so a Stream Deck Neo is 4x2 (regression 00a1032)', () => {
+    expect(getButtonControlSize(asDeck(new FakeStreamDeck(neoControls())))).toEqual({ columns: 4, rows: 2, total: 8 })
   })
 })
 
@@ -66,6 +63,13 @@ describe('renderDashboard', () => {
       expect(buffer.length).toBe(72 * 72 * 4)
       expect(options).toEqual({ format: 'rgba' })
     }
+  })
+
+  it('only draws on the LCD keys of a Stream Deck Neo', async () => {
+    const deck = new FakeStreamDeck(neoControls())
+    await renderDashboard(asDeck(deck), { ...dashboardWith({}), columns: 4, rows: 2 })
+
+    expect(deck.clearedKeys().sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
   })
 
   it('keeps going when one key fails to render', async () => {

@@ -36,7 +36,9 @@ Serial and firmware are read over TCP feature reports that can time out. Their f
 
 ## Button events
 
-Deck `down`/`up` events for controls of type `button` go to `streamDeckEvent(event, onoff, control)`:
+Deck `down`/`up` events for controls of type `button` go to `streamDeckEvent(event, onoff, control)`. That includes buttons without an LCD, such as the Neo's two RGB touch keys: they have no dashboard item, so they fire `any_button_action` as an empty key (row 3).
+
+For each event:
 
 - Tokens: `dashboard` (name), `imageName`, `textFirstLine`, `textSecondLine`, `payload`, `column` and `row` (1-based), and `item` (row letter + column number, for example `B3`). State: `{ action, imageId, variableId }`, which the run listeners match against (see [flow-cards.md](flow-cards.md)).
 - If `onoff` is false, only `off_button_action` fires (for any key, on any dashboard).
@@ -61,5 +63,4 @@ This uses the global `setTimeout`, not `homey.setTimeout`.
 
 ## Known issues
 
-- `getButtonControlSize` uses `control as StreamDeckButtonControlDefinitionLcdFeedback` as if it were a type check. It's a cast, so every control counts, and a Stream Deck Neo (8 LCD keys plus 2 RGB touch keys and an LCD segment on row 3) is measured as 4×3. `renderDashboard` also tries to draw on the non-LCD controls, and those errors are logged.
 - After `onDiscoveryAddressChanged`, the device doesn't reconnect by itself: `setSettings` doesn't call `onSettings`, so it relies on the next `onDiscoveryAvailable`.

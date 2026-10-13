@@ -6,8 +6,9 @@ All drawing goes through `lib/streamDeckAdapter.mts`, which pushes raw RGBA buff
 
 | Function | Behaviour |
 |---|---|
-| `getButtonControlSize(deck)` | `{ columns, rows, total }` = max `column + 1` / `row + 1` over `deck.CONTROLS`. (Known issue: it counts non-LCD controls too. See [device.md](device.md).) |
-| `renderDashboard(deck, dashboard)` | For each control `i`, looks up `dashboard.items[i + 1]`. `variable` → `renderText`, `image` → `renderImage`, anything else → `clearKey`. All keys render in parallel. Each failure is caught and logged, so one bad key doesn't stop the others. |
+| `getLcdButtonControls(deck)` | The controls with `type === 'button'` and `feedbackType === 'lcd'`, the keys that can show an image. Everything else (the Neo's RGB touch keys and LCD segment, the + encoders) is skipped. Used by every function that walks the keys, and by the device's `getDisplayedControlForVariable`. |
+| `getButtonControlSize(deck)` | `{ columns, rows, total }` = max `column + 1` / `row + 1` over the LCD buttons, so a Neo is 4×2. |
+| `renderDashboard(deck, dashboard)` | For each LCD button `i`, looks up `dashboard.items[i + 1]`. `variable` → `renderText`, `image` → `renderImage`, anything else → `clearKey`. All keys render in parallel. Each failure is caught and logged, so one bad key doesn't stop the others. |
 | `renderText(deck, control, first, second, textColor, bg)` | `TextToImage.create(control.pixelSize.width, …)` → `fillKeyBuffer(index, rgba)` |
 | `renderImage(deck, control, buffer)` | decodes the stored image with jimp, resizes it to `pixelSize`, then `fillKeyBuffer` |
 | `renderHomeyLogo(deck)` | `assets/homey-logo.png`, scaled to fit the panel minus 50 px padding and centered on black, then `fillPanelBuffer`. If `calculateFillPanelDimensions()` is `null`, it calls `clearPanel()` instead. |

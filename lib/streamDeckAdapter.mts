@@ -1,6 +1,6 @@
 'use strict';
 
-import type { StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
+import type { StreamDeckButtonControlDefinitionLcdFeedback, StreamDeckControlDefinition } from '@elgato-stream-deck/core'
 import { StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Jimp } from 'jimp';
 import path from 'path';
@@ -10,17 +10,24 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { TextToImage } from './textToImage.mjs';
 import { Dashboard } from './storage.mjs';
 
+function isLcdButton(control: StreamDeckControlDefinition): control is StreamDeckButtonControlDefinitionLcdFeedback {
+    return control.type === 'button' && control.feedbackType === 'lcd';
+}
+
+/** The keys that can show an image. Other controls (the Neo's RGB touch keys and LCD segment, encoders) are skipped. */
+export function getLcdButtonControls(streamDeck: StreamDeckTcp): StreamDeckButtonControlDefinitionLcdFeedback[] {
+    return streamDeck.CONTROLS.filter(isLcdButton);
+}
+
 export function getButtonControlSize(streamDeck: StreamDeckTcp) {
-    return streamDeck.CONTROLS.reduce((result, control) => {
-        if (control as StreamDeckButtonControlDefinitionLcdFeedback) {
-            if (result.columns < (control.column + 1)) {
-            result.columns = control.column + 1
-            result.total = result.rows * result.columns;
-            }
-            if (result.rows < (control.row + 1)) {
-            result.rows = control.row + 1
-            result.total = result.rows * result.columns;
-            }
+    return getLcdButtonControls(streamDeck).reduce((result, control) => {
+        if (result.columns < (control.column + 1)) {
+        result.columns = control.column + 1
+        result.total = result.rows * result.columns;
+        }
+        if (result.rows < (control.row + 1)) {
+        result.rows = control.row + 1
+        result.total = result.rows * result.columns;
         }
         return result
         }, {columns: 0, rows: 0, total: 0});
@@ -39,7 +46,7 @@ export async function renderImage(streamDeck: StreamDeckTcp, control: StreamDeck
 }
 
 export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dashboard) {
-    const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    const controls = getLcdButtonControls(streamDeck)
 
     const actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
@@ -81,7 +88,7 @@ export async function renderPincodeDashboard(streamDeck: StreamDeckTcp) {
         }
     }
 
-    const controls = streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    const controls = getLcdButtonControls(streamDeck)
     const actions: Promise<void>[] = []
     for (const [i, control] of controls.entries()) {
         const item = items[i+1];

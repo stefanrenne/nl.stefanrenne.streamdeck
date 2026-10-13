@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createFakeHomey, FakeCard, FakeHomey, FakeSettings, seedSettings } from './helpers/fake-homey.mjs'
-import { FakeStreamDeck, lcdButtons } from './helpers/fake-stream-deck.mjs'
+import { FakeStreamDeck, lcdButtons, neoControls } from './helpers/fake-stream-deck.mjs'
 
 // The real connection manager opens TCP sockets; the tests drive its events by hand.
 vi.mock('@elgato-stream-deck/tcp', async () => {
@@ -54,7 +54,8 @@ const connect = async (streamDeck: FakeStreamDeck) => {
   device.connectionManager.emit('connected', streamDeck)
   await vi.waitFor(() => {
     const keysTouched = streamDeck.fillKeyBuffer.mock.calls.length + streamDeck.clearKey.mock.calls.length
-    expect(keysTouched >= streamDeck.CONTROLS.length || streamDeck.fillPanelBuffer.mock.calls.length > 0).toBe(true)
+    const lcdKeys = streamDeck.CONTROLS.filter((control) => control.type === 'button' && control.feedbackType === 'lcd').length
+    expect(keysTouched >= lcdKeys || streamDeck.fillPanelBuffer.mock.calls.length > 0).toBe(true)
   }, { timeout: 15_000 })
 }
 
@@ -344,6 +345,20 @@ describe('reacting to settings changes', () => {
   it('unset-variable clears that key', async () => {
     settings.emit('unset-variable', 'var-temp')
     await vi.waitFor(() => expect(deck.clearedKeys()).toEqual([7]))
+  })
+})
+
+describe('Stream Deck Neo (regression 00a1032)', () => {
+  beforeEach(async () => {
+    deck = new FakeStreamDeck(neoControls())
+    device = createDevice({ dashboard: 'd-home', onoff: true })
+    await device.onInit()
+    await connect(deck)
+  })
+
+  it('is measured as 4x2 and only its LCD keys are drawn', async () => {
+    await vi.waitFor(() => expect(device.settings).toMatchObject({ columns: 4, rows: 2 }))
+    expect([...deck.filledKeys(), ...deck.clearedKeys()].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
   })
 })
 

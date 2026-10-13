@@ -1,9 +1,9 @@
 import Homey, { DiscoveryResultMDNSSD, FlowCardTriggerDevice } from 'homey';
-import type { StreamDeckButtonControlDefinition, StreamDeckButtonControlDefinitionLcdFeedback } from '@elgato-stream-deck/core'
+import type { StreamDeckButtonControlDefinition } from '@elgato-stream-deck/core'
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
 import { Dashboard, Store } from '../../lib/storage.mjs';
 import { CardListener } from '../../lib/cardListener.mjs';
-import { getButtonControlSize, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter.mjs';
+import { getButtonControlSize, getLcdButtonControls, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter.mjs';
 import { map } from '../../lib/helpers.mjs';
 
 export default class NetworkDock extends Homey.Device {
@@ -204,7 +204,7 @@ export default class NetworkDock extends Homey.Device {
       return undefined;
     }
 
-    const controls = this.streamDeck.CONTROLS.map((control) => control as StreamDeckButtonControlDefinitionLcdFeedback)
+    const controls = getLcdButtonControls(this.streamDeck)
     for (const [i, control] of controls.entries()) {
       const item = dashboard.items[i+1];
       if (item.kind === 'variable' && item.variableId === variableId) {

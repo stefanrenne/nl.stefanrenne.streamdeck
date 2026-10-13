@@ -6,7 +6,6 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Bugs
 
-- [ ] **Stream Deck Neo is measured as 4×3.** In `lib/streamDeckAdapter.mts`, `getButtonControlSize` uses `if (control as StreamDeckButtonControlDefinitionLcdFeedback)` as if it were a type check. It's a cast, so the Neo's 2 RGB touch keys and LCD segment (row 2) count too. The device settings show 3 rows, `Store.updateDashboard(4, 3)` is rejected on every load, and `renderDashboard` / `getDisplayedControlForVariable` also iterate over the non-LCD controls. Filter on `type === 'button' && feedbackType === 'lcd'` in all three. Test: `rendering.test.mts` "ignores non-LCD controls".
 - [?] **`homey.settings.get` for a missing key: `undefined` or `null`?** `Store.getImage` / `getDashboard` / `getVariable` only handle `undefined`. If the runtime returns `null`, a dashboard that points to a deleted image crashes on `.replace`. Verify on a Homey. Comparing with `== null` would handle both either way.
 - [?] **An ip address change from discovery doesn't reconnect.** `onDiscoveryAddressChanged` only calls `setSettings({ ipAddress })`, and `onSettings` isn't called for programmatic changes. Check on a Homey whether `onDiscoveryAvailable` follows with the new address. Otherwise, reconnect in `onDiscoveryAddressChanged`.
 - [ ] **Settings page renders names as HTML.** Image, variable and dashboard names are written with `innerHTML` (`loadImages`, `loadVariables`, `loadDashboards`), and image names come from file names. Use `textContent`.

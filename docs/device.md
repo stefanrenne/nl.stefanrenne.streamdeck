@@ -47,7 +47,7 @@ For each event:
 
 ### Single and double press
 
-On `down`, `validateSingleDouble` runs before the `down` triggers:
+On `down`, `validateSingleDouble(control, isTurnedOn)` runs before the `down` triggers, both while the deck is on (only for keys on a loaded dashboard) and while it's off (any key). The resulting `single`/`double` is sent with the `onoff` state of the press, so a press while off produces `single`/`double` on `off_button_action`:
 
 - A second `down` on the **same key within 250 ms** fires `double` immediately, and suppresses the pending single.
 - Otherwise a `single` fires **400 ms** after the press, unless a double happened in between. A press on another key doesn't cancel it.

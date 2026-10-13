@@ -238,10 +238,11 @@ export default class NetworkDock extends Homey.Device {
 
   private lastKeyPressTime: number = 0;
   private lastKeyPressIndex: number = 0;
-  validateSingleDouble(control: StreamDeckButtonControlDefinition) {
+  // isTurnedOn is the state at the press, so a 'single'/'double' goes to the same cards as its 'down'.
+  validateSingleDouble(control: StreamDeckButtonControlDefinition, isTurnedOn: boolean) {
     const thisKeyPressTime = new Date().getTime();
     if (thisKeyPressTime - this.lastKeyPressTime <= 250 && this.lastKeyPressIndex == control.index+1) {
-      this.streamDeckEvent('double', true, control).catch((e) => console.error('double event failed:', e));
+      this.streamDeckEvent('double', isTurnedOn, control).catch((e) => console.error('double event failed:', e));
       this.lastKeyPressTime = 0;
       this.lastKeyPressIndex = 0;
     } else {
@@ -250,7 +251,7 @@ export default class NetworkDock extends Homey.Device {
       // homey.setTimeout is cleared when the app unloads, so no 'single' fires after that.
       this.homey.setTimeout(() => {
         if (this.lastKeyPressTime > 0) {
-          this.streamDeckEvent('single', true, control).catch((e) => console.error('single event failed:', e));
+          this.streamDeckEvent('single', isTurnedOn, control).catch((e) => console.error('single event failed:', e));
         }
       }, 400);
     }
@@ -263,6 +264,9 @@ export default class NetworkDock extends Homey.Device {
     const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
     
     if (!isTurnedOn) {
+      if (event === 'down') {
+        this.validateSingleDouble(control, false);
+      }
       await this.onOffButtonAction.trigger(this, tokens, state);
       this.log(event + ' disabled button');
       return
@@ -274,7 +278,7 @@ export default class NetworkDock extends Homey.Device {
     }
 
     if (event === 'down') {
-      this.validateSingleDouble(control);
+      this.validateSingleDouble(control, true);
     }
 
     const actions: Promise<void>[] = []

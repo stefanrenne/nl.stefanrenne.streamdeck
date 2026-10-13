@@ -42,7 +42,3 @@ The variable actions are registered in `app.mts`. They do nothing if the variabl
 1. Add `.homeycompose/flow/<type>/<id>.json` with all 13 languages. Leave out empty `args`/`tokens` arrays, and add `device` (`driver_id=network-dock`) for device cards.
 2. Register it: device cards in `NetworkDock.onInit` (use `getDeviceTriggerCard` for triggers), app cards in `StreamDeckApp.onInit`. Use `CardListener` for autocomplete.
 3. Add tests (`device.test.mts` or `app.test.mts`), then update this doc and the Flow Cards section of README.md.
-
-## Known issues
-
-- `off_button_action` offers single and double press in its `action` dropdown, but those never fire while the deck is off, because press detection only runs while it's on. Only press and release work.

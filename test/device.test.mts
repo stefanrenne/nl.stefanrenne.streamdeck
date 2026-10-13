@@ -260,6 +260,32 @@ describe('button events', () => {
       expect(homey.setTimeout).toHaveBeenCalledWith(expect.any(Function), 400)
     })
 
+    describe('while the deck is turned off (regression cdf1426)', () => {
+      const offActions = () => card('off_button_action').trigger.mock.calls.map(([, , callState]) => (callState as { action: string }).action)
+
+      beforeEach(() => {
+        device.capabilityValues.set('onoff', false)
+      })
+
+      it('fires "single" on the disabled-button card', async () => {
+        await press('down', deck.CONTROLS[0])
+        await vi.advanceTimersByTimeAsync(400)
+
+        expect(offActions()).toEqual(['down', 'single'])
+        expect(actions()).toEqual([])
+      })
+
+      it('fires "double" on the disabled-button card', async () => {
+        await press('down', deck.CONTROLS[0])
+        await vi.advanceTimersByTimeAsync(200)
+        await press('down', deck.CONTROLS[0])
+        await vi.advanceTimersByTimeAsync(500)
+
+        expect(offActions().sort()).toEqual(['double', 'down', 'down'])
+        expect(actions()).toEqual([])
+      })
+    })
+
     it('two presses on different keys are two singles', async () => {
       await press('down', deck.CONTROLS[0])
       await vi.advanceTimersByTimeAsync(100)

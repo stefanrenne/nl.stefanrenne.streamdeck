@@ -75,6 +75,17 @@ describe('locales and READMEs', () => {
     const file = language === 'en' ? 'README.txt' : `README.${language}.txt`
     expect(readFileSync(join(root, file), 'utf8').trim()).not.toBe('')
   })
+
+  // App Store Guidelines 1.3: the store description is a short pitch, not a feature list. Details go in README.md.
+  it.each(LANGUAGES)('README.txt for %s is a short pitch that points to GitHub', (language) => {
+    const file = language === 'en' ? 'README.txt' : `README.${language}.txt`
+    const text = readFileSync(join(root, file), 'utf8').trim()
+    const paragraphs = text.split(/\n\s*\n/)
+
+    expect(paragraphs.length).toBeLessThanOrEqual(4)
+    expect(text).not.toMatch(/^\s*(-{3,}|- |\*)/m)
+    expect(paragraphs.at(-1)).toContain('https://github.com/stefanrenne/nl.stefanrenne.streamdeck')
+  })
 })
 
 describe('release metadata', () => {

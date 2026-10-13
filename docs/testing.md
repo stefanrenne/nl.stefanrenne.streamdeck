@@ -25,7 +25,7 @@ Unit tests use [Vitest](https://vitest.dev) and live in `test/`. Run them with `
 | `device.test.mts` | `NetworkDock`: init and dashboard fallback, connecting (settings, rendering, failing serial reads, no deck, disconnect), button events and tokens, single/double timing (fake timers), dashboard cards and the capability, the settings events, brightness, discovery/ip changes, delete. |
 | `app.test.mts` | `StreamDeckApp` (cleanup on init, the settings relay, the three update-variable actions), `api.textToImage`, `NetworkDockDriver.onPairListDevices`. |
 | `settings.test.mts` | The settings page (`settings/index.html`) has no build step or DOM tests, so this checks its source: names are never written with `innerHTML`, dashboard sizes are stored as numbers, and the `variables` list only gets `{ id, name }`. |
-| `manifest.test.mts` | All compose files (flow, capability, driver, app) are translated into all 13 languages. Flow cards have no empty `args`/`tokens`. `app.json` matches `.homeycompose`. Locales have matching keys, and every README exists. Every `README*.txt` is a short pitch (at most 4 paragraphs, no lists, ends with the GitHub link). Versions match, and the changelog has the current version. `@elgato-stream-deck/*` stays on 7.7.x (see TODO.md). |
+| `manifest.test.mts` | All compose files (flow, capability, driver, app) are translated into all 13 languages. Flow cards have no empty `args`/`tokens`. `app.json` matches `.homeycompose`. Locales have matching keys, and every README exists. Every `README*.txt` is a short pitch (at most 4 paragraphs, no lists, ends with the GitHub link). Versions match, and the changelog has the current version. |
 
 ## Conventions
 

@@ -255,6 +255,11 @@ describe('button events', () => {
       expect(actions().sort()).toEqual(['double', 'down', 'down'])
     })
 
+    it('waits for "single" with homey.setTimeout, so the timer is cleared when the app unloads', async () => {
+      await press('down', deck.CONTROLS[0])
+      expect(homey.setTimeout).toHaveBeenCalledWith(expect.any(Function), 400)
+    })
+
     it('two presses on different keys are two singles', async () => {
       await press('down', deck.CONTROLS[0])
       await vi.advanceTimersByTimeAsync(100)

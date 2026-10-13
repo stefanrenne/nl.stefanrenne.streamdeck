@@ -99,6 +99,9 @@ export function createFakeHomey() {
     __: (key: string) => key,
     log: vi.fn(),
     error: vi.fn(),
+    // Delegate at call time, so vi.useFakeTimers() also controls these.
+    setTimeout: vi.fn((callback: () => void, ms: number) => setTimeout(callback, ms)),
+    clearTimeout: vi.fn((timeout: ReturnType<typeof setTimeout>) => clearTimeout(timeout)),
   }
 
   return { homey, card, cards, settings }

@@ -14,7 +14,6 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Cleanup
 
-- [ ] Single/double press detection uses the global `setTimeout`. Use `this.homey.setTimeout`, so it is cleared when the app unloads.
 - [ ] The settings page stores `columns`/`rows` as strings, and the full variable (including its base64 `sample`) in the `variables` list. Store numbers and `{ id, name }` only (keep reading the old format).
 
 ## Docs / store listing

@@ -52,7 +52,7 @@ On `down`, `validateSingleDouble` runs before the `down` triggers:
 - A second `down` on the **same key within 250 ms** fires `double` immediately, and suppresses the pending single.
 - Otherwise a `single` fires **400 ms** after the press, unless a double happened in between. A press on another key doesn't cancel it.
 
-This uses the global `setTimeout`, not `homey.setTimeout`.
+The 400 ms wait uses `homey.setTimeout`, which Homey clears when the app unloads.
 
 ## Brightness
 

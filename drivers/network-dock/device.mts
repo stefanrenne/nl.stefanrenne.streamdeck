@@ -247,16 +247,12 @@ export default class NetworkDock extends Homey.Device {
     } else {
       this.lastKeyPressTime = thisKeyPressTime;
       this.lastKeyPressIndex = control.index+1;
-      void new Promise<void>((resolve) => {
-        setTimeout(function() {
-          resolve()
-        }, 400);
-      })
-      .then(() => {
+      // homey.setTimeout is cleared when the app unloads, so no 'single' fires after that.
+      this.homey.setTimeout(() => {
         if (this.lastKeyPressTime > 0) {
-          this.streamDeckEvent('single', true, control).catch((e) => console.error('single event failed:', e));;
+          this.streamDeckEvent('single', true, control).catch((e) => console.error('single event failed:', e));
         }
-      });
+      }, 400);
     }
   }
 

@@ -27,6 +27,7 @@ All user data lives in **`homey.settings`** (the app settings store). The settin
 `Store` is a read-through cache: `getDashboard`, `getImage` and `getVariable` read settings on the first call and then serve from memory until they're invalidated.
 
 - `getDashboard(id)` resolves each item into a `DashboardItem`: `{ kind: 'image', imageBuffer, … }`, `{ kind: 'variable', firstLine, secondLine, textColor, backgroundColor, … }` or `{ kind: 'empty', payload }`. An item whose image or variable no longer exists becomes `empty` but keeps its payload. `items` always has keys 1–32, defaulting to empty. `usedVariableIds` lists the variables shown on it.
+- The Homey SDK docs don't say whether `settings.get` returns `undefined` or `null` for a missing key, so `Store` checks the stored data with `== null` (both). A dashboard item that points at an image without data becomes an empty item, and a dashboard without data is `undefined`.
 - `getVariable(id)` defaults the colours to `#ffffff` on `#000000` and maps an empty `secondLine` to `undefined`. `setVariable` stores `undefined` as `''`.
 - `getImage(id)` decodes the data URL into `imageBuffer`.
 - The `…Metadata` lists are cached separately and are re-read when a cache is invalidated or empty.
@@ -53,4 +54,3 @@ settings page / Store.setVariable
 
 - `setVariable` deletes `cachedImages[id]` instead of `cachedVariables[id]`. It's harmless today, because the settings relay invalidates the variable right after.
 - `updateDashboard` rebuilds the cached dashboard with its **old** `columns`/`rows` (a no-op since 1f5b120). The settings write that follows invalidates it anyway.
-- The Homey SDK typings don't say whether `settings.get` returns `undefined` or `null` for a missing key. `getImage` and `getDashboard` only handle `undefined`.

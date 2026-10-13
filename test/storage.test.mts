@@ -120,6 +120,25 @@ describe('dashboards', () => {
     expect(store.getDashboard('d')?.items[4]).toEqual({ kind: 'empty', payload: 'kept' })
   })
 
+  describe('when homey.settings.get returns null for a missing key (regression 355019a)', () => {
+    it('treats a deleted image as missing instead of crashing', () => {
+      settings.values.set('image-deleted', null)
+      expect(store.getImage('deleted')).toBeUndefined()
+      expect(store.getDashboard('d')?.items[4]).toEqual({ kind: 'empty', payload: 'kept' })
+    })
+
+    it('treats an image whose data is gone as missing', () => {
+      settings.values.set('image-img', null)
+      expect(store.getImage('img')).toBeUndefined()
+    })
+
+    it('treats a dashboard whose data is gone as missing', () => {
+      settings.values.set('dashboard-d', null)
+      expect(store.getDashboard('d')).toBeUndefined()
+      expect(() => store.updateDashboard('d', 4, 2)).not.toThrow()
+    })
+  })
+
   it('returns undefined for an unknown dashboard', () => {
     expect(store.getDashboard('unknown')).toBeUndefined()
   })

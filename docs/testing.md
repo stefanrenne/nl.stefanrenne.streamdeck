@@ -19,7 +19,7 @@ Unit tests use [Vitest](https://vitest.dev) and live in `test/`. Run them with `
 
 | File | Covers |
 |---|---|
-| `storage.test.mts` | `Store`: resolving dashboard items, unescaping payloads, the image/variable defaults, caching and invalidation (including variable → dashboard), `updateDashboard` layouts, `cleanSettings`. |
+| `storage.test.mts` | `Store`: resolving dashboard items, unescaping payloads, missing keys read as `null`, the image/variable defaults, caching and invalidation (including variable → dashboard), `updateDashboard` layouts, `cleanSettings`. |
 | `cardListener.test.mts` | Autocomplete for images, variables and dashboards (including the Homey entry), and the run-listener matching. |
 | `rendering.test.mts` | `TextToImage` (size, background, text colour, `#rgb`), `getButtonControlSize`, `renderDashboard` (which keys are drawn or cleared, only LCD keys on a Neo, error tolerance), `renderHomeyLogo`. |
 | `device.test.mts` | `NetworkDock`: init and dashboard fallback, connecting (settings, rendering, failing serial reads, no deck, disconnect), button events and tokens, single/double timing (fake timers), dashboard cards and the capability, the settings events, brightness, discovery/ip changes, delete. |

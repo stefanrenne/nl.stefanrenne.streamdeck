@@ -116,8 +116,8 @@ export class Store {
         }
 
         //write cache back to store
-        const data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
-        if (data !== undefined) {
+        const data: StoredDashboard | null | undefined = this.homey.settings.get('dashboard-' + id);
+        if (data != null) {
             data.columns = columns;
             data.rows = rows;
             this.homey.settings.set('dashboard-' + id, data);
@@ -145,8 +145,8 @@ export class Store {
             this.invalidateDashboardMetadata();
         }
         const metadata = this.cachedDashboardMetadata.find((dashboard) => dashboard.id === id);
-        const data: StoredDashboard | undefined = this.homey.settings.get('dashboard-' + id);
-        if (metadata === undefined || data === undefined) {
+        const data: StoredDashboard | null | undefined = this.homey.settings.get('dashboard-' + id);
+        if (metadata === undefined || data == null) {
             return undefined
         }
 
@@ -234,7 +234,7 @@ export class Store {
             this.invalidateVariablesMetadata();
         }
         const metadata = this.cachedVariablesMetadata.find((variable) => variable.id === id);
-        const variable: StoredVariable | undefined = this.homey.settings.get('variable-' + id);
+        const variable: StoredVariable | null | undefined = this.homey.settings.get('variable-' + id);
         if (metadata === undefined) {
             return undefined
         }
@@ -278,10 +278,11 @@ export class Store {
             this.invalidateImagesMetadata();
         }
         const metadata = this.cachedImagesMetadata.find((image) => image.id === id);
-        const base64Image: string | undefined = this.homey.settings.get('image-' + id);
-        const imageBuffer = (base64Image === undefined) ? undefined : Buffer.from(base64Image.replace(/^data:image\/[a-z]+;base64,/gi, ''), 'base64');
+        // `== null`: the runtime may return null or undefined for a missing key.
+        const base64Image: string | null | undefined = this.homey.settings.get('image-' + id);
+        const imageBuffer = (base64Image == null) ? undefined : Buffer.from(base64Image.replace(/^data:image\/[a-z]+;base64,/gi, ''), 'base64');
 
-        if (metadata === undefined || base64Image === undefined || imageBuffer === undefined) {
+        if (metadata === undefined || base64Image == null || imageBuffer === undefined) {
             return undefined
         }
         const image: Image = { id: metadata.id, name: metadata.name, base64Image: base64Image, imageBuffer: imageBuffer }

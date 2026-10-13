@@ -9,7 +9,7 @@ App-level cards live in `.homeycompose/flow/`. The `onoff` and `dim` capabilitie
 | `any_button_action` | `action` | `dashboard`, `imageName`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` | `args.action === state.action` |
 | `image_button_action` | `image` (autocomplete), `action` | `dashboard`, `payload`, `column`, `row`, `item` | same image id and action |
 | `variable_button_action` | `variable` (autocomplete), `action` | `dashboard`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` | same variable id and action |
-| `off_button_action` | `action` | `column`, `row`, `item` | **none registered**, so the `action` dropdown is ignored: a flow fires on both `down` and `up` (see known issues) |
+| `off_button_action` | `action` | `column`, `row`, `item` | `args.action === state.action` (the same listener as `any_button_action`) |
 | `changed_dashboard` | none | `dashboard` (name) | none |
 
 `action` is a dropdown: `down` (pressed), `up` (released), `single`, `double`. When each fires is described in [device.md](device.md#button-events). The device sends the full token set to every trigger, and Homey only exposes the tokens declared in the card's JSON.
@@ -45,4 +45,4 @@ The variable actions are registered in `app.mts`. They do nothing if the variabl
 
 ## Known issues
 
-- `off_button_action` has an `action` arg, but no run listener. A "Disabled button **released**" flow also fires on press, and vice versa. Single and double never fire while the deck is off, because press detection only runs while it's on.
+- `off_button_action` offers single and double press in its `action` dropdown, but those never fire while the deck is off, because press detection only runs while it's on. Only press and release work.

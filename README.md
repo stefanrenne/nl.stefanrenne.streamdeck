@@ -39,7 +39,7 @@ The app automatically detects your Stream Deck Network Dock on the local network
 | Button action | Fires on any button event | `dashboard`, `imageName`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` |
 | Image button action | Fires when a button assigned to an image is triggered | `dashboard`, `payload`, `column`, `row`, `item` |
 | Variable button action | Fires when a button assigned to a variable is triggered | `dashboard`, `textFirstLine`, `textSecondLine`, `payload`, `column`, `row`, `item` |
-| Disabled button action | Fires when any button is pressed or released while the Stream Deck is turned off | `column`, `row`, `item` |
+| Disabled button action | Fires when a button is pressed or released (you choose which) while the Stream Deck is turned off | `column`, `row`, `item` |
 
 All button triggers support filtering by action type: **pressed** (down), **released** (up), **single pressed**, or **double pressed**. A double press is two presses on the same button within 250 ms; a single press fires 400 ms after a press that wasn't followed by a second one.
 

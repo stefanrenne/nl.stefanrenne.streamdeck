@@ -208,8 +208,14 @@ describe('button events', () => {
     expect(card('any_button_action').trigger).not.toHaveBeenCalled()
   })
 
-  // See TODO.md: off_button_action has an `action` arg but no run listener, so every flow fires on every press/release.
-  it.todo('off_button_action only fires flows for the chosen action')
+  it('off_button_action only fires flows for the chosen action (regression cdf1426)', async () => {
+    device.capabilityValues.set('onoff', false)
+    await press('up', deck.CONTROLS[0])
+
+    const [, , triggeredState] = card('off_button_action').trigger.mock.calls[0]
+    expect(await card('off_button_action').run({ action: 'up' }, triggeredState as never)).toBe(true)
+    expect(await card('off_button_action').run({ action: 'down' }, triggeredState as never)).toBe(false)
+  })
 
   it('nothing fires on the Homey dashboard', async () => {
     await device.loadDashboard('0')

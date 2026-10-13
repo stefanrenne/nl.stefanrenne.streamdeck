@@ -30,6 +30,7 @@ export default class NetworkDock extends Homey.Device {
     this.cardListener.registerVariableAutocompleteListenerForCard(this.onVariableButtonAction);
     this.cardListener.registerVariableButtonRunListener(this.onVariableButtonAction);
     this.cardListener.registerAnyButtonRunListener(this.onAnyButtonAction);
+    this.cardListener.registerAnyButtonRunListener(this.onOffButtonAction);
     this.registerIsDashboardListener();
     this.registerChangeDashboardListener();
 

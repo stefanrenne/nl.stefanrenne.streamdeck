@@ -6,13 +6,14 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Bugs
 
-- [ ] **"Disabled button" flows ignore the chosen action.** `off_button_action` has an `action` dropdown, but no run listener is registered (`CardListener.registerAnyButtonRunListener` would do), so a flow fires on both press and release. Test: `device.test.mts` "off_button_action only fires flows for the chosen action".
 - [ ] **Stream Deck Neo is measured as 4×3.** In `lib/streamDeckAdapter.mts`, `getButtonControlSize` uses `if (control as StreamDeckButtonControlDefinitionLcdFeedback)` as if it were a type check. It's a cast, so the Neo's 2 RGB touch keys and LCD segment (row 2) count too. The device settings show 3 rows, `Store.updateDashboard(4, 3)` is rejected on every load, and `renderDashboard` / `getDisplayedControlForVariable` also iterate over the non-LCD controls. Filter on `type === 'button' && feedbackType === 'lcd'` in all three. Test: `rendering.test.mts` "ignores non-LCD controls".
 - [?] **`homey.settings.get` for a missing key: `undefined` or `null`?** `Store.getImage` / `getDashboard` / `getVariable` only handle `undefined`. If the runtime returns `null`, a dashboard that points to a deleted image crashes on `.replace`. Verify on a Homey. Comparing with `== null` would handle both either way.
 - [?] **An ip address change from discovery doesn't reconnect.** `onDiscoveryAddressChanged` only calls `setSettings({ ipAddress })`, and `onSettings` isn't called for programmatic changes. Check on a Homey whether `onDiscoveryAvailable` follows with the new address. Otherwise, reconnect in `onDiscoveryAddressChanged`.
 - [ ] **Settings page renders names as HTML.** Image, variable and dashboard names are written with `innerHTML` (`loadImages`, `loadVariables`, `loadDashboards`), and image names come from file names. Use `textContent`.
 
 - [ ] **`@elgato-stream-deck/*` 7.8.0 doesn't connect on Homey.** With 7.8.0, `connectTo` never results in `connected` (not even for the dock itself) and no `error` is emitted when the app runs in Docker (`homey app run`, and so on a Homey). 7.7.1 connects within a second in the same setup. On the macOS host, both versions connect. Pinned to `~7.7.1` (package.json, Dependabot ignore, `manifest.test.mts`). Find the cause (suspects: the keepalive/timeout rework in `socketWrapper.js`, `TcpCoraHidDevice.#disconnected`), report it upstream at [node-elgato-stream-deck](https://github.com/Julusian/node-elgato-stream-deck), and lift the pin once a fixed version is verified with `homey app run`. Note: plain `docker run` containers on the dev Mac get `ECONNREFUSED` from the dock with either version, so they can't be used to reproduce this.
+
+- [?] **Single/double press never fire while the deck is off.** `off_button_action` offers single and double press in its dropdown, but `streamDeckEvent` returns before `validateSingleDouble` when `onoff` is false, and `validateSingleDouble` always passes `isTurnedOn = true`. Decide: run press detection while off (and pass the real `onoff`), or remove single/double from that card's dropdown (all 13 languages).
 
 ## Cleanup
 

@@ -24,6 +24,7 @@ export default class NetworkDock extends Homey.Device {
    * onInit is called when the device is initialized.
    */
   async onInit() {
+    this.log(`NetworkDock ${this.getData().id} has been initialized, ipAddress ${this.getSetting('ipAddress')}`);
     this.cardListener.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
     this.cardListener.registerImageButtonRunListener(this.onImageButtonAction);
     this.cardListener.registerVariableAutocompleteListenerForCard(this.onVariableButtonAction);
@@ -36,6 +37,7 @@ export default class NetworkDock extends Homey.Device {
     await this.validateSelectedDashboardOption();
 
     this.connectionManager.on('error', async (message) => {
+        this.log('connectionManager - error ' + message);
         await this.setUnavailable(message);
     });
 
@@ -417,16 +419,19 @@ export default class NetworkDock extends Homey.Device {
    * Discovery result update
    */
   onDiscoveryResult(discoveryResult: DiscoveryResultMDNSSD) {
-    return discoveryResult.id === this.getData().id;
+    const matches = discoveryResult.id === this.getData().id;
+    this.log(`onDiscoveryResult ${discoveryResult.id} at ${discoveryResult.address}, matches: ${matches}`);
+    return matches;
   }
 
   async onDiscoveryAvailable(discoveryResult: DiscoveryResultMDNSSD) {
     const ipAddress = this.getSetting('ipAddress');
+    this.log(`onDiscoveryAvailable at ${discoveryResult.address}, connecting to ${ipAddress}`);
     this.connectionManager.connectTo(ipAddress)
   }
 
   onDiscoveryAddressChanged(discoveryResult: DiscoveryResultMDNSSD) {
-    console.log("onDiscoveryAddressChanged to " + discoveryResult.address);
+    this.log('onDiscoveryAddressChanged to ' + discoveryResult.address);
     this.setSettings({'ipAddress': discoveryResult.address}).catch((e) => console.error('update ipAddress failed:', e));
   }
 };

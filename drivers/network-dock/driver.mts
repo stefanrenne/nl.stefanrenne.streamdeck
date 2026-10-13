@@ -4,6 +4,14 @@ export default class NetworkDockDriver extends Homey.Driver {
   
   async onInit() {
     this.log('NetworkDockDriver has been initialized');
+
+    const discoveryStrategy = this.getDiscoveryStrategy();
+    const logResults = () => {
+      const results = Object.values(discoveryStrategy.getDiscoveryResults());
+      this.log(`discovery: ${results.length} result(s)` + results.map((r) => ` [${r.id} at ${r.address}]`).join(''));
+    };
+    logResults();
+    discoveryStrategy.on('result', logResults);
   }
 
   async onPairListDevices() {

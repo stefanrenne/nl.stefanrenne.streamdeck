@@ -10,14 +10,14 @@ All user data lives in **`homey.settings`** (the app settings store). The settin
 | `dashboard-<id>` | settings page, `Store.updateDashboard` | `{ columns, rows, items: StoredDashboardItem[] }` |
 | `images` | settings page | `[{ id, name }]` |
 | `image-<id>` | settings page | JPEG data URL (`data:image/jpeg;base64,…`), center-cropped to a square of at most 250 px |
-| `variables` | settings page | `[{ id, name, …}]`. The settings page stores the **whole** variable here (including `sample`); `Store` only reads `id` and `name`. |
+| `variables` | settings page | `[{ id, name }]` (`toMetadata` in the settings page). Installs saved by older versions may still hold the whole variable here, including `sample`, until the list is next written; `Store` and the settings page only read `id` and `name` from it. |
 | `variable-<id>` | settings page, `Store.setVariable` (flow cards) | `{ firstLine, secondLine, textColor, backgroundColor, sample }` |
 
 `StoredDashboardItem` is `{ type: 'empty' | 'image' | 'variable', item, imageId?, variableId?, payload }`:
 
 - `item` is the **1-based key position**, in row-major order (`index + 1` of the deck's `CONTROLS`). Key names in the UI and the `item` token are a row letter plus a column number: item 1 is `A1`, and item 8 on a 5-column deck is `B3`.
 - `payload` is free text. The settings page escapes `"` as `\x22` and `'` as `\x27`, and `Store.getDashboard` unescapes them.
-- `columns` / `rows` are one of 8×4, 5×3, 4×2, 3×2. The settings page stores them as **strings** (`"5"`), because they are read from `innerHTML`. `Store.updateDashboard` writes numbers. `NetworkDock.loadDashboard` compares with `!=`, so both work.
+- `columns` / `rows` are one of 8×4, 5×3, 4×2, 3×2, stored as numbers by the settings page (`Number(...)` on the picker values) and `Store.updateDashboard`. Older settings pages stored strings (`"5"`); `Store.getDashboard` converts with `Number()`, and the settings page rewrites a dashboard as numbers the next time it's saved.
 - Dashboards from before 1.1.6 had `displayMode` (6/8/15/32) instead of `columns`/`rows`. The settings page migrates them when it loads. If it hasn't, the device writes the deck's size on the next load.
 
 `cleanSettings()` (run from `StreamDeckApp.onInit`) removes every key that isn't `dashboards` / `images` / `variables` or referenced from one of those lists.

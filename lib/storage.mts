@@ -170,7 +170,8 @@ export class Store {
             return result;
         }, defaultItems);
 
-        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, columns: data.columns, rows: data.rows, items: items, usedVariableIds: usedVariableIds };
+        // Older settings pages stored the size as strings ("5").
+        const dashboard: Dashboard = { id: metadata.id, name: metadata.name, columns: Number(data.columns), rows: Number(data.rows), items: items, usedVariableIds: usedVariableIds };
         this.cachedDashboards[id] = dashboard;
         return dashboard;
 

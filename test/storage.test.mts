@@ -172,6 +172,11 @@ describe('dashboards', () => {
     expect(store.getDashboard('d')).toMatchObject({ columns: 4, rows: 2 })
   })
 
+  it('reads columns and rows that older settings pages stored as strings as numbers', () => {
+    settings.seed('dashboard-d', { columns: '5', rows: '3', items: [] })
+    expect(store.getDashboard('d')).toMatchObject({ columns: 5, rows: 3 })
+  })
+
   it('updateDashboard ignores layouts no Stream Deck has', () => {
     store.updateDashboard('d', 4, 3)
     expect(settings.get('dashboard-d')).toMatchObject({ columns: 5, rows: 3 })

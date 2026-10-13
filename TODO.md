@@ -14,7 +14,6 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Cleanup
 
-- [ ] The settings page stores `columns`/`rows` as strings, and the full variable (including its base64 `sample`) in the `variables` list. Store numbers and `{ id, name }` only (keep reading the old format).
 
 ## Docs / store listing
 

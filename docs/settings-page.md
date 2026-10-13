@@ -39,8 +39,3 @@ The editor has a name, first and second line, and text and background colours. T
 | Route | Body | Returns |
 |---|---|---|
 | `POST /textToImage` | `{ firstLine, secondLine?, textColor?, backgroundColor? }` | A JPEG data URL rendered by `TextToImage` at 192 px. An empty `secondLine` means one line. The colours default to `#ffffff` on `#000000`. |
-
-## Known issues
-
-- `columns`/`rows` are saved as strings (see [data-model.md](data-model.md)).
-- The `variables` list stores every variable's full data, including its base64 `sample`, next to `variable-<id>`.

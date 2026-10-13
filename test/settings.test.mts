@@ -11,4 +11,20 @@ describe('settings page', () => {
     const htmlFromName = lines.filter(({ text }) => /\.innerHTML\s*=\s*[^;]*\.name\b/.test(text))
     expect(htmlFromName).toEqual([])
   })
+
+  it('stores dashboard columns and rows as numbers', () => {
+    // The pickers are read from innerHTML, so without Number() they're saved as "5" / "3".
+    const dashboardData = lines.find(({ text }) => text.startsWith('const dashboardData ='))
+    expect(dashboardData?.text).toContain("'columns': Number(columns)")
+    expect(dashboardData?.text).toContain("'rows': Number(rows)")
+  })
+
+  it('stores only id and name in the variables list', () => {
+    // The full variable (with its base64 sample) belongs in variable-<id> only.
+    const listWrites = lines.filter(({ text }) => text.includes("Homey.set('variables'"))
+    expect(listWrites.length).toBeGreaterThan(0)
+    for (const { text } of listWrites) {
+      expect(text).toMatch(/Homey\.set\('variables', toMetadata\(/)
+    }
+  })
 })

@@ -6,9 +6,16 @@ import { FakeStreamDeck, lcdButtons, neoControls } from './helpers/fake-stream-d
 // The real connection manager opens TCP sockets; the tests drive its events by hand.
 vi.mock('@elgato-stream-deck/tcp', async () => {
   const { EventEmitter } = await import('node:events')
+  // Like the real one, connectTo throws for an address it's already connected (or connecting) to.
   class StreamDeckTcpConnectionManager extends EventEmitter {
-    connectTo = vi.fn()
-    disconnectFrom = vi.fn()
+    connections = new Set<string>()
+    connectTo = vi.fn((address: string) => {
+      if (this.connections.has(address)) {
+        throw new Error('Connection already exists')
+      }
+      this.connections.add(address)
+    })
+    disconnectFrom = vi.fn((address: string) => this.connections.delete(address))
   }
   return { StreamDeckTcpConnectionManager, StreamDeckTcp: class {} }
 })
@@ -457,12 +464,32 @@ describe('network', () => {
     expect(device.onDiscoveryResult({ id: 'Other' } as never)).toBe(false)
   })
 
+  it('ignores a repeated onDiscoveryAvailable for the address it already connects to (regression 73d7d9d)', async () => {
+    await device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.50' } as never)
+    await expect(device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.50' } as never)).resolves.toBeUndefined()
+    expect(device.connectionManager.connectTo).toHaveBeenCalledTimes(1)
+  })
+
+  it('reconnects to the new address when discovery reports a change (regression 73d7d9d)', async () => {
+    await device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.50' } as never)
+    device.onDiscoveryAddressChanged({ id: 'Network Dock ABC', address: '192.168.1.99' } as never)
+
+    expect(device.connectionManager.disconnectFrom).toHaveBeenCalledWith('192.168.1.50')
+    expect(device.connectionManager.connectTo).toHaveBeenLastCalledWith('192.168.1.99')
+    await vi.waitFor(() => expect(device.settings.ipAddress).toBe('192.168.1.99'))
+
+    // Homey may follow up with onDiscoveryAvailable for the new address: that must not connect twice.
+    await expect(device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.99' } as never)).resolves.toBeUndefined()
+    expect(device.connectionManager.connectTo).toHaveBeenCalledTimes(2)
+  })
+
   it('stores a changed discovery address in the settings', async () => {
     device.onDiscoveryAddressChanged({ id: 'Network Dock ABC', address: '192.168.1.99' } as never)
     await vi.waitFor(() => expect(device.settings.ipAddress).toBe('192.168.1.99'))
   })
 
   it('reconnects when the user changes the ip address (73d7d9d)', async () => {
+    await device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.50' } as never)
     await connect(deck)
     await device.onSettings({ oldSettings: { ipAddress: '192.168.1.50' }, newSettings: { ipAddress: '192.168.1.60' }, changedKeys: ['ipAddress'] })
 
@@ -472,6 +499,7 @@ describe('network', () => {
   })
 
   it('clears the panel and disconnects when deleted', async () => {
+    await device.onDiscoveryAvailable({ id: 'Network Dock ABC', address: '192.168.1.50' } as never)
     await connect(deck)
     await device.onDeleted()
     expect(deck.clearPanel).toHaveBeenCalled()

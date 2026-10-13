@@ -337,8 +337,7 @@ export default class NetworkDock extends Homey.Device {
       const newIp = newSettings['ipAddress'] as string;
       if (oldIp !== newIp) {
         await this.streamDeck?.clearPanel();
-        this.connectionManager.disconnectFrom(oldIp);
-        this.connectionManager.connectTo(newIp);
+        this.connectToAddress(newIp);
       }
     }
   }  
@@ -347,10 +346,12 @@ export default class NetworkDock extends Homey.Device {
     this.log('NetworkDock has been deleted');
     await this.streamDeck?.clearPanel();
     this.streamDeck?.tcpEvents.removeAllListeners()
-    const ipAddress = this.streamDeck?.remoteAddress
+    // The connected address, not the deck's: a dock that isn't reachable is still being retried.
+    const ipAddress = this.connectedAddress;
     if (ipAddress !== undefined) {
       this.log('disconnect from ' + ipAddress);
       this.connectionManager.disconnectFrom(ipAddress);
+      this.connectedAddress = undefined;
     }
   }
 
@@ -428,11 +429,30 @@ export default class NetworkDock extends Homey.Device {
   async onDiscoveryAvailable(discoveryResult: DiscoveryResultMDNSSD) {
     const ipAddress = this.getSetting('ipAddress');
     this.log(`onDiscoveryAvailable at ${discoveryResult.address}, connecting to ${ipAddress}`);
-    this.connectionManager.connectTo(ipAddress)
+    this.connectToAddress(ipAddress);
   }
 
   onDiscoveryAddressChanged(discoveryResult: DiscoveryResultMDNSSD) {
     this.log('onDiscoveryAddressChanged to ' + discoveryResult.address);
+    // setSettings doesn't call onSettings, so reconnect here.
+    this.connectToAddress(discoveryResult.address);
     this.setSettings({'ipAddress': discoveryResult.address}).catch((e) => console.error('update ipAddress failed:', e));
+  }
+
+  /**
+   * Connects to `address`, dropping the connection to a previous address. The connection manager
+   * keeps retrying a connection by itself and throws for an address it already has, so calling
+   * this again for the same address does nothing.
+   */
+  private connectedAddress: string | undefined;
+  connectToAddress(address: string) {
+    if (address === this.connectedAddress) {
+      return;
+    }
+    if (this.connectedAddress !== undefined) {
+      this.connectionManager.disconnectFrom(this.connectedAddress);
+    }
+    this.connectedAddress = address;
+    this.connectionManager.connectTo(address);
   }
 };

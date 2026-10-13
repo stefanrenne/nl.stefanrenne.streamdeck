@@ -10,20 +10,22 @@
 
 ## Connection lifecycle
 
+All connecting goes through `connectToAddress(address)`. It remembers the address, disconnects from the previous one when it changes, and does nothing for the address it already has. That matters because the connection manager throws `Connection already exists` for a known address, and keeps retrying a connection by itself, so Homey calling `onDiscoveryAvailable` again (or after `onDiscoveryAddressChanged`) must not connect twice.
+
 The connection uses `@elgato-stream-deck/tcp`, pinned to `~7.7.1`: 7.8.0 never connects when the app runs in Docker, as it does on a Homey (see `TODO.md`). Dependabot ignores `>=7.8.0` for `@elgato-stream-deck/*`, and `manifest.test.mts` checks the pin.
 
 The driver logs the discovery results on init and on every new result. The device logs `onInit` (id and `ipAddress`), every `onDiscoveryResult` (found id, address, and whether it matches), `onDiscoveryAvailable`, `onDiscoveryAddressChanged` and connection manager errors, so a device that never connects shows where it stops.
 
 | Event | What happens |
 |---|---|
-| `onDiscoveryAvailable` | `connectionManager.connectTo(getSetting('ipAddress'))` |
-| `onDiscoveryAddressChanged` | stores the new address in the `ipAddress` setting |
-| `onSettings` with a changed `ipAddress` | clears the panel, `disconnectFrom(old)`, `connectTo(new)` |
+| `onDiscoveryAvailable` | `connectToAddress(getSetting('ipAddress'))` |
+| `onDiscoveryAddressChanged` | `connectToAddress(new address)`, then stores it in the `ipAddress` setting (`setSettings` doesn't call `onSettings`) |
+| `onSettings` with a changed `ipAddress` | clears the panel, `connectToAddress(new)` |
 | manager `connected` with controls | keeps the deck, `setAvailable`, subscribes to `down`/`up`/`error`/`disconnected`, writes the `name`/`columns`/`rows` settings (and `serial`/`firmware` if they can be read), then loads the selected dashboard |
 | manager `connected` without controls | `setUnavailable('No Stream Deck connected to Network Dock')` if no deck was connected yet |
 | manager `error` / deck `error` | `setUnavailable(message)` |
 | deck `disconnected` | `setUnavailable('Stream Deck Disconnected')`, drops the deck |
-| `onDeleted` | clears the panel and disconnects from the deck's address |
+| `onDeleted` | clears the panel and disconnects from the connected address, even if the dock was never reached |
 
 Serial and firmware are read over TCP feature reports that can time out. Their failures are logged and ignored (fix 2a23812), and must never reject the connect handler.
 
@@ -60,7 +62,3 @@ The 400 ms wait uses `homey.setTimeout`, which Homey clears when the app unloads
 - `onoff`: `setBrightness(100 | 0)`, and sets `dim` to `1` or `0`.
 - On every `connected`, the device sends the current brightness (`dim`, or 0 when `onoff` is false). A failure is logged and doesn't stop the dashboard from loading.
 - `onAdded` sets `dim = 1` and `onoff = true`.
-
-## Known issues
-
-- After `onDiscoveryAddressChanged`, the device doesn't reconnect by itself: `setSettings` doesn't call `onSettings`, so it relies on the next `onDiscoveryAvailable`.

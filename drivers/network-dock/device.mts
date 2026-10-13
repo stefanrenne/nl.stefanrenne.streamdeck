@@ -106,9 +106,9 @@ export default class NetworkDock extends Homey.Device {
     });
 
     this.registerCapabilityListener('onoff', async (value: boolean) => {
-      const number: number = value ? 100 : 0;
-      await this.streamDeck?.setBrightness(number);
-      await this.setCapabilityValue('dim', number);
+      const dim: number = value ? 1 : 0;
+      await this.streamDeck?.setBrightness(dim * 100);
+      await this.setCapabilityValue('dim', dim);
     });
 
     this.registerCapabilityListener('dim', async (value: number) => {

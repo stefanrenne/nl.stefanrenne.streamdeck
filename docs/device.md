@@ -51,11 +51,10 @@ This uses the global `setTimeout`, not `homey.setTimeout`.
 ## Brightness
 
 - `dim` (0–1): `setBrightness(value * 100)`, and `onoff = value > 0`.
-- `onoff`: `setBrightness(100 | 0)`, and **writes 100 or 0 to `dim`** (see known issues).
+- `onoff`: `setBrightness(100 | 0)`, and sets `dim` to `1` or `0`.
 - `onAdded` sets `dim = 1` and `onoff = true`.
 
 ## Known issues
 
-- The `onoff` listener sets `dim` to `100`/`0`, but `dim` ranges from 0 to 1.
 - `getButtonControlSize` uses `control as StreamDeckButtonControlDefinitionLcdFeedback` as if it were a type check. It's a cast, so every control counts, and a Stream Deck Neo (8 LCD keys plus 2 RGB touch keys and an LCD segment on row 3) is measured as 4×3. `renderDashboard` also tries to draw on the non-LCD controls, and those errors are logged.
 - After `onDiscoveryAddressChanged`, the device doesn't reconnect by itself: `setSettings` doesn't call `onSettings`, so it relies on the next `onDiscoveryAvailable`.

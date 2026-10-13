@@ -2,6 +2,11 @@
 
 Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep the context: root cause, gotchas, and how it was verified. Commit hashes refer to this repo. For how the app evolved, see [docs/history.md](docs/history.md).
 
+## 2026-10-13
+
+- **`onoff` wrote 0/100 to `dim`** (since `a95f9c8`). The `onoff` listener used one value for both `setBrightness` (0–100) and the `dim` capability (0–1), so turning the deck on set `dim` to 100. It now sets `dim` to `1`/`0` and passes `dim * 100` to the deck. Test: `device.test.mts` "onoff sets dim to 1 or 0 (regression a95f9c8)".
+- **Unused `homey-api` dependency.** Listed in `dependencies` but never imported (the app uses the SDK's `this.homey`). It pulled in `socket.io-client` → `engine.io-client` → `parseuri` (GHSA-6fx8-h7jm-663j, moderate ReDoS). Removed in `df5f5f0`; `npm audit` is clean.
+
 ## 2026-09-30
 
 - **`package.json` version drift.** `package.json` and the root of `package-lock.json` said `1.0.0` while the app was `1.1.9`. The release workflow only bumps `.homeycompose/app.json` / `app.json`. Synced by hand to `1.1.9`, and `release.yml` now runs `npm version <x> --no-git-tag-version` after the bump. `test/manifest.test.mts` checks that the versions match.

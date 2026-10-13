@@ -364,8 +364,12 @@ describe('brightness', () => {
     expect(deck.setBrightness).toHaveBeenLastCalledWith(100)
   })
 
-  // See TODO.md: the onoff listener writes 0/100 to `dim`, whose range is 0–1.
-  it.todo('onoff sets dim to 1 or 0')
+  it('onoff sets dim to 1 or 0 (regression a95f9c8)', async () => {
+    await device.capabilityListeners.get('onoff')?.(false)
+    expect(device.getCapabilityValue('dim')).toBe(0)
+    await device.capabilityListeners.get('onoff')?.(true)
+    expect(device.getCapabilityValue('dim')).toBe(1)
+  })
 })
 
 describe('network', () => {

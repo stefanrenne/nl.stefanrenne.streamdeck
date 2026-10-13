@@ -14,8 +14,6 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Cleanup
 
-- [ ] `Store.setVariable` deletes `cachedImages[id]`, which should be `cachedVariables[id]` (harmless today, because the settings relay invalidates it).
-- [ ] `Store.updateDashboard` rebuilds the cached dashboard with its old `columns`/`rows`. This became a no-op in `1f5b120`. Set the new values, or just invalidate.
 - [ ] The `.sort()` calls in `lib/cardListener.mts` sort objects and don't change the order. Sort by `name`, or remove them.
 - [ ] `renderPincodeDashboard` in `lib/streamDeckAdapter.mts` is unused and broken (inverted early return, divides by `rows` where it means `columns`). Finish it or delete it.
 - [ ] Single/double press detection uses the global `setTimeout`. Use `this.homey.setTimeout`, so it is cleared when the app unloads.

@@ -68,6 +68,15 @@ describe('variables', () => {
     expect(settings.get('variable-v')).toEqual({ firstLine: 'First', secondLine: '', textColor: '#fff', backgroundColor: '#000', sample: 'sample' })
   })
 
+  it('setVariable drops the cached variable, so the store reads the new text without the settings relay (regression 355019a)', () => {
+    seedSettings(settings, { variables: [{ id: 'v', name: 'Temp', firstLine: 'old' }] })
+    expect(store.getVariable('v')?.firstLine).toBe('old')
+
+    store.setVariable('v', 'new', undefined, '#fff', '#000', 'sample')
+
+    expect(store.getVariable('v')?.firstLine).toBe('new')
+  })
+
   it('invalidateVariable also drops cached dashboards that show the variable', () => {
     seedSettings(settings, {
       variables: [{ id: 'v', name: 'Temp', firstLine: 'old' }],
@@ -155,6 +164,12 @@ describe('dashboards', () => {
   it.each([[8, 4], [5, 3], [4, 2], [3, 2]])('updateDashboard stores a %ix%i layout', (columns, rows) => {
     store.updateDashboard('d', columns, rows)
     expect(settings.get('dashboard-d')).toMatchObject({ columns, rows })
+  })
+
+  it('updateDashboard also updates a cached dashboard (regression 1f5b120)', () => {
+    expect(store.getDashboard('d')).toMatchObject({ columns: 5, rows: 3 })
+    store.updateDashboard('d', 4, 2)
+    expect(store.getDashboard('d')).toMatchObject({ columns: 4, rows: 2 })
   })
 
   it('updateDashboard ignores layouts no Stream Deck has', () => {

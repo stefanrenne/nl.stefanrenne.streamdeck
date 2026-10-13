@@ -109,19 +109,13 @@ export class Store {
             return
         }
 
-        //update cache
-        const cache = this.cachedDashboards[id];
-        if (cache !== undefined) {
-            this.cachedDashboards[id] = { id: cache.id, name: cache.name,  columns: cache.columns, rows: cache.rows, items: cache.items, usedVariableIds: cache.usedVariableIds };
-        }
-
-        //write cache back to store
         const data: StoredDashboard | null | undefined = this.homey.settings.get('dashboard-' + id);
         if (data != null) {
             data.columns = columns;
             data.rows = rows;
             this.homey.settings.set('dashboard-' + id, data);
         }
+        this.invalidateDashboard(id);
     }
 
     // cache dashboards
@@ -218,11 +212,9 @@ export class Store {
     }
 
     setVariable(id: string, firstLine: string, secondLine: string | undefined, textColor: string, backgroundColor: string, base64Sample: string) {
-        if (this.cachedImages[id] !== undefined) {
-            delete this.cachedImages[id];
-        }
         const variable: StoredVariable = { firstLine: firstLine, secondLine: secondLine ?? '', textColor: textColor, backgroundColor: backgroundColor, sample: base64Sample };
         this.homey.settings.set('variable-' + id, variable);
+        this.invalidateVariable(id);
     }
 
     getVariable(id: string): Variable | undefined {

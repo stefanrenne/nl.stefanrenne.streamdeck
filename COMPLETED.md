@@ -2,6 +2,10 @@
 
 Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep the context: root cause, gotchas, and how it was verified. Commit hashes refer to this repo. For how the app evolved, see [docs/history.md](docs/history.md).
 
+## 2026-11-06
+
+- **Dependabot: zod and minimatch vulnerabilities.** `zod` 3.25.76 (under every `@jimp/plugin-*`, runtime; high, memory exhaustion validating oversized collections) and `minimatch` 9.x/10.x (under eslint and typescript-eslint, dev only; moderate, GHSA-g3hv-75wg-m249) have no fix inside the ranges their parents ask for: zod's fix is 4.6.6, minimatch's 11.0.1, and jimp 1.6.1 and eslint 10.14.0 are the latest. `package.json` now overrides `zod: ^4.6.6` and `minimatch: ^11.0.1` everywhere (replacing the typescript-estree-only `^9.0.7` pin). jimp's plugins only use basic zod schemas, which zod 4 keeps; the rendering tests (resize, blit, the text and logo images) pass on it. Remove the overrides once jimp and eslint depend on patched versions themselves. Test: `manifest.test.mts` "vulnerable dependencies are overridden", which fails on the old lockfile.
+
 ## 2026-10-13
 
 - **Stream Deck libraries back on 7.8.x: the 7.8.0 "regression" was Docker Desktop.** The pin to `~7.7.1` below was wrong. Later the same day, `homey app run` on 7.7.1 hung after `onDiscoveryAvailable` too, and every plain container got `ECONNREFUSED` from the dock (port 5343) while the macOS host and the router were reachable. Docker Desktop had Local Network permission; restarting Docker Desktop fixed it. After the restart, a probe script connected the dock and the Stream Deck 32 Module within 2 s on both 7.8.0 and 7.7.1, twice, alternating. The earlier "two failures on 7.8.0, one success on 7.7.1" was timing. Removed the pin, the Dependabot ignore and the manifest test; `docs/device.md` now explains how to check Docker's reach to the dock. Lesson: with flaky networking, compare versions back to back under the same conditions before pinning.
@@ -41,7 +45,7 @@ Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep 
 
 ## 1.1.7 (2026-07)
 
-- **minimatch vulnerability** (`11c0b50`). Pinned `minimatch ^9.0.7` under `@typescript-eslint/typescript-estree` through `overrides` in `package.json`. That override is still there; remove it once `npm audit` stays clean without it.
+- **minimatch vulnerability** (`11c0b50`). Pinned `minimatch ^9.0.7` under `@typescript-eslint/typescript-estree` through `overrides` in `package.json`. Replaced on 2026-11-06 by the top-level `minimatch` override (see there).
 - **`item` token** (`6aa335b`). The button triggers gained `item` (row letter + column, for example `B3`), matching the key labels in the settings page.
 
 ## 1.1.6 (2026-05)

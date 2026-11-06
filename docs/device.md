@@ -29,6 +29,8 @@ The driver logs the discovery results on init and on every new result. The devic
 
 Serial and firmware are read over TCP feature reports that can time out. Their failures are logged and ignored (fix 2a23812), and must never reject the connect handler.
 
+Every listener registered with `.on` (the connection manager's, `homey.settings`' `set-`/`unset-` events, the deck's `down`/`up`/`error` and `tcpEvents`' `disconnected`) is wrapped in `guard(event, listener)`. Nobody awaits an EventEmitter listener, so a rejection there is unhandled and crashes the app; `guard` logs it as `<event> failed: <error>` instead. The usual cause is `Disconnected` from a draw while the dock has dropped but `disconnected` hasn't been handled yet (fix 46385cf). Wrap any new `.on` listener the same way.
+
 ## Dashboards
 
 - The `dashboard` capability's values are `0` ("Homey", which shows the Homey logo full-panel) plus every dashboard (`updateSelectableDashboardOptions`). They are refreshed on init and on every `set-`/`unset-dashboard`.

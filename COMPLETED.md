@@ -2,6 +2,10 @@
 
 Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep the context: root cause, gotchas, and how it was verified. Commit hashes refer to this repo. For how the app evolved, see [docs/history.md](docs/history.md).
 
+## 2026-11-06
+
+- **A dock that dropped while a key was drawn crashed the app** (since `46385cf`). The `set-variable` settings listener awaited `renderText`, whose `fillKeyBuffer` throws `Disconnected` when the dock's connection is gone but the deck's `disconnected` event hasn't arrived yet (`this.streamDeck` is still set). An EventEmitter doesn't await its listeners, so the rejection was unhandled and Homey restarted the app. Every listener the device registers with `.on` (connection manager, `homey.settings`, the deck and its `tcpEvents`) now goes through `guard(event, listener)`, which logs `<event> failed: <error>`. Capability and run listeners are awaited by Homey and stay as they are. Test: `device.test.mts` "logs a draw that fails because the dock disconnected (regression 46385cf)", which fails with the same unhandled rejection without the fix.
+
 ## 2026-10-13
 
 - **Stream Deck libraries back on 7.8.x: the 7.8.0 "regression" was Docker Desktop.** The pin to `~7.7.1` below was wrong. Later the same day, `homey app run` on 7.7.1 hung after `onDiscoveryAvailable` too, and every plain container got `ECONNREFUSED` from the dock (port 5343) while the macOS host and the router were reachable. Docker Desktop had Local Network permission; restarting Docker Desktop fixed it. After the restart, a probe script connected the dock and the Stream Deck 32 Module within 2 s on both 7.8.0 and 7.7.1, twice, alternating. The earlier "two failures on 7.8.0, one success on 7.7.1" was timing. Removed the pin, the Dependabot ignore and the manifest test; `docs/device.md` now explains how to check Docker's reach to the dock. Lesson: with flaky networking, compare versions back to back under the same conditions before pinning.

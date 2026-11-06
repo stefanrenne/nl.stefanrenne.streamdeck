@@ -384,6 +384,21 @@ describe('reacting to settings changes', () => {
     settings.emit('unset-variable', 'var-temp')
     await vi.waitFor(() => expect(deck.clearedKeys()).toEqual([7]))
   })
+
+  // The dock can drop while a key is drawn, before the deck's `disconnected` event arrives. A
+  // settings listener isn't awaited by anyone, so its rejection was unhandled and crashed the app.
+  it('logs a draw that fails because the dock disconnected (regression 46385cf)', async () => {
+    const log = vi.spyOn(device as unknown as { log: (message: string) => void }, 'log')
+    deck.fillKeyBuffer.mockRejectedValue(new Error('Disconnected'))
+    deck.clearKey.mockRejectedValue(new Error('Disconnected'))
+    settings.seed('variable-var-temp', { firstLine: '22°', secondLine: '', sample: '' })
+
+    settings.emit('set-variable', 'var-temp')
+    settings.emit('unset-variable', 'var-temp')
+
+    await vi.waitFor(() => expect(log).toHaveBeenCalledWith('set-variable failed: Error: Disconnected'))
+    await vi.waitFor(() => expect(log).toHaveBeenCalledWith('unset-variable failed: Error: Disconnected'))
+  })
 })
 
 describe('Stream Deck Neo (regression 00a1032)', () => {

@@ -37,12 +37,12 @@ export default class NetworkDock extends Homey.Device {
     await this.updateSelectableDashboardOptions();
     await this.validateSelectedDashboardOption();
 
-    this.connectionManager.on('error', async (message) => {
+    this.connectionManager.on('error', this.guard('error', async (message) => {
         this.log('connectionManager - error ' + message);
         await this.setUnavailable(message);
-    });
+    }));
 
-    this.connectionManager.on('connected', async (streamDeck) => {
+    this.connectionManager.on('connected', this.guard('connected', async (streamDeck) => {
       this.log('connectionManager - connected');
 
       if (streamDeck.CONTROLS.length > 0) {
@@ -62,9 +62,9 @@ export default class NetworkDock extends Homey.Device {
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable('No Stream Deck connected to Network Dock');
       }
-    });
+    }));
 
-    this.homey.settings.on('set-dashboard', async (id: string) => {
+    this.homey.settings.on('set-dashboard', this.guard('set-dashboard', async (id: string) => {
       this.store.invalidateDashboard(id);
       await this.updateSelectableDashboardOptions();
 
@@ -73,9 +73,9 @@ export default class NetworkDock extends Homey.Device {
         this.log('selected dashboard updated');
         await this.loadDashboard(id);
       }
-    });
+    }));
 
-    this.homey.settings.on('unset-dashboard', async (id: string) => {
+    this.homey.settings.on('unset-dashboard', this.guard('unset-dashboard', async (id: string) => {
       const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
       if (selectedDashboardId === id) {
         this.log('selected dashboard removed');
@@ -84,17 +84,17 @@ export default class NetworkDock extends Homey.Device {
 
       this.store.invalidateDashboard(id);
       await this.updateSelectableDashboardOptions();
-    });
+    }));
 
-    this.homey.settings.on('set-image', async (id: string) => {
+    this.homey.settings.on('set-image', this.guard('set-image', async (id: string) => {
       this.store.invalidateImage(id);
-    });
+    }));
 
-    this.homey.settings.on('unset-image', async (id: string) => {
+    this.homey.settings.on('unset-image', this.guard('unset-image', async (id: string) => {
       this.store.invalidateImage(id);
-    });
+    }));
 
-    this.homey.settings.on('set-variable', async (id: string) => {
+    this.homey.settings.on('set-variable', this.guard('set-variable', async (id: string) => {
       this.store.invalidateVariable(id);
       const control = await this.getDisplayedControlForVariable(id);
       if (control !== undefined && this.streamDeck !== undefined) {
@@ -105,15 +105,15 @@ export default class NetworkDock extends Homey.Device {
           await renderText(this.streamDeck, control, variable.firstLine, variable.secondLine, variable.textColor, variable.backgroundColor);
         }
       }
-    });
+    }));
 
-    this.homey.settings.on('unset-variable', async (id: string) => {
+    this.homey.settings.on('unset-variable', this.guard('unset-variable', async (id: string) => {
       this.store.invalidateVariable(id);
       const control = await this.getDisplayedControlForVariable(id);
       if (control !== undefined) {
         await this.streamDeck?.clearKey(control.index);
       }
-    });
+    }));
 
     this.registerCapabilityListener('onoff', async (value: boolean) => {
       const dim: number = value ? 1.0 : 0.0;
@@ -135,6 +135,17 @@ export default class NetworkDock extends Homey.Device {
     });
   }
   
+  /**
+   * Wraps an async event listener. An EventEmitter doesn't await its listeners, so a rejection
+   * (for example `Disconnected` when the dock drops while a key is being drawn) would be unhandled
+   * and crash the app. It is logged instead.
+   */
+  guard<Args extends unknown[]>(event: string, listener: (...args: Args) => Promise<void>): (...args: Args) => void {
+    return (...args: Args) => {
+      listener(...args).catch((e) => this.log(`${event} failed: ${e}`));
+    };
+  }
+
   async applyBrightness(dim: number) {
     await this.streamDeck?.setBrightness(Math.round(dim * 100));
   }
@@ -142,29 +153,29 @@ export default class NetworkDock extends Homey.Device {
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
       this.log('device - connected');
 
-      streamDeck.tcpEvents.on('disconnected', async () => {
+      streamDeck.tcpEvents.on('disconnected', this.guard('disconnected', async () => {
         this.log('device - disconnected');
         await this.setUnavailable('Stream Deck Disconnected');
         this.streamDeck = undefined;
-      });
+      }));
 
-      streamDeck.on('error', async (error) => {
+      streamDeck.on('error', this.guard('error', async (error) => {
         this.log('device - error ' + error);
         const message = typeof error === 'string' ? error : undefined;
         await this.setUnavailable(message);
-      });
+      }));
 
-      streamDeck.on('down', async (control) => {
+      streamDeck.on('down', this.guard('down', async (control) => {
         if (control.type === 'button') {
           await this.streamDeckEvent('down', this.getCapabilityValue('onoff'), control);
         }
-      });
+      }));
 
-      streamDeck.on('up', async (control) => {
+      streamDeck.on('up', this.guard('up', async (control) => {
         if (control.type === 'button') {
           await this.streamDeckEvent('up', this.getCapabilityValue('onoff'), control);
         }
-      });
+      }));
 
       const size = getButtonControlSize(streamDeck);
       // Serial and firmware are informational only, and are fetched over TCP

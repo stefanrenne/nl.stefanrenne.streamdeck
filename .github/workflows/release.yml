@@ -25,7 +25,20 @@ jobs:
     name: Update Homey App Version
     runs-on: ubuntu-latest
     steps:
+      # RELEASE_TOKEN: a fine-grained token of the repo owner (Contents: read and write). The owner's
+      # admin role may bypass the develop ruleset (pull request and signed commits required);
+      # GITHUB_TOKEN may not, and GitHub Actions cannot be added to the bypass list of a personal repo.
+      - name: Check RELEASE_TOKEN
+        run: |
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "::error::Secret RELEASE_TOKEN is not set: a fine-grained token of the repo owner with Contents read and write"
+            exit 1
+          fi
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
@@ -43,8 +56,7 @@ jobs:
         run: npm version "$VERSION" --no-git-tag-version --allow-same-version
         env:
           VERSION: ${{ steps.update_app_version.outputs.version }}
-      # Pushing to develop needs GitHub Actions as an "always" bypass actor in the develop ruleset
-      # (it requires a pull request and signed commits otherwise).
+      # Pushes with RELEASE_TOKEN (see checkout above).
       - name: Commit & Push
         run: |
           git config --local user.name "github-actions[bot]"
@@ -72,7 +84,7 @@ jobs:
         env:
           VERSION: ${{ steps.update_app_version.outputs.version }}
           CHANGELOG: ${{ inputs.changelog }}
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       - name: Publish Homey App
         uses: athombv/github-action-homey-app-publish@master
         id: publish

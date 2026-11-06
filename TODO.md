@@ -6,7 +6,7 @@ When an item is done, move it to [COMPLETED.md](COMPLETED.md) with its context (
 
 ## Bugs
 
-- [ ] **The Release workflow can't push to `develop`.** The ruleset "Disable push to develop active branch" requires a pull request and verified signatures, and only the admin role may always bypass it. The workflow's `github-actions[bot]` commit is unsigned and pushed directly, so `Commit & Push` fails (first run, 2026-10-13: it pushed tag `v1.2.0` to an orphan commit before failing, which had to be deleted). Options: add GitHub Actions as a bypass actor (a repo security setting, the user's call), or have the workflow open a PR and tag/publish after it's merged. v1.2.0 was released by hand.
+- [?] **The Release workflow needs a bypass in the `develop` ruleset.** The workflow is fixed (see COMPLETED.md, 2026-11-06), but its push still fails until GitHub Actions is a bypass actor of the ruleset "Disable push to develop" with bypass mode *Always* (Settings → Rules → Rulesets → Bypass list → Add bypass → Apps → GitHub Actions). Only the repo owner can change that. Then run Release once (1.2.1: patch, with the changelog of the draft release) and move this item to COMPLETED.md.
 
 ## Cleanup
 

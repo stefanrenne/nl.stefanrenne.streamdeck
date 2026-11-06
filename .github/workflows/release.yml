@@ -25,8 +25,8 @@ jobs:
     name: Update Homey App Version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - run: npm install
@@ -40,20 +40,38 @@ jobs:
           changelog: ${{ inputs.changelog }}
       # package.json isn't read by Homey, but test/manifest.test.mts requires it to match the app version.
       - name: Sync package.json version
-        run: npm version "${{ steps.update_app_version.outputs.version }}" --no-git-tag-version --allow-same-version
+        run: npm version "$VERSION" --no-git-tag-version --allow-same-version
+        env:
+          VERSION: ${{ steps.update_app_version.outputs.version }}
+      # Pushing to develop needs GitHub Actions as an "always" bypass actor in the develop ruleset
+      # (it requires a pull request and signed commits otherwise).
       - name: Commit & Push
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add -A
-          git commit -m "Update Homey App Version to v${{ steps.update_app_version.outputs.version }}"
-          git tag "v${{ steps.update_app_version.outputs.version }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null; then
+            echo "::error::Tag v$VERSION already exists on GitHub"
+            exit 1
+          fi
 
-          git push origin HEAD --tags
-          gh release create "v${{ steps.update_app_version.outputs.version }}" -t "v${{ steps.update_app_version.outputs.version }}" --notes "" --generate-notes
+          git add -A
+          git commit -m "Update Homey App Version to v$VERSION"
+
+          # The branch first: a refused push must not leave the tag on a commit that is on no branch.
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+
+          # A draft release for this version (notes written by hand) is published as it is.
+          if [ "$(gh release view "v$VERSION" --json isDraft -q .isDraft 2>/dev/null)" = "true" ]; then
+            gh release edit "v$VERSION" --tag "v$VERSION" --draft=false --latest
+          else
+            gh release create "v$VERSION" -t "v$VERSION" --notes "$CHANGELOG" --generate-notes
+          fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.update_app_version.outputs.version }}
+          CHANGELOG: ${{ inputs.changelog }}
           GH_TOKEN: ${{ github.token }}
       - name: Publish Homey App
         uses: athombv/github-action-homey-app-publish@master

@@ -100,3 +100,27 @@ describe('release metadata', () => {
     expect(readJson('.homeychangelog.json')[version]?.en).toBeTruthy()
   })
 })
+
+// zod (under jimp) and minimatch (under eslint and typescript-eslint) only have fixes in a newer
+// major than their parents ask for, so package.json overrides them. Every copy in the lockfile
+// must be a patched version.
+describe('vulnerable dependencies are overridden (GHSA-g3hv-75wg-m249, zod memory exhaustion)', () => {
+  const packages: Record<string, { version: string }> = readJson('package-lock.json').packages
+  const versions = (name: string) => Object.entries(packages)
+    .filter(([path]) => path.endsWith(`node_modules/${name}`))
+    .map(([, entry]) => entry.version)
+  const atLeast = (version: string, minimum: string) => {
+    const [a, b] = [version, minimum].map((v) => v.split('.').map(Number))
+    for (let i = 0; i < 3; i++) {
+      if (a[i] !== b[i]) return a[i] > b[i]
+    }
+    return true
+  }
+
+  it.each([['zod', '4.6.6'], ['minimatch', '11.0.1']])('every %s is at least %s', (name, minimum) => {
+    expect(versions(name).length).toBeGreaterThan(0)
+    for (const version of versions(name)) {
+      expect(atLeast(version, minimum), `${name}@${version}`).toBe(true)
+    }
+  })
+})

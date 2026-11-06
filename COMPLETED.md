@@ -4,6 +4,7 @@ Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep 
 
 ## 2026-11-06
 
+- **Dependabot: zod and minimatch vulnerabilities.** `zod` 3.25.76 (under every `@jimp/plugin-*`, runtime; high, memory exhaustion validating oversized collections) and `minimatch` 9.x/10.x (under eslint and typescript-eslint, dev only; moderate, GHSA-g3hv-75wg-m249) have no fix inside the ranges their parents ask for: zod's fix is 4.6.6, minimatch's 11.0.1, and jimp 1.6.1 and eslint 10.14.0 are the latest. `package.json` now overrides `zod: ^4.6.6` and `minimatch: ^11.0.1` everywhere (replacing the typescript-estree-only `^9.0.7` pin). jimp's plugins only use basic zod schemas, which zod 4 keeps; the rendering tests (resize, blit, the text and logo images) pass on it. Remove the overrides once jimp and eslint depend on patched versions themselves. Test: `manifest.test.mts` "vulnerable dependencies are overridden", which fails on the old lockfile.
 - **A dock that dropped while a key was drawn crashed the app** (since `46385cf`). The `set-variable` settings listener awaited `renderText`, whose `fillKeyBuffer` throws `Disconnected` when the dock's connection is gone but the deck's `disconnected` event hasn't arrived yet (`this.streamDeck` is still set). An EventEmitter doesn't await its listeners, so the rejection was unhandled and Homey restarted the app. Every listener the device registers with `.on` (connection manager, `homey.settings`, the deck and its `tcpEvents`) now goes through `guard(event, listener)`, which logs `<event> failed: <error>`. Capability and run listeners are awaited by Homey and stay as they are. Test: `device.test.mts` "logs a draw that fails because the dock disconnected (regression 46385cf)", which fails with the same unhandled rejection without the fix.
 
 ## 2026-10-13
@@ -45,7 +46,7 @@ Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep 
 
 ## 1.1.7 (2026-07)
 
-- **minimatch vulnerability** (`11c0b50`). Pinned `minimatch ^9.0.7` under `@typescript-eslint/typescript-estree` through `overrides` in `package.json`. That override is still there; remove it once `npm audit` stays clean without it.
+- **minimatch vulnerability** (`11c0b50`). Pinned `minimatch ^9.0.7` under `@typescript-eslint/typescript-estree` through `overrides` in `package.json`. Replaced on 2026-11-06 by the top-level `minimatch` override (see there).
 - **`item` token** (`6aa335b`). The button triggers gained `item` (row letter + column, for example `B3`), matching the key labels in the settings page.
 
 ## 1.1.6 (2026-05)

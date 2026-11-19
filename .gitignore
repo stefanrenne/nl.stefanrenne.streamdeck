@@ -2,3 +2,5 @@
 /node_modules/
 /.homeybuild/
 .claude/
+# Files the Unraid FUSE share keeps for deleted files that are still open
+.fuse_hidden*

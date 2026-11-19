@@ -1,0 +1,48 @@
+{
+  "name": {
+    "en": "Virtual Stream Deck",
+    "nl": "Virtuele Stream Deck",
+    "de": "Virtuelles Stream Deck",
+    "fr": "Stream Deck virtuel",
+    "it": "Stream Deck virtuale",
+    "sv": "Virtuellt Stream Deck",
+    "no": "Virtuelt Stream Deck",
+    "es": "Stream Deck virtual",
+    "da": "Virtuelt Stream Deck",
+    "ru": "Виртуальный Stream Deck",
+    "pl": "Wirtualny Stream Deck",
+    "ko": "가상 Stream Deck",
+    "ar": "Stream Deck افتراضي"
+  },
+  "settings": [
+    {
+      "id": "device",
+      "type": "autocomplete",
+      "title": {
+        "en": "Virtual Stream Deck",
+        "nl": "Virtuele Stream Deck",
+        "de": "Virtuelles Stream Deck",
+        "fr": "Stream Deck virtuel",
+        "it": "Stream Deck virtuale",
+        "sv": "Virtuellt Stream Deck",
+        "no": "Virtuelt Stream Deck",
+        "es": "Stream Deck virtual",
+        "da": "Virtuelt Stream Deck",
+        "ru": "Виртуальный Stream Deck",
+        "pl": "Wirtualny Stream Deck",
+        "ko": "가상 Stream Deck",
+        "ar": "Stream Deck افتراضي"
+      }
+    }
+  ],
+  "api": {
+    "getState": {
+      "method": "GET",
+      "path": "/state"
+    },
+    "press": {
+      "method": "POST",
+      "path": "/press"
+    }
+  }
+}

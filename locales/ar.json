@@ -81,5 +81,14 @@
                 "textColor": "لون النص"
             }
         }
+    },
+    "virtualDeck": {
+        "deviceName": "__model__ افتراضي (__size__)"
+    },
+    "widgets": {
+        "virtualDeck": {
+            "noDevice": "اختر Stream Deck افتراضيًا في إعدادات الأداة. يمكنك إضافة واحد من الأجهزة.",
+            "notFound": "لم يعد جهاز Stream Deck الافتراضي هذا موجودًا. اختر جهازًا آخر في إعدادات الأداة."
+        }
     }
 }

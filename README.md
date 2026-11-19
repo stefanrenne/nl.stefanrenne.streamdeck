@@ -23,6 +23,11 @@ Create variable buttons that display two lines of live text — temperature, a d
 **Brightness Control**<br/>
 Turn the Stream Deck on or off and dim the screen directly from Homey using the standard on/off and dim capabilities.
 
+**Virtual Stream Deck**<br/>
+No Stream Deck at hand, or want one on your wall tablet too? Add a *Virtual Stream Deck* device (Mini, Neo, +, MK.2 or XL layout) and put the *Virtual Stream Deck* widget on a Homey dashboard. It shows the same dashboards, images and live variables as a real deck, and pressing its keys fires the same Flow cards, including single and double presses. Dashboards, brightness and on/off work exactly as on hardware, and you can change the model later in the device settings.
+
+![virtual-deck-widget](./md/virtual-deck-widget.png)
+
 **Auto-Discovery**<br/>
 The app automatically detects your Stream Deck Network Dock on the local network via mDNS, so setup takes seconds.
 
@@ -87,6 +92,8 @@ Edit image:
 
 ## Requirements
 
+For a real Stream Deck:
+
 - Stream Deck Studio
 - Stream Deck Network Dock, with one of the following devices:
   - Stream Deck Module 6
@@ -98,6 +105,10 @@ Edit image:
   - Stream Deck XL
   - Stream Deck neo (LCD buttons only)
   - Stream Deck + (LCD buttons only)
+
+For a virtual Stream Deck: nothing but Homey. Add the device under *Devices* and the widget on a Homey dashboard, then choose the device in the widget settings.
+
+Every Flow card below works for both kinds of deck.
 
 ---
 

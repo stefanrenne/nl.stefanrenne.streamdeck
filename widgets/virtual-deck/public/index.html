@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --deck-gap: 6px;
+      --deck-padding: 10px;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--homey-font-family, sans-serif);
+      color: var(--homey-text-color, #000);
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* The deck is a black device in both themes, like the real one. */
+    .deck {
+      display: grid;
+      gap: var(--deck-gap);
+      padding: var(--deck-padding);
+      border-radius: 14px;
+      background: #111;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .key {
+      position: relative;
+      aspect-ratio: 1;
+      border: 0;
+      padding: 0;
+      border-radius: 10%;
+      overflow: hidden;
+      background: #000;
+      box-shadow: inset 0 0 0 1px #2a2a2a;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 60ms ease-out;
+    }
+
+    .key img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .key.pressed {
+      transform: scale(0.94);
+    }
+
+    /* Brightness: a black layer over the keys, so 0% is a dark deck, as on a real one. */
+    .key::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: var(--deck-dimmed, 0);
+      pointer-events: none;
+    }
+
+    .message {
+      padding: 16px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/javascript">
+    function onHomeyReady(Homey) {
+      const root = document.getElementById('root');
+      const deviceId = Homey.getSettings().device?.id;
+      let state;
+      let keys = [];
+      let isReady = false;
+
+      // Presses are sent one after the other, so an 'up' never overtakes its 'down'.
+      let queue = Promise.resolve();
+      const send = (index, action) => {
+        queue = queue
+          .then(() => Homey.api('POST', '/press', { deviceId, index, action }))
+          .catch((error) => console.error('press failed', error));
+      };
+
+      const ready = () => {
+        const height = Math.ceil(root.getBoundingClientRect().height);
+        if (isReady) {
+          Homey.setHeight(height);
+        } else {
+          isReady = true;
+          Homey.ready({ height });
+        }
+      };
+
+      const showMessage = (text) => {
+        state = undefined;
+        keys = [];
+        const message = document.createElement('div');
+        message.className = 'message';
+        message.textContent = text;
+        root.replaceChildren(message);
+        ready();
+      };
+
+      const setKey = (index, image) => {
+        const key = keys[index];
+        if (key === undefined) {
+          return;
+        }
+        if (image === null) {
+          key.replaceChildren();
+        } else {
+          let img = key.firstChild;
+          if (img === null) {
+            img = document.createElement('img');
+            img.alt = '';
+            key.appendChild(img);
+          }
+          img.src = image;
+        }
+      };
+
+      const setBrightness = (brightness) => {
+        root.style.setProperty('--deck-dimmed', String(1 - brightness / 100));
+      };
+
+      const render = (newState) => {
+        state = newState;
+        const deck = document.createElement('div');
+        deck.className = 'deck';
+        deck.style.gridTemplateColumns = `repeat(${state.columns}, 1fr)`;
+
+        keys = state.keys.map((_, index) => {
+          const key = document.createElement('button');
+          key.className = 'key';
+          key.type = 'button';
+          let pressed = false;
+
+          key.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            key.setPointerCapture?.(event.pointerId);
+            pressed = true;
+            key.classList.add('pressed');
+            Homey.hapticFeedback?.();
+            send(index, 'down');
+          });
+          const release = () => {
+            if (!pressed) {
+              return;
+            }
+            pressed = false;
+            key.classList.remove('pressed');
+            send(index, 'up');
+          };
+          key.addEventListener('pointerup', release);
+          key.addEventListener('pointercancel', release);
+          key.addEventListener('lostpointercapture', release);
+          key.addEventListener('contextmenu', (event) => event.preventDefault());
+
+          deck.appendChild(key);
+          return key;
+        });
+
+        root.replaceChildren(deck);
+        state.keys.forEach((image, index) => setKey(index, image));
+        setBrightness(state.brightness);
+        ready();
+      };
+
+      if (deviceId === undefined) {
+        showMessage(Homey.__('widgets.virtualDeck.noDevice'));
+        return;
+      }
+
+      Homey.on('virtual-deck', (event) => {
+        if (event.deviceId !== deviceId) {
+          return;
+        }
+        switch (event.type) {
+        case 'state':
+          render(event.state);
+          break;
+        case 'key':
+          setKey(event.index, event.image);
+          break;
+        case 'brightness':
+          setBrightness(event.brightness);
+          break;
+        case 'deleted':
+          showMessage(Homey.__('widgets.virtualDeck.notFound'));
+          break;
+        }
+      });
+
+      Homey.api('GET', `/state?deviceId=${encodeURIComponent(deviceId)}`)
+        .then(render)
+        .catch(() => showMessage(Homey.__('widgets.virtualDeck.notFound')));
+
+      // The keys are square, so the height follows the width.
+      let lastWidth = root.getBoundingClientRect().width;
+      new ResizeObserver(() => {
+        const width = root.getBoundingClientRect().width;
+        if (state !== undefined && width !== lastWidth) {
+          lastWidth = width;
+          ready();
+        }
+      }).observe(root);
+    }
+  </script>
+</body>
+</html>

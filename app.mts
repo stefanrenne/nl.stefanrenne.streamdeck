@@ -3,6 +3,14 @@ import { Store } from './lib/storage.mjs';
 import { CardListener } from './lib/cardListener.mjs';
 import { TextToImage } from './lib/textToImage.mjs';
 
+// @types/homey predates widgets, so it has no homey.dashboards.
+type WidgetAutocompleteResult = { id: string, name: string, description?: string };
+type Dashboards = {
+  getWidget(id: string): {
+    registerSettingAutocompleteListener(settingId: string, listener: (query: string) => Promise<WidgetAutocompleteResult[]>): unknown
+  }
+};
+
 export default class StreamDeckApp extends Homey.App {
 
   private store = new Store(this.homey);
@@ -15,6 +23,18 @@ export default class StreamDeckApp extends Homey.App {
     this.registerUpdateVariableListener();
     this.registerUpdateVariableFirstLineTextListener();
     this.registerUpdateVariableSecondLineTextListener();
+    this.registerVirtualDeckWidget();
+  }
+
+  /** The widget's `device` setting offers every virtual deck, and stores its `data.id`. */
+  registerVirtualDeckWidget() {
+    const dashboards = (this.homey as unknown as { dashboards: Dashboards }).dashboards;
+    dashboards.getWidget('virtual-deck').registerSettingAutocompleteListener('device', async (query: string) => {
+      return this.homey.drivers.getDriver('virtual-deck').getDevices()
+        .map((device) => ({ id: device.getData().id, name: device.getName() }))
+        .filter((device) => query.length == 0 || device.name.toLowerCase().includes(query.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    });
   }
 
   observeSettings() {

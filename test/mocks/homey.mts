@@ -22,13 +22,19 @@ class Device {
   capabilityListeners = new Map<string, CapabilityListener>()
   settings: Record<string, unknown>
   data: Record<string, unknown>
+  name: string
   available = true
   unavailableMessage: string | undefined
 
-  constructor(homey: unknown, options: { settings?: Record<string, unknown>, data?: Record<string, unknown> } = {}) {
+  constructor(homey: unknown, options: { settings?: Record<string, unknown>, data?: Record<string, unknown>, name?: string } = {}) {
     this.homey = homey
     this.settings = { ...options.settings }
     this.data = { id: 'dock', ...options.data }
+    this.name = options.name ?? 'Device'
+  }
+
+  getName() {
+    return this.name
   }
 
   // Like Homey: a capability that was never set reads as null.

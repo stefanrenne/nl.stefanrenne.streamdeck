@@ -47,6 +47,29 @@ export class FakeCard {
   }
 }
 
+/** Records the setting autocomplete listeners the app registers on a widget. */
+export class FakeWidget {
+  id: string
+  autocompleteListeners = new Map<string, AutocompleteListener>()
+
+  constructor(id: string) {
+    this.id = id
+  }
+
+  registerSettingAutocompleteListener(name: string, listener: AutocompleteListener) {
+    this.autocompleteListeners.set(name, listener)
+    return this
+  }
+
+  async autocomplete(setting: string, query: string) {
+    const listener = this.autocompleteListeners.get(setting)
+    if (listener === undefined) {
+      throw new Error(`No ${setting} autocomplete registered for ${this.id}`)
+    }
+    return listener(query)
+  }
+}
+
 /**
  * In-memory `homey.settings`. Like Homey it emits `set` / `unset` with the key,
  * and it is also used as a plain EventEmitter for the app's `set-image`, `set-dashboard`… relay.
@@ -91,11 +114,33 @@ export function createFakeHomey() {
     return result
   }
   const settings = new FakeSettings()
+  const widgets = new Map<string, FakeWidget>()
+  const widget = (id: string): FakeWidget => {
+    let result = widgets.get(id)
+    if (result === undefined) {
+      result = new FakeWidget(id)
+      widgets.set(id, result)
+    }
+    return result
+  }
+  // The devices `homey.drivers.getDriver(id).getDevices()` returns; tests add to them.
+  const devices = new Map<string, unknown[]>()
+  const driverDevices = (id: string) => {
+    let result = devices.get(id)
+    if (result === undefined) {
+      result = []
+      devices.set(id, result)
+    }
+    return result
+  }
 
   const homey = {
     manifest,
     settings,
     flow: { getActionCard: card, getConditionCard: card, getTriggerCard: card, getDeviceTriggerCard: card },
+    api: { realtime: vi.fn(async (event: string, data: unknown) => undefined) },
+    drivers: { getDriver: (id: string) => ({ getDevices: () => driverDevices(id) }) },
+    dashboards: { getWidget: widget },
     __: (key: string) => key,
     log: vi.fn(),
     error: vi.fn(),
@@ -104,7 +149,7 @@ export function createFakeHomey() {
     clearTimeout: vi.fn((timeout: ReturnType<typeof setTimeout>) => clearTimeout(timeout)),
   }
 
-  return { homey, card, cards, settings }
+  return { homey, card, cards, settings, widget, driverDevices }
 }
 
 export type FakeHomey = ReturnType<typeof createFakeHomey>['homey']

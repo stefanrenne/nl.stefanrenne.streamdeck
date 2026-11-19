@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Homey (Athom smart-home hub) SDK v3 app `nl.stefanrenne.streamdeck`: it turns an Elgato Stream Deck, connected through a **Stream Deck Network Dock** on the LAN, into a Homey controller. Users build dashboards of image and text ("variable") buttons in the app settings page. Button presses fire Flow triggers, and Flows can switch dashboards or update variable text. TypeScript as ES modules (`.mts`, imported with `.mjs` extensions), Node 22, `platforms: ["local"]`. It uses `@elgato-stream-deck/tcp` for the dock connection and `jimp` for rendering images.
+Homey (Athom smart-home hub) SDK v3 app `nl.stefanrenne.streamdeck`: it turns an Elgato Stream Deck, connected through a **Stream Deck Network Dock** on the LAN, into a Homey controller. A **virtual Stream Deck** (a device shown and pressed in a dashboard widget) does the same without hardware. Users build dashboards of image and text ("variable") buttons in the app settings page. Button presses fire Flow triggers, and Flows can switch dashboards or update variable text. TypeScript as ES modules (`.mts`, imported with `.mjs` extensions), Node 22, `platforms: ["local"]`. It uses `@elgato-stream-deck/tcp` for the dock connection and `jimp` for rendering images.
 
 ## Commands
 
@@ -21,7 +21,7 @@ homey app run      # run on a Homey for development (requires Homey CLI and a Ne
 
 ## Tests are required
 
-**Every feature and every bug fix must come with new unit tests, or extend the existing ones, in the same change.** A change is not done until `npm test` and `npm run lint` pass. For a bug fix, add a test that fails without the fix and name it with the regression commit, for example `(regression 2a23812)`, as the existing ones are. When you fix a bug that has an `it.todo(...)`, replace the todo with a real test and delete the test that documents the old behaviour. Put tests in the file that matches the layer you changed (`storage`, `cardListener`, `rendering` for `textToImage`/`streamDeckAdapter`, `device`, `app` for the app/api/driver, `settings` for `settings/index.html`, `manifest` for compose/locale/release files). Only change existing assertions when the behaviour change is intended, and say so in the commit. See [docs/testing.md](docs/testing.md) for how the suite is set up.
+**Every feature and every bug fix must come with new unit tests, or extend the existing ones, in the same change.** A change is not done until `npm test` and `npm run lint` pass. For a bug fix, add a test that fails without the fix and name it with the regression commit, for example `(regression 2a23812)`, as the existing ones are. When you fix a bug that has an `it.todo(...)`, replace the todo with a real test and delete the test that documents the old behaviour. Put tests in the file that matches the layer you changed (`storage`, `cardListener`, `rendering` for `textToImage`/`streamDeckAdapter`, `device`, `virtualDeck` for the virtual deck, its driver and the widget API, `app` for the app/api/driver, `settings` for `settings/index.html`, `manifest` for compose/locale/release files). Only change existing assertions when the behaviour change is intended, and say so in the commit. See [docs/testing.md](docs/testing.md) for how the suite is set up.
 
 ## Outstanding work
 
@@ -37,6 +37,7 @@ Detailed reference lives in `docs/`. Read the relevant file before changing that
 - [docs/device.md](docs/device.md): the Network Dock driver and device: discovery and pairing, the connection lifecycle, capabilities, button events and single/double press detection, and dashboard switching.
 - [docs/rendering.md](docs/rendering.md): `streamDeckAdapter` and `TextToImage`: how dashboards, variables and the Homey logo are drawn on the keys.
 - [docs/flow-cards.md](docs/flow-cards.md): every trigger, condition and action card, with args, tokens and run-listener matching.
+- [docs/virtual-deck.md](docs/virtual-deck.md): the virtual Stream Deck: `VirtualStreamDeck`, the `virtual-deck` driver and device, the widget, its API and realtime events.
 - [docs/settings-page.md](docs/settings-page.md): the settings page (dashboard editor, images, variables), what it writes, and the `/textToImage` API.
 - [docs/testing.md](docs/testing.md): the test setup (vitest, the fake Homey and Stream Deck), what each test file covers, and how to add tests.
 - [docs/history.md](docs/history.md): how the app evolved and why some things look the way they do.
@@ -54,13 +55,14 @@ When finishing a feature, check both before committing.
 
 ## Homey Compose: never edit `app.json` directly
 
-The root `app.json` is **generated** by the Homey CLI from `.homeycompose/app.json`, `.homeycompose/flow/{actions,conditions,triggers}/*.json`, `.homeycompose/capabilities/*.json`, `.homeycompose/discovery/*.json`, and `drivers/*/driver.compose.json` / `driver.settings.compose.json`. Make manifest changes in those source files. The `api` section (the `/textToImage` route for `api.mts`) lives in `.homeycompose/app.json`. For version bumps, see [Releasing](#releasing).
+The root `app.json` is **generated** by the Homey CLI from `.homeycompose/app.json`, `.homeycompose/flow/{actions,conditions,triggers}/*.json`, `.homeycompose/capabilities/*.json`, `.homeycompose/discovery/*.json`, `drivers/*/driver.compose.json` / `driver.settings.compose.json`, and `widgets/*/widget.compose.json`. Make manifest changes in those source files. The `api` section (the `/textToImage` route for `api.mts`) lives in `.homeycompose/app.json`. For version bumps, see [Releasing](#releasing).
 
 ## Architecture
 
 - **`app.mts` (`StreamDeckApp`)** relays settings writes: it listens to `homey.settings` `set`/`unset`, and for keys `image-<id>`, `dashboard-<id>` and `variable-<id>` it re-emits `set-image` / `set-dashboard` / `set-variable` (or `unset-*`) with the id on the same emitter. It also owns the three `update_variable*` action cards, which render a sample with `TextToImage` and write `variable-<id>`. On init it removes orphaned settings keys (`Store.cleanSettings`).
 - **`lib/streamDeckDevice.mts` (`StreamDeckDevice`)** is the base class of every device. It listens to those `set-*`/`unset-*` events to redraw keys, turns key presses into Flow triggers, and handles the `onoff` / `dim` / `dashboard` capabilities and the dashboard cards. It draws on a `DeckSurface` (`lib/streamDeckAdapter.mts`), the part of the `@elgato-stream-deck/core` `StreamDeck` API that drawing needs.
 - **`drivers/network-dock/device.mts` (`NetworkDock`)** extends it and only owns the TCP connection (`StreamDeckTcpConnectionManager`), discovery and the dock's settings.
+- **`drivers/virtual-deck/device.mts` (`VirtualDeck`)** extends it with a `VirtualStreamDeck` (`lib/virtualStreamDeck.mts`), a deck in memory whose keys are sent to the **`widgets/virtual-deck`** widget over `homey.api.realtime`. The widget's `api.mts` passes presses back. The app registers the widget's device autocomplete.
 - **`lib/storage.mts` (`Store`)** is a read-through cache over `homey.settings`. **The app and every device each create their own `Store`**, so a cache is only invalidated through the settings events. Writes normally come from the settings page; the only writers in app code are `setVariable` and `updateDashboard`.
 - **`lib/cardListener.mts`** holds the shared autocomplete (images, variables, dashboards) and run listeners (matching `args` against the trigger `state`). **`lib/streamDeckAdapter.mts`** and **`lib/textToImage.mts`** do all the drawing.
 - **`settings/index.html`** is a single static page that writes directly to `homey.settings` via `Homey.set`.

@@ -258,7 +258,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "type": "dropdown",
@@ -530,7 +530,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           }
         ],
         "tokens": [
@@ -591,7 +591,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "name": "image",
@@ -841,7 +841,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "type": "dropdown",
@@ -1033,7 +1033,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "name": "variable",
@@ -1323,7 +1323,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "name": "dashboard",
@@ -1385,7 +1385,7 @@
           {
             "type": "device",
             "name": "device",
-            "filter": "driver_id=network-dock"
+            "filter": "driver_id=network-dock|virtual-deck"
           },
           {
             "name": "dashboard",
@@ -1849,8 +1849,234 @@
           ]
         }
       ]
+    },
+    {
+      "name": {
+        "en": "Virtual Stream Deck",
+        "nl": "Virtuele Stream Deck",
+        "de": "Virtuelles Stream Deck",
+        "fr": "Stream Deck virtuel",
+        "it": "Stream Deck virtuale",
+        "sv": "Virtuellt Stream Deck",
+        "no": "Virtuelt Stream Deck",
+        "es": "Stream Deck virtual",
+        "da": "Virtuelt Stream Deck",
+        "ru": "Виртуальный Stream Deck",
+        "pl": "Wirtualny Stream Deck",
+        "ko": "가상 Stream Deck",
+        "ar": "Stream Deck افتراضي"
+      },
+      "class": "button",
+      "capabilities": [
+        "onoff",
+        "dim",
+        "dashboard"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [],
+      "images": {
+        "small": "/drivers/virtual-deck/assets/images/small.png",
+        "large": "/drivers/virtual-deck/assets/images/large.png",
+        "xlarge": "/drivers/virtual-deck/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "virtual-deck",
+      "settings": [
+        {
+          "id": "model",
+          "type": "dropdown",
+          "value": "mk2",
+          "label": {
+            "en": "Model",
+            "nl": "Model",
+            "de": "Modell",
+            "fr": "Modèle",
+            "it": "Modello",
+            "sv": "Modell",
+            "no": "Modell",
+            "es": "Modelo",
+            "da": "Model",
+            "ru": "Модель",
+            "pl": "Model",
+            "ko": "모델",
+            "ar": "الطراز"
+          },
+          "hint": {
+            "en": "The Stream Deck this virtual deck imitates: its number of keys and their size. A dashboard shown on it takes on this size, just like on a real deck.",
+            "nl": "De Stream Deck die deze virtuele deck nabootst: het aantal knoppen en hun formaat. Een dashboard dat erop wordt getoond, krijgt dit formaat, net als op een echte deck.",
+            "de": "Das Stream Deck, das dieses virtuelle Deck nachbildet: die Anzahl der Tasten und ihre Größe. Ein darauf angezeigtes Dashboard übernimmt diese Größe, wie auf einem echten Deck.",
+            "fr": "Le Stream Deck que ce deck virtuel imite : le nombre de touches et leur taille. Un tableau de bord affiché dessus prend cette taille, comme sur un vrai deck.",
+            "it": "Lo Stream Deck che questo deck virtuale imita: il numero di tasti e la loro dimensione. Una dashboard mostrata su di esso assume questa dimensione, come su un deck reale.",
+            "sv": "Det Stream Deck som detta virtuella deck efterliknar: antalet knappar och deras storlek. En instrumentpanel som visas på det får denna storlek, precis som på ett riktigt deck.",
+            "no": "Stream Deck-en dette virtuelle decket etterligner: antall knapper og størrelsen deres. Et dashbord som vises på det får denne størrelsen, akkurat som på et ekte deck.",
+            "es": "El Stream Deck que imita este deck virtual: el número de teclas y su tamaño. Un panel mostrado en él adopta este tamaño, igual que en un deck real.",
+            "da": "Det Stream Deck, som dette virtuelle deck efterligner: antallet af knapper og deres størrelse. Et dashboard, der vises på det, får denne størrelse, ligesom på et rigtigt deck.",
+            "ru": "Stream Deck, который имитирует эта виртуальная панель: количество кнопок и их размер. Показанная на ней панель управления принимает этот размер, как на настоящем устройстве.",
+            "pl": "Stream Deck, który naśladuje ten wirtualny deck: liczba przycisków i ich rozmiar. Wyświetlany na nim pulpit przyjmuje ten rozmiar, tak jak na prawdziwym urządzeniu.",
+            "ko": "이 가상 덱이 흉내 내는 Stream Deck: 버튼 수와 크기입니다. 여기에 표시되는 대시보드는 실제 덱과 마찬가지로 이 크기를 따릅니다.",
+            "ar": "جهاز Stream Deck الذي يحاكيه هذا الجهاز الافتراضي: عدد الأزرار وحجمها. تأخذ لوحة المعلومات المعروضة عليه هذا الحجم، تمامًا كما في الجهاز الحقيقي."
+          },
+          "values": [
+            {
+              "id": "mini",
+              "label": {
+                "en": "Stream Deck Mini (3×2)",
+                "nl": "Stream Deck Mini (3×2)",
+                "de": "Stream Deck Mini (3×2)",
+                "fr": "Stream Deck Mini (3×2)",
+                "it": "Stream Deck Mini (3×2)",
+                "sv": "Stream Deck Mini (3×2)",
+                "no": "Stream Deck Mini (3×2)",
+                "es": "Stream Deck Mini (3×2)",
+                "da": "Stream Deck Mini (3×2)",
+                "ru": "Stream Deck Mini (3×2)",
+                "pl": "Stream Deck Mini (3×2)",
+                "ko": "Stream Deck Mini (3×2)",
+                "ar": "Stream Deck Mini (3×2)"
+              }
+            },
+            {
+              "id": "neo",
+              "label": {
+                "en": "Stream Deck Neo (4×2)",
+                "nl": "Stream Deck Neo (4×2)",
+                "de": "Stream Deck Neo (4×2)",
+                "fr": "Stream Deck Neo (4×2)",
+                "it": "Stream Deck Neo (4×2)",
+                "sv": "Stream Deck Neo (4×2)",
+                "no": "Stream Deck Neo (4×2)",
+                "es": "Stream Deck Neo (4×2)",
+                "da": "Stream Deck Neo (4×2)",
+                "ru": "Stream Deck Neo (4×2)",
+                "pl": "Stream Deck Neo (4×2)",
+                "ko": "Stream Deck Neo (4×2)",
+                "ar": "Stream Deck Neo (4×2)"
+              }
+            },
+            {
+              "id": "plus",
+              "label": {
+                "en": "Stream Deck + (4×2)",
+                "nl": "Stream Deck + (4×2)",
+                "de": "Stream Deck + (4×2)",
+                "fr": "Stream Deck + (4×2)",
+                "it": "Stream Deck + (4×2)",
+                "sv": "Stream Deck + (4×2)",
+                "no": "Stream Deck + (4×2)",
+                "es": "Stream Deck + (4×2)",
+                "da": "Stream Deck + (4×2)",
+                "ru": "Stream Deck + (4×2)",
+                "pl": "Stream Deck + (4×2)",
+                "ko": "Stream Deck + (4×2)",
+                "ar": "Stream Deck + (4×2)"
+              }
+            },
+            {
+              "id": "mk2",
+              "label": {
+                "en": "Stream Deck MK.2 (5×3)",
+                "nl": "Stream Deck MK.2 (5×3)",
+                "de": "Stream Deck MK.2 (5×3)",
+                "fr": "Stream Deck MK.2 (5×3)",
+                "it": "Stream Deck MK.2 (5×3)",
+                "sv": "Stream Deck MK.2 (5×3)",
+                "no": "Stream Deck MK.2 (5×3)",
+                "es": "Stream Deck MK.2 (5×3)",
+                "da": "Stream Deck MK.2 (5×3)",
+                "ru": "Stream Deck MK.2 (5×3)",
+                "pl": "Stream Deck MK.2 (5×3)",
+                "ko": "Stream Deck MK.2 (5×3)",
+                "ar": "Stream Deck MK.2 (5×3)"
+              }
+            },
+            {
+              "id": "xl",
+              "label": {
+                "en": "Stream Deck XL (8×4)",
+                "nl": "Stream Deck XL (8×4)",
+                "de": "Stream Deck XL (8×4)",
+                "fr": "Stream Deck XL (8×4)",
+                "it": "Stream Deck XL (8×4)",
+                "sv": "Stream Deck XL (8×4)",
+                "no": "Stream Deck XL (8×4)",
+                "es": "Stream Deck XL (8×4)",
+                "da": "Stream Deck XL (8×4)",
+                "ru": "Stream Deck XL (8×4)",
+                "pl": "Stream Deck XL (8×4)",
+                "ko": "Stream Deck XL (8×4)",
+                "ar": "Stream Deck XL (8×4)"
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
+  "widgets": {
+    "virtual-deck": {
+      "name": {
+        "en": "Virtual Stream Deck",
+        "nl": "Virtuele Stream Deck",
+        "de": "Virtuelles Stream Deck",
+        "fr": "Stream Deck virtuel",
+        "it": "Stream Deck virtuale",
+        "sv": "Virtuellt Stream Deck",
+        "no": "Virtuelt Stream Deck",
+        "es": "Stream Deck virtual",
+        "da": "Virtuelt Stream Deck",
+        "ru": "Виртуальный Stream Deck",
+        "pl": "Wirtualny Stream Deck",
+        "ko": "가상 Stream Deck",
+        "ar": "Stream Deck افتراضي"
+      },
+      "settings": [
+        {
+          "id": "device",
+          "type": "autocomplete",
+          "title": {
+            "en": "Virtual Stream Deck",
+            "nl": "Virtuele Stream Deck",
+            "de": "Virtuelles Stream Deck",
+            "fr": "Stream Deck virtuel",
+            "it": "Stream Deck virtuale",
+            "sv": "Virtuellt Stream Deck",
+            "no": "Virtuelt Stream Deck",
+            "es": "Stream Deck virtual",
+            "da": "Virtuelt Stream Deck",
+            "ru": "Виртуальный Stream Deck",
+            "pl": "Wirtualny Stream Deck",
+            "ko": "가상 Stream Deck",
+            "ar": "Stream Deck افتراضي"
+          }
+        }
+      ],
+      "api": {
+        "getState": {
+          "method": "GET",
+          "path": "/state"
+        },
+        "press": {
+          "method": "POST",
+          "path": "/press"
+        }
+      },
+      "id": "virtual-deck"
+    }
+  },
   "capabilities": {
     "dashboard": {
       "type": "enum",

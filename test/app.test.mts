@@ -2,17 +2,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import StreamDeckApp from '../app.mjs'
 import api from '../api.mjs'
 import NetworkDockDriver from '../drivers/network-dock/driver.mjs'
-import { createFakeHomey, FakeCard, FakeHomey, FakeSettings, RED_PIXEL_PNG, seedSettings } from './helpers/fake-homey.mjs'
+import { createFakeHomey, FakeCard, FakeHomey, FakeSettings, FakeWidget, RED_PIXEL_PNG, seedSettings } from './helpers/fake-homey.mjs'
 
 let homey: FakeHomey
 let settings: FakeSettings
 let card: (id: string) => FakeCard
+let widget: (id: string) => FakeWidget
+let driverDevices: (id: string) => unknown[]
 
 beforeEach(() => {
   const fake = createFakeHomey()
   homey = fake.homey
   settings = fake.settings
   card = fake.card
+  widget = fake.widget
+  driverDevices = fake.driverDevices
 })
 
 const startApp = async () => {
@@ -37,6 +41,19 @@ describe('onInit', () => {
       expect(card(id).runListener, id).toBeDefined()
       expect(card(id).autocompleteListeners.has('variable'), id).toBe(true)
     }
+  })
+})
+
+describe('virtual deck widget', () => {
+  it('offers the virtual decks by name in the device setting, and stores their data id', async () => {
+    const device = (id: string, name: string) => ({ getData: () => ({ id }), getName: () => name })
+    driverDevices('virtual-deck').push(device('b', 'Kitchen'), device('a', 'desk'), device('c', 'Office'))
+    await startApp()
+
+    expect(await widget('virtual-deck').autocomplete('device', '')).toEqual([
+      { id: 'a', name: 'desk' }, { id: 'b', name: 'Kitchen' }, { id: 'c', name: 'Office' },
+    ])
+    expect(await widget('virtual-deck').autocomplete('device', 'KIT')).toEqual([{ id: 'b', name: 'Kitchen' }])
   })
 })
 

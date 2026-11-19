@@ -19,7 +19,7 @@
         {
         "type": "device",
         "name": "device",
-        "filter": "driver_id=network-dock"
+        "filter": "driver_id=network-dock|virtual-deck"
         }
     ],
     "tokens": [

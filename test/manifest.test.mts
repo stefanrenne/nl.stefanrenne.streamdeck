@@ -18,6 +18,9 @@ const translatedFiles = [
   '.homeycompose/capabilities/dashboard.json',
   'drivers/network-dock/driver.compose.json',
   'drivers/network-dock/driver.settings.compose.json',
+  'drivers/virtual-deck/driver.compose.json',
+  'drivers/virtual-deck/driver.settings.compose.json',
+  'widgets/virtual-deck/widget.compose.json',
 ]
 
 /** Every object with a string `en` key is a translation; returns the ones missing a language. */
@@ -57,6 +60,34 @@ describe('compose files', () => {
       const generated = (manifest.flow[type] as { id: string }[]).map((card) => card.id).sort()
       expect(generated, `flow.${type}`).toEqual(composed)
     }
+  })
+})
+
+describe('virtual deck', () => {
+  it('every device card is offered for the Network Dock and the virtual deck', () => {
+    const filters = flowCardFiles
+      .flatMap((entry) => readJson(entry.path).args ?? [])
+      .filter((arg: { type: string }) => arg.type === 'device')
+      .map((arg: { filter: string }) => arg.filter)
+    expect(filters.length).toBeGreaterThan(0)
+    expect(new Set(filters)).toEqual(new Set(['driver_id=network-dock|virtual-deck']))
+  })
+
+  it('the model setting offers every model the virtual deck knows', async () => {
+    const { VIRTUAL_DECK_MODELS } = await import('../lib/virtualStreamDeck.mjs')
+    const [setting] = readJson('drivers/virtual-deck/driver.settings.compose.json')
+    expect(setting.values.map((value: { id: string }) => value.id).sort()).toEqual(Object.keys(VIRTUAL_DECK_MODELS).sort())
+    expect(Object.keys(VIRTUAL_DECK_MODELS)).toContain(setting.value)
+  })
+
+  it.each(['public/index.html', 'preview-light.png', 'preview-dark.png', 'api.mts'])('the widget has %s', (file) => {
+    expect(readFileSync(join(root, 'widgets/virtual-deck', file)).length).toBeGreaterThan(0)
+  })
+
+  it('app.json has the widget and the driver', () => {
+    const manifest = readJson('app.json')
+    expect(Object.keys(manifest.widgets)).toEqual(['virtual-deck'])
+    expect(manifest.drivers.map((driver: { id: string }) => driver.id).sort()).toEqual(['network-dock', 'virtual-deck'])
   })
 })
 

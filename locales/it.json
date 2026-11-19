@@ -81,5 +81,14 @@
                 "textColor": "Colore del testo"
             }
         }
+    },
+    "virtualDeck": {
+        "deviceName": "__model__ virtuale (__size__)"
+    },
+    "widgets": {
+        "virtualDeck": {
+            "noDevice": "Scegli uno Stream Deck virtuale nelle impostazioni del widget. Puoi aggiungerne uno in Dispositivi.",
+            "notFound": "Questo Stream Deck virtuale non esiste più. Scegline un altro nelle impostazioni del widget."
+        }
     }
 }

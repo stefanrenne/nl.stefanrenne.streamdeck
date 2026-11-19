@@ -1,6 +1,6 @@
 # Flow cards
 
-App-level cards live in `.homeycompose/flow/`. The `onoff` and `dim` capabilities add Homey's standard device cards (turned on/off, brightness, and so on). All button triggers and the dashboard cards take a `device` arg (`driver_id=network-dock`). The code references a card by its `id`, which isn't always the file name (`update_variable_firstLine.json` has id `update_variable_firstline`).
+App-level cards live in `.homeycompose/flow/`. The `onoff` and `dim` capabilities add Homey's standard device cards (turned on/off, brightness, and so on). All button triggers and the dashboard cards take a `device` arg (`driver_id=network-dock|virtual-deck`), so they work for a Network Dock and a virtual deck alike. The code references a card by its `id`, which isn't always the file name (`update_variable_firstLine.json` has id `update_variable_firstline`).
 
 ## Triggers (device trigger cards, fired from `StreamDeckDevice`)
 
@@ -39,6 +39,6 @@ The variable actions are registered in `app.mts`. They do nothing if the variabl
 
 ## Adding a card
 
-1. Add `.homeycompose/flow/<type>/<id>.json` with all 13 languages. Leave out empty `args`/`tokens` arrays, and add `device` (`driver_id=network-dock`) for device cards.
+1. Add `.homeycompose/flow/<type>/<id>.json` with all 13 languages. Leave out empty `args`/`tokens` arrays, and add `device` (`driver_id=network-dock|virtual-deck`) for device cards.
 2. Register it: device cards in `StreamDeckDevice.onInit` (use `getDeviceTriggerCard` for triggers), app cards in `StreamDeckApp.onInit`. Use `CardListener` for autocomplete.
 3. Add tests (`device.test.mts` or `app.test.mts`), then update this doc and the Flow Cards section of README.md.

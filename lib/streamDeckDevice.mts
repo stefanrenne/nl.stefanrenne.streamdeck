@@ -293,11 +293,14 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
       await this.onDashboardChanged.trigger(this, { 'dashboard': this.cardListener.emptyDashboard.name })
   }
 
+  // A card has one run listener for all devices (the last device to register it wins), so the
+  // listeners act on the device in the card's args, never on `this`.
   registerIsDashboardListener() {
     const card = this.homey.flow.getConditionCard('is_dashboard');
     this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+      const device: StreamDeckDevice = args.device;
+      const selectedDashboardId: string | undefined = await device.getCapabilityValue('dashboard');
       const dashboardId: string = args.dashboard.id;
       return selectedDashboardId === dashboardId;
     });
@@ -307,21 +310,24 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     const card = this.homey.flow.getActionCard('set_dashboard');
     this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
-      if (!this.getAvailable()) {
-        throw 'Stream Deck is unavailable';
-      }
-
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      const dashboardId: string = args.dashboard.id;
-      const dashboardName: string = args.dashboard.name;
-      if (selectedDashboardId === dashboardId) {
-        // value not changed
-        return {};
-      }
-      await this.setCapabilityValue('dashboard', dashboardId);
-      await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
-      await this.loadDashboard(dashboardId);
+      const device: StreamDeckDevice = args.device;
+      await device.selectDashboard(args.dashboard.id, args.dashboard.name);
       return {};
     });
+  }
+
+  async selectDashboard(dashboardId: string, dashboardName: string) {
+    if (!this.getAvailable()) {
+      throw 'Stream Deck is unavailable';
+    }
+
+    const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
+    if (selectedDashboardId === dashboardId) {
+      // value not changed
+      return;
+    }
+    await this.setCapabilityValue('dashboard', dashboardId);
+    await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
+    await this.loadDashboard(dashboardId);
   }
 };

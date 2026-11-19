@@ -41,7 +41,8 @@ Every listener registered with `.on` (the connection manager's, `homey.settings`
 - The `dashboard` capability's values are `0` ("Homey", which shows the Homey logo full-panel) plus every dashboard (`updateSelectableDashboardOptions`). They are refreshed on init and on every `set-`/`unset-dashboard`.
 - On init, if the selected dashboard no longer exists, the device switches to `0` and triggers `changed_dashboard`. The options **must** be set before the value, otherwise Homey rejects the enum value (fix 8862c09, 1.0.2).
 - `loadDashboard(id)`: `0` or an unknown id draws the Homey logo. Otherwise it draws the dashboard, and if the deck's grid differs from the stored `columns`/`rows`, it stores the deck's size (`Store.updateDashboard`).
-- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. `set_dashboard` throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
+- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. `set_dashboard` (`selectDashboard`) throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
+- A flow card has one run listener for all devices, and every device registers it again in `onInit`, so the last one wins. The `is_dashboard` and `set_dashboard` listeners therefore act on `args.device`, never on `this` (fix of `d9685a0`). Do the same in any new device card.
 
 ## Button events
 

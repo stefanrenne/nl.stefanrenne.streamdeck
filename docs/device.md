@@ -2,6 +2,11 @@
 
 `drivers/network-dock/` has one driver, class `button`, with the capabilities `onoff`, `dim` and the custom enum `dashboard` (`.homeycompose/capabilities/dashboard.json`, a picker whose values are set at runtime).
 
+The device is split in two:
+
+- `lib/streamDeckDevice.mts` (`StreamDeckDevice<Deck>`) does everything that doesn't depend on how the deck is attached: the capabilities, the dashboards, redrawing on settings changes, button events and the dashboard cards (the sections [Dashboards](#dashboards), [Button events](#button-events) and [Brightness](#brightness) below). It draws on a `DeckSurface`, see [rendering.md](rendering.md). `deckDidConnect(deck)` takes a deck into use: it sends the brightness and draws the selected dashboard. A subclass passes key presses to `streamDeckEvent`.
+- `drivers/network-dock/device.mts` (`NetworkDock extends StreamDeckDevice<StreamDeckTcp>`) owns discovery and the TCP connection (the sections [Discovery and pairing](#discovery-and-pairing) and [Connection lifecycle](#connection-lifecycle)).
+
 ## Discovery and pairing
 
 - `.homeycompose/discovery/network-dock.json`: mDNS-SD `_elg._tcp`, matching `txt.md` against `.*Network Dock.*`. The discovery id is `txt.md`.
@@ -21,7 +26,7 @@ The driver logs the discovery results on init and on every new result. The devic
 | `onDiscoveryAvailable` | `connectToAddress(getSetting('ipAddress'))` |
 | `onDiscoveryAddressChanged` | `connectToAddress(new address)`, then stores it in the `ipAddress` setting (`setSettings` doesn't call `onSettings`) |
 | `onSettings` with a changed `ipAddress` | clears the panel, `connectToAddress(new)` |
-| manager `connected` with controls | keeps the deck, `setAvailable`, subscribes to `down`/`up`/`error`/`disconnected`, writes the `name`/`columns`/`rows` settings (and `serial`/`firmware` if they can be read), then loads the selected dashboard |
+| manager `connected` with controls | keeps the deck, `setAvailable`, subscribes to `down`/`up`/`error`/`disconnected`, writes the `name`/`columns`/`rows` settings (and `serial`/`firmware` if they can be read), then `deckDidConnect` sends the brightness and loads the selected dashboard |
 | manager `connected` without controls | `setUnavailable('No Stream Deck connected to Network Dock')` if no deck was connected yet |
 | manager `error` / deck `error` | `setUnavailable(message)` |
 | deck `disconnected` | `setUnavailable('Stream Deck Disconnected')`, drops the deck |

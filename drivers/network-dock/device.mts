@@ -1,41 +1,22 @@
-import Homey, { DiscoveryResultMDNSSD, FlowCardTriggerDevice } from 'homey';
-import type { StreamDeckButtonControlDefinition } from '@elgato-stream-deck/core'
+import { DiscoveryResultMDNSSD } from 'homey';
 import { StreamDeckTcpConnectionManager, StreamDeckTcp } from '@elgato-stream-deck/tcp'
-import { Dashboard, Store } from '../../lib/storage.mjs';
-import { CardListener } from '../../lib/cardListener.mjs';
-import { getButtonControlSize, getLcdButtonControls, renderText, renderDashboard, renderHomeyLogo } from '../../lib/streamDeckAdapter.mjs';
-import { map } from '../../lib/helpers.mjs';
+import StreamDeckDevice from '../../lib/streamDeckDevice.mjs';
+import { getButtonControlSize } from '../../lib/streamDeckAdapter.mjs';
 
-export default class NetworkDock extends Homey.Device {
+/**
+ * A Stream Deck behind a Network Dock. This class only owns the TCP connection and discovery;
+ * dashboards, capabilities and Flow triggers are in `StreamDeckDevice`.
+ */
+export default class NetworkDock extends StreamDeckDevice<StreamDeckTcp> {
 
-  private store = new Store(this.homey);
-  private cardListener = new CardListener(this.homey, this.store);
   private connectionManager = new StreamDeckTcpConnectionManager();
-  private streamDeck: StreamDeckTcp | undefined;
-  private dashboard: Dashboard | undefined;
-  
-  private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
-  private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
-  private onVariableButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('variable_button_action');
-  private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
-  private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
 
   /**
    * onInit is called when the device is initialized.
    */
   async onInit() {
     this.log(`NetworkDock ${this.getData().id} has been initialized, ipAddress ${this.getSetting('ipAddress')}`);
-    this.cardListener.registerImageAutocompleteListenerForCard(this.onImageButtonAction);
-    this.cardListener.registerImageButtonRunListener(this.onImageButtonAction);
-    this.cardListener.registerVariableAutocompleteListenerForCard(this.onVariableButtonAction);
-    this.cardListener.registerVariableButtonRunListener(this.onVariableButtonAction);
-    this.cardListener.registerAnyButtonRunListener(this.onAnyButtonAction);
-    this.cardListener.registerAnyButtonRunListener(this.onOffButtonAction);
-    this.registerIsDashboardListener();
-    this.registerChangeDashboardListener();
-
-    await this.updateSelectableDashboardOptions();
-    await this.validateSelectedDashboardOption();
+    await super.onInit();
 
     this.connectionManager.on('error', this.guard('error', async (message) => {
         this.log('connectionManager - error ' + message);
@@ -49,105 +30,11 @@ export default class NetworkDock extends Homey.Device {
         this.streamDeck = streamDeck
         await this.setAvailable();
         await this.streamDeckDidConnect(streamDeck);
-
-        // Homey's dim value is only sent when it changes, so after a reconnect
-        // or power cycle the deck would keep its own brightness. A failure
-        // here must not stop the dashboard from loading.
-        const on: boolean = this.getCapabilityValue('onoff') ?? true;
-        await this.applyBrightness(on ? this.getCapabilityValue('dim') ?? 1 : 0)
-          .catch((e) => this.log('setBrightness failed: ' + e));
-
-        const dashboardId: string = await this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
-        await this.loadDashboard(dashboardId);
+        await this.deckDidConnect(streamDeck);
       } else if (this.streamDeck == undefined) {
         await this.setUnavailable('No Stream Deck connected to Network Dock');
       }
     }));
-
-    this.homey.settings.on('set-dashboard', this.guard('set-dashboard', async (id: string) => {
-      this.store.invalidateDashboard(id);
-      await this.updateSelectableDashboardOptions();
-
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      if (selectedDashboardId === id) {
-        this.log('selected dashboard updated');
-        await this.loadDashboard(id);
-      }
-    }));
-
-    this.homey.settings.on('unset-dashboard', this.guard('unset-dashboard', async (id: string) => {
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      if (selectedDashboardId === id) {
-        this.log('selected dashboard removed');
-        await this.loadEmptyDashboardOptions();
-      }
-
-      this.store.invalidateDashboard(id);
-      await this.updateSelectableDashboardOptions();
-    }));
-
-    this.homey.settings.on('set-image', this.guard('set-image', async (id: string) => {
-      this.store.invalidateImage(id);
-    }));
-
-    this.homey.settings.on('unset-image', this.guard('unset-image', async (id: string) => {
-      this.store.invalidateImage(id);
-    }));
-
-    this.homey.settings.on('set-variable', this.guard('set-variable', async (id: string) => {
-      this.store.invalidateVariable(id);
-      const control = await this.getDisplayedControlForVariable(id);
-      if (control !== undefined && this.streamDeck !== undefined) {
-        const variable = this.store.getVariable(id);
-        if (variable === undefined) {
-          await this.streamDeck.clearKey(control.index);
-        } else {
-          await renderText(this.streamDeck, control, variable.firstLine, variable.secondLine, variable.textColor, variable.backgroundColor);
-        }
-      }
-    }));
-
-    this.homey.settings.on('unset-variable', this.guard('unset-variable', async (id: string) => {
-      this.store.invalidateVariable(id);
-      const control = await this.getDisplayedControlForVariable(id);
-      if (control !== undefined) {
-        await this.streamDeck?.clearKey(control.index);
-      }
-    }));
-
-    this.registerCapabilityListener('onoff', async (value: boolean) => {
-      const dim: number = value ? 1.0 : 0.0;
-      await this.applyBrightness(dim);
-      await this.setCapabilityValue('dim', dim);
-    });
-
-    this.registerCapabilityListener('dim', async (value: number) => {
-      await this.applyBrightness(value);
-      await this.setCapabilityValue('onoff', value > 0);
-    });
-
-    this.registerCapabilityListener('dashboard', async (id: string) => {
-      await this.loadDashboard(id);
-      const dashboardName = (id === this.cardListener.emptyDashboard.id) ? this.cardListener.emptyDashboard.name : this.store.getDashboard(id)?.name
-      if (dashboardName) {
-        await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
-      }
-    });
-  }
-  
-  /**
-   * Wraps an async event listener. An EventEmitter doesn't await its listeners, so a rejection
-   * (for example `Disconnected` when the dock drops while a key is being drawn) would be unhandled
-   * and crash the app. It is logged instead.
-   */
-  guard<Args extends unknown[]>(event: string, listener: (...args: Args) => Promise<void>): (...args: Args) => void {
-    return (...args: Args) => {
-      listener(...args).catch((e) => this.log(`${event} failed: ${e}`));
-    };
-  }
-
-  async applyBrightness(dim: number) {
-    await this.streamDeck?.setBrightness(Math.round(dim * 100));
   }
 
   async streamDeckDidConnect(streamDeck: StreamDeckTcp) {
@@ -206,126 +93,6 @@ export default class NetworkDock extends Homey.Device {
       await this.setSettings(settings);
   }
 
-  async getDisplayedControlForVariable(variableId: string) {
-    if (this.streamDeck === undefined) {
-      return undefined;
-    }
-    const dashboard: Dashboard | undefined = map(await this.getCapabilityValue('dashboard'), (dashboardId) => this.store.getDashboard(dashboardId));
-    if (dashboard === undefined) {
-      return undefined;
-    }
-
-    const controls = getLcdButtonControls(this.streamDeck)
-    for (const [i, control] of controls.entries()) {
-      const item = dashboard.items[i+1];
-      if (item.kind === 'variable' && item.variableId === variableId) {
-        return control
-      }
-    }
-    return undefined
-  }
-
-  async loadDashboard(id: string) {
-    if (this.streamDeck === undefined) {
-      this.dashboard = undefined;
-      return
-    }
-    const dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
-    if (dashboard === undefined) {
-      this.dashboard = undefined;
-      await renderHomeyLogo(this.streamDeck);
-      return
-    }
-
-    // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
-    const size = getButtonControlSize(this.streamDeck);
-    if (dashboard.columns != size.columns || dashboard.rows != size.rows) {
-      this.store.updateDashboard(dashboard.id, size.columns, size.rows);
-    }
-
-    this.dashboard = dashboard;
-    await renderDashboard(this.streamDeck, dashboard);
-  }
-
-  private lastKeyPressTime: number = 0;
-  private lastKeyPressIndex: number = 0;
-  // isTurnedOn is the state at the press, so a 'single'/'double' goes to the same cards as its 'down'.
-  validateSingleDouble(control: StreamDeckButtonControlDefinition, isTurnedOn: boolean) {
-    const thisKeyPressTime = new Date().getTime();
-    if (thisKeyPressTime - this.lastKeyPressTime <= 250 && this.lastKeyPressIndex == control.index+1) {
-      this.streamDeckEvent('double', isTurnedOn, control).catch((e) => console.error('double event failed:', e));
-      this.lastKeyPressTime = 0;
-      this.lastKeyPressIndex = 0;
-    } else {
-      this.lastKeyPressTime = thisKeyPressTime;
-      this.lastKeyPressIndex = control.index+1;
-      // homey.setTimeout is cleared when the app unloads, so no 'single' fires after that.
-      this.homey.setTimeout(() => {
-        if (this.lastKeyPressTime > 0) {
-          this.streamDeckEvent('single', isTurnedOn, control).catch((e) => console.error('single event failed:', e));
-        }
-      }, 400);
-    }
-  }
-
-  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: boolean, control: StreamDeckButtonControlDefinition) {
-
-    const button = this.dashboard?.items[control.index+1];
-    const state = { action: event, variableId: '', imageId: '' }
-    const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
-    
-    if (!isTurnedOn) {
-      if (event === 'down') {
-        this.validateSingleDouble(control, false);
-      }
-      await this.onOffButtonAction.trigger(this, tokens, state);
-      this.log(event + ' disabled button');
-      return
-    }
-
-    if (button === undefined || this.dashboard?.name === undefined) {
-      this.log(event + ' empty dashboard button');
-      return
-    }
-
-    if (event === 'down') {
-      this.validateSingleDouble(control, true);
-    }
-
-    const actions: Promise<void>[] = []
-
-    switch (button.kind) {
-    case 'variable':
-      state.variableId = button.variableId;
-      tokens.textFirstLine = button.firstLine;
-      tokens.textSecondLine = button.secondLine ?? '';
-      actions.push(this.onVariableButtonAction.trigger(this, tokens, state));
-      this.log(event + ' variable button ' + button.firstLine);
-      break; 
-    case 'image':
-      state.imageId = button.imageId;
-      tokens.imageName = button.name;
-      actions.push(this.onImageButtonAction.trigger(this, tokens, state));
-      this.log(event + ' image button ' + button.name);
-      break; 
-    default:
-      this.log(event + ' empty button ');
-      break;
-    }
-    actions.push(this.onAnyButtonAction.trigger(this, tokens, state));
-
-    await Promise.all(actions);
-  }
-
-  /**
-   * onAdded is called when the user adds the device, called just after pairing.
-   */
-  async onAdded() {
-    this.log('NetworkDock has been added');
-    await this.setCapabilityValue('dim', 1.0);
-    await this.setCapabilityValue('onoff', true);
-  } 
-
   /**
    * onSettings is called when the user updates the device's settings.
    * @param {object} event the onSettings event data
@@ -351,8 +118,8 @@ export default class NetworkDock extends Homey.Device {
         this.connectToAddress(newIp);
       }
     }
-  }  
-  
+  }
+
   async onDeleted() {
     this.log('NetworkDock has been deleted');
     await this.streamDeck?.clearPanel();
@@ -364,68 +131,6 @@ export default class NetworkDock extends Homey.Device {
       this.connectionManager.disconnectFrom(ipAddress);
       this.connectedAddress = undefined;
     }
-  }
-
-  async validateSelectedDashboardOption() {
-    const selectedDashboardId = await this.getCapabilityValue('dashboard');
-    const allDashboardIds = this.store.getDashboardMetadata().map((metadata) => metadata.id);
-    if (selectedDashboardId === undefined || !allDashboardIds.includes(selectedDashboardId)) {
-      await this.loadEmptyDashboardOptions();
-    }
-  }
-
-  async updateSelectableDashboardOptions() {
-    const staticOptions = [
-      {'id': this.cardListener.emptyDashboard.id, 'title': { 'en': this.cardListener.emptyDashboard.name } }
-    ]
-    const dynamicOptions = this.store
-      .getDashboardMetadata()
-      .map((dashboard) => ({'id': dashboard.id, 'title': { 'en': dashboard.name } }) );
-
-    await this.setCapabilityOptions('dashboard', { values: staticOptions.concat(dynamicOptions) });
-  }
-
-  async loadEmptyDashboardOptions() {
-      // set the first dashboard as new dashboard
-      await this.setCapabilityValue('dashboard', this.cardListener.emptyDashboard.id);
-
-      // load the new dashboard
-      await this.loadDashboard(this.cardListener.emptyDashboard.id);
-
-      // notifiy about the dashboard change
-      await this.onDashboardChanged.trigger(this, { 'dashboard': this.cardListener.emptyDashboard.name })
-  }
-
-  registerIsDashboardListener() {
-    const card = this.homey.flow.getConditionCard('is_dashboard');
-    this.cardListener.registerDashboardAutocompleteListenerForCard(card);
-    card.registerRunListener(async (args) => {
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      const dashboardId: string = args.dashboard.id;
-      return selectedDashboardId === dashboardId;
-    });
-  }
-
-  registerChangeDashboardListener() {
-    const card = this.homey.flow.getActionCard('set_dashboard');
-    this.cardListener.registerDashboardAutocompleteListenerForCard(card);
-    card.registerRunListener(async (args) => {
-      if (!this.getAvailable()) {
-        throw 'Stream Deck is unavailable';
-      }
-      
-      const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
-      const dashboardId: string = args.dashboard.id;
-      const dashboardName: string = args.dashboard.name;
-      if (selectedDashboardId === dashboardId) {
-        // value not changed
-        return {};
-      }
-      await this.setCapabilityValue('dashboard', dashboardId);
-      await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
-      await this.loadDashboard(dashboardId);
-      return {};
-    });
   }
 
   /**

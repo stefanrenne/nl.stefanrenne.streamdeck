@@ -2,6 +2,8 @@
 
 All drawing goes through `lib/streamDeckAdapter.mts`, which pushes raw RGBA buffers to the deck, and `lib/textToImage.mts`, which produces jimp images.
 
+The adapter draws on a `DeckSurface`: `Pick<StreamDeck, 'CONTROLS' | 'fillKeyBuffer' | 'clearKey' | 'clearPanel' | 'fillPanelBuffer' | 'calculateFillPanelDimensions' | 'setBrightness'>` from `@elgato-stream-deck/core`. A `StreamDeckTcp` is one; anything else that implements those members can be drawn on the same way.
+
 ## streamDeckAdapter
 
 | Function | Behaviour |

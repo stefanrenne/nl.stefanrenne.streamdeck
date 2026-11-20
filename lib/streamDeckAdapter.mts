@@ -21,6 +21,17 @@ export function getLcdButtonControls(streamDeck: DeckSurface): StreamDeckButtonC
     return streamDeck.CONTROLS.filter(isLcdButton);
 }
 
+/**
+ * The dashboard item on `control`, by row and column, so a deck smaller than the dashboard shows its
+ * top-left part. A control outside the dashboard (the Neo's touch keys) has none.
+ */
+export function getDashboardItem(dashboard: Dashboard, control: Pick<StreamDeckControlDefinition, 'row' | 'column'>) {
+    if (control.row >= dashboard.rows || control.column >= dashboard.columns) {
+        return undefined;
+    }
+    return dashboard.items[control.row * dashboard.columns + control.column + 1];
+}
+
 export function getButtonControlSize(streamDeck: DeckSurface) {
     return getLcdButtonControls(streamDeck).reduce((result, control) => {
         if (result.columns < (control.column + 1)) {
@@ -51,8 +62,8 @@ export async function renderDashboard(streamDeck: DeckSurface, dashboard: Dashbo
     const controls = getLcdButtonControls(streamDeck)
 
     const actions: Promise<void>[] = []
-    for (const [i, control] of controls.entries()) {
-        const item = dashboard.items[i+1];
+    for (const control of controls) {
+        const item = getDashboardItem(dashboard, control);
         switch (item?.kind) {
         case 'variable':
         actions.push(renderText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('renderText failed:', e)));

@@ -2,7 +2,7 @@ import Homey, { FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinition } from '@elgato-stream-deck/core'
 import { Dashboard, Store } from './storage.mjs';
 import { CardListener } from './cardListener.mjs';
-import { DeckSurface, getButtonControlSize, getLcdButtonControls, renderText, renderDashboard, renderHomeyLogo } from './streamDeckAdapter.mjs';
+import { DeckSurface, getButtonControlSize, getDashboardItem, getLcdButtonControls, renderText, renderDashboard, renderHomeyLogo } from './streamDeckAdapter.mjs';
 import { map } from './helpers.mjs';
 
 /**
@@ -163,9 +163,9 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     }
 
     const controls = getLcdButtonControls(this.streamDeck)
-    for (const [i, control] of controls.entries()) {
-      const item = dashboard.items[i+1];
-      if (item.kind === 'variable' && item.variableId === variableId) {
+    for (const control of controls) {
+      const item = getDashboardItem(dashboard, control);
+      if (item?.kind === 'variable' && item.variableId === variableId) {
         return control
       }
     }
@@ -177,17 +177,22 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
       this.dashboard = undefined;
       return
     }
-    const dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
+    let dashboard: Dashboard | undefined = (id === this.cardListener.emptyDashboard.id) ? undefined : this.store.getDashboard(id);
     if (dashboard === undefined) {
       this.dashboard = undefined;
       await renderHomeyLogo(this.streamDeck);
       return
     }
 
-    // Validate if the loaded dashboard has the correct number of buttons (6, 15 or 32)
+    // A deck larger than the dashboard grows it to the deck's size, so every key can be filled in the
+    // settings page. Never shrink: with decks of different sizes on one dashboard, each would resize it
+    // for the other, and every write redraws both, endlessly (regression ec7db59). The sizes (3×2, 4×2,
+    // 5×3, 8×4) are ordered, so the dashboard settles at the largest deck; a smaller deck shows its
+    // top-left part (getDashboardItem).
     const size = getButtonControlSize(this.streamDeck);
-    if (dashboard.columns != size.columns || dashboard.rows != size.rows) {
+    if (size.columns > dashboard.columns || size.rows > dashboard.rows) {
       this.store.updateDashboard(dashboard.id, size.columns, size.rows);
+      dashboard = this.store.getDashboard(id) ?? dashboard;
     }
 
     this.dashboard = dashboard;
@@ -217,7 +222,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
 
   async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: boolean, control: StreamDeckButtonControlDefinition) {
 
-    const button = this.dashboard?.items[control.index+1];
+    const button = map(this.dashboard, (dashboard) => getDashboardItem(dashboard, control));
     const state = { action: event, variableId: '', imageId: '' }
     const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
 

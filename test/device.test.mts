@@ -175,6 +175,49 @@ describe('connecting', () => {
     await connect(new FakeStreamDeck(lcdButtons(8, 4)))
     expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 8, rows: 4 })
   })
+
+  it('never shrinks the dashboard for a smaller deck (regression ec7db59)', async () => {
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    await connect(new FakeStreamDeck(lcdButtons(4, 2)))
+    expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 5, rows: 3 })
+  })
+
+  it('shows the top-left part of a larger dashboard, by row and column', async () => {
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    const small = new FakeStreamDeck(lcdButtons(4, 2))
+    await connect(small)
+
+    // Item 8 of the 5×3 dashboard is row 2, column 3: key 6 on a 4×2 deck, not key 7.
+    const filled = small.fillKeyBuffer.mock.calls.map(([index]) => index).sort()
+    expect(filled).toEqual([0, 6])
+  })
+
+  it('two decks of different sizes on one dashboard settle instead of resizing it for each other (regression ec7db59)', async () => {
+    // The app relays settings writes as set-dashboard; every device on the dashboard reloads it.
+    settings.on('set', (key: string) => {
+      if (key.startsWith('dashboard-')) {
+        settings.emit('set-dashboard', key.slice('dashboard-'.length))
+      }
+    })
+    const writes = vi.spyOn(settings, 'set')
+    const large = new FakeStreamDeck(lcdButtons(8, 4))
+    const small = new FakeStreamDeck(lcdButtons(4, 2))
+
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    const first = device
+    await connect(large)
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    await connect(small)
+    device = first
+
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 8, rows: 4 })
+    expect(writes.mock.calls.filter(([key]) => key === 'dashboard-d-home')).toHaveLength(1)
+  })
 })
 
 describe('button events', () => {

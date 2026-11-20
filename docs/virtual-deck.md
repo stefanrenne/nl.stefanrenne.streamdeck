@@ -26,7 +26,7 @@ A `DeckSurface` (see [rendering.md](rendering.md)) that keeps its keys in memory
 - **Pairing** (`driver.mts`): `list_devices` offers one virtual deck per model, named after the model ("Stream Deck XL", so the part that tells them apart fits on the pairing tile) and with an icon of its key grid (`assets/icons/<model>.svg`; the Neo and + add their touch strip and dials, because both have 4×2 keys). `options.singular` lets the user pick one deck instead of adding every model, which `list_devices` would preselect. Each gets a random `data.id`, so pairing the same model again adds another one.
 - **Setting** `model` (dropdown, default `mk2`). Changing it replaces the deck (`attach`) and redraws. An unknown model falls back to `mk2`.
 - `onInit` → `StreamDeckDevice.onInit`, then `attach(model)`: creates the deck, forwards its `key` / `brightness` events to the widgets, passes `down` / `up` to `streamDeckEvent` (through `guard`), publishes `state`, and calls `deckDidConnect`. The deck is always connected, so the device is never unavailable.
-- Like on a real deck, loading a dashboard whose size differs from the deck stores the deck's size (`Store.updateDashboard`). A dashboard shared by decks of different sizes is resized by each of them.
+- Like on a real deck, loading a dashboard smaller than the deck grows it to the deck's size (`Store.updateDashboard`), and a dashboard larger than the deck shows its top-left part (see [device.md](device.md)).
 - `onDeleted` publishes `deleted` and drops the deck.
 
 ### Realtime events

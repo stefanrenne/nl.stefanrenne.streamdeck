@@ -95,6 +95,29 @@
           .catch((error) => console.error('press failed', error));
       };
 
+      // Single and double presses are timed here, where the press happens: the requests reach Homey
+      // one by one, too late and too unevenly to time them there. Same rules as a real deck
+      // (StreamDeckDevice.validateSingleDouble): a second down on the same key within 250 ms is a
+      // 'double'; otherwise a 'single' follows 400 ms after the down.
+      let lastDownTime = 0;
+      let lastDownIndex = -1;
+      const detectSingleDouble = (index) => {
+        const now = performance.now();
+        if (now - lastDownTime <= 250 && lastDownIndex === index) {
+          send(index, 'double');
+          lastDownTime = 0;
+          lastDownIndex = -1;
+        } else {
+          lastDownTime = now;
+          lastDownIndex = index;
+          setTimeout(() => {
+            if (lastDownTime > 0) {
+              send(index, 'single');
+            }
+          }, 400);
+        }
+      };
+
       // The iframe must fit the content plus the body's padding, which Homey's widget stylesheet sets:
       // without it the widget is too short and scrolls. Not body.scrollHeight: the body can be
       // stretched to the iframe's height, and the widget would never shrink.
@@ -164,6 +187,7 @@
             key.classList.add('pressed');
             Homey.hapticFeedback?.();
             send(index, 'down');
+            detectSingleDouble(index);
           });
           const release = () => {
             if (!pressed) {

@@ -220,23 +220,39 @@ describe('VirtualDeck device', () => {
     expect(card('virtual_any_button_action').trigger).toHaveBeenCalled()
   })
 
-  it('detects a single press, like a real deck', async () => {
+  // The widget's requests arrive one by one over HTTP: timed on Homey, a double press arrived as two
+  // singles, and a 'single' could fire before its 'up'. The widget times them and sends single/double.
+  it('leaves single and double to the widget: a down and up alone trigger no single', async () => {
     const device = createDevice()
     await device.onInit()
     vi.useFakeTimers()
 
     device.press(4, 'down')
     device.press(4, 'up')
+    device.press(4, 'down')
     await vi.advanceTimersByTimeAsync(500)
 
     const actions = card('virtual_variable_button_action').trigger.mock.calls.map((call) => (call[2] as { action: string }).action)
-    expect(actions).toEqual(['down', 'up', 'single'])
+    expect(actions).toEqual(['down', 'up', 'down'])
   })
 
-  it('rejects an unknown action', async () => {
+  it.each(['single', 'double'])('triggers the %s the widget detected, like a real deck', async (action) => {
+    const device = createDevice()
+    await device.onInit()
+
+    device.press(4, action)
+
+    await vi.waitFor(() => expect(card('virtual_variable_button_action').trigger).toHaveBeenCalled())
+    expect(card('virtual_variable_button_action').trigger).toHaveBeenCalledWith(device,
+      expect.objectContaining({ item: 'B2' }), { action, imageId: '', variableId: 'var-temp' })
+    expect(card('virtual_any_button_action').trigger).toHaveBeenCalledWith(device, expect.anything(), expect.objectContaining({ action }))
+  })
+
+  it('rejects an unknown action or key', async () => {
     const device = createDevice()
     await device.onInit()
     expect(() => device.press(0, 'click')).toThrow(TypeError)
+    expect(() => device.press(99, 'single')).toThrow(TypeError)
   })
 
   it('redraws a variable key when the variable changes', async () => {
@@ -336,5 +352,12 @@ describe('virtual deck widget page', () => {
     // Homey's widget stylesheet pads the body; a height of only the deck left the widget short and scrollable.
     expect(page).toContain('getComputedStyle(document.body)')
     expect(page).toMatch(/root\.getBoundingClientRect\(\)\.height \+ padding/)
+  })
+
+  it('times single and double presses itself, with the same rules as a real deck', () => {
+    expect(page).toContain("send(index, 'down');\n            detectSingleDouble(index);")
+    expect(page).toMatch(/now - lastDownTime <= 250 && lastDownIndex === index/)
+    expect(page).toContain("send(index, 'double')")
+    expect(page).toMatch(/send\(index, 'single'\);\s*\}\s*\}, 400\)/)
   })
 })

@@ -63,15 +63,34 @@ export default class VirtualDeck extends StreamDeckDevice<VirtualStreamDeck> {
     return this.streamDeck.getState();
   }
 
-  /** A key press from the widget. */
+  /**
+   * The widget's requests arrive one by one over HTTP, so their arrival times say little about the
+   * press: a double press would arrive too far apart, and a 'single' could fire before its 'up'
+   * arrived. The widget times the presses and sends 'single' and 'double' itself.
+   */
+  protected detectsSingleDouble(): boolean {
+    return false;
+  }
+
+  /** A key event from the widget: 'down' and 'up' as on a real deck, or the 'single'/'double' it detected. */
   press(index: number, action: string) {
     if (this.streamDeck === undefined) {
       throw new Error('Virtual Stream Deck is not ready');
     }
-    if (action !== 'down' && action !== 'up') {
-      throw new TypeError(`Expected action down or up, got ${action}`);
+    if (action === 'down' || action === 'up') {
+      this.streamDeck.press(index, action);
+      return;
     }
-    this.streamDeck.press(index, action);
+    if (action !== 'single' && action !== 'double') {
+      throw new TypeError(`Expected action down, up, single or double, got ${action}`);
+    }
+    const control = this.streamDeck.CONTROLS[index];
+    if (control === undefined) {
+      throw new TypeError(`Virtual Stream Deck has no key ${index}`);
+    }
+    this.guard(action, async () => {
+      await this.streamDeckEvent(action, this.getCapabilityValue('onoff'), control);
+    })();
   }
 
   private publish(event: VirtualDeckChange) {

@@ -199,6 +199,15 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     await renderDashboard(this.streamDeck, dashboard);
   }
 
+  /**
+   * Whether this device tells a single from a double press itself, from when the downs arrive. A deck
+   * whose presses arrive late and unevenly (the virtual deck's widget, over HTTP) times them where
+   * they happen and sends 'single'/'double' itself instead.
+   */
+  protected detectsSingleDouble(): boolean {
+    return true;
+  }
+
   private lastKeyPressTime: number = 0;
   private lastKeyPressIndex: number = 0;
   // isTurnedOn is the state at the press, so a 'single'/'double' goes to the same cards as its 'down'.
@@ -227,7 +236,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
 
     if (!isTurnedOn) {
-      if (event === 'down') {
+      if (event === 'down' && this.detectsSingleDouble()) {
         this.validateSingleDouble(control, false);
       }
       await this.onOffButtonAction.trigger(this, tokens, state);
@@ -240,7 +249,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
       return
     }
 
-    if (event === 'down') {
+    if (event === 'down' && this.detectsSingleDouble()) {
       this.validateSingleDouble(control, true);
     }
 

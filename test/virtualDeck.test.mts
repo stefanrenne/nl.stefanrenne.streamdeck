@@ -327,3 +327,14 @@ describe('VirtualDeckDriver', () => {
     expect(compose.pair.find((step: { id: string }) => step.id === 'list_devices').options).toEqual({ singular: true })
   })
 })
+
+// The widget page is a static HTML file without a build step, so these tests check its source.
+describe('virtual deck widget page', () => {
+  const page = readFileSync(fileURLToPath(new URL('../widgets/virtual-deck/public/index.html', import.meta.url)), 'utf8')
+
+  it('sizes the widget to the deck plus the body padding, so it does not scroll', () => {
+    // Homey's widget stylesheet pads the body; a height of only the deck left the widget short and scrollable.
+    expect(page).toContain('getComputedStyle(document.body)')
+    expect(page).toMatch(/root\.getBoundingClientRect\(\)\.height \+ padding/)
+  })
+})

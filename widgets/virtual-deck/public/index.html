@@ -95,13 +95,21 @@
           .catch((error) => console.error('press failed', error));
       };
 
+      // The iframe must fit the content plus the body's padding, which Homey's widget stylesheet sets:
+      // without it the widget is too short and scrolls. Not body.scrollHeight: the body can be
+      // stretched to the iframe's height, and the widget would never shrink.
+      let lastHeight = 0;
       const ready = () => {
-        const height = Math.ceil(root.getBoundingClientRect().height);
-        if (isReady) {
-          Homey.setHeight(height);
-        } else {
+        const style = getComputedStyle(document.body);
+        const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+        const height = Math.ceil(root.getBoundingClientRect().height + padding);
+        if (!isReady) {
           isReady = true;
+          lastHeight = height;
           Homey.ready({ height });
+        } else if (height !== lastHeight) {
+          lastHeight = height;
+          Homey.setHeight(height);
         }
       };
 
@@ -210,11 +218,8 @@
         .catch(() => showMessage(Homey.__('widgets.virtualDeck.notFound')));
 
       // The keys are square, so the height follows the width.
-      let lastWidth = root.getBoundingClientRect().width;
       new ResizeObserver(() => {
-        const width = root.getBoundingClientRect().width;
-        if (state !== undefined && width !== lastWidth) {
-          lastWidth = width;
+        if (isReady) {
           ready();
         }
       }).observe(root);

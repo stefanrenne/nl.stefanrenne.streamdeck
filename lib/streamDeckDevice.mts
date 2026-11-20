@@ -18,11 +18,21 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   protected streamDeck: Deck | undefined;
   private dashboard: Dashboard | undefined;
 
-  private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('off_button_action');
-  private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('image_button_action');
-  private onVariableButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('variable_button_action');
-  private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('any_button_action');
-  private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard('changed_dashboard');
+  private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('off_button_action'));
+  private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('image_button_action'));
+  private onVariableButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('variable_button_action'));
+  private onAnyButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('any_button_action'));
+  private onDashboardChanged: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('changed_dashboard'));
+
+  /**
+   * The id of this driver's copy of a device Flow card. A device argument's filter takes only one
+   * driver_id, so every driver has its own copy (driver.flow.compose.json, built from the templates
+   * in .homeycompose/drivers/flow). The Network Dock's keep the original ids, so existing Flows work.
+   * Called from the field initializers above, so an override must not use instance fields.
+   */
+  protected flowCardId(id: string): string {
+    return id;
+  }
 
   /**
    * onInit is called when the device is initialized.
@@ -296,7 +306,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   // A card has one run listener for all devices (the last device to register it wins), so the
   // listeners act on the device in the card's args, never on `this`.
   registerIsDashboardListener() {
-    const card = this.homey.flow.getConditionCard('is_dashboard');
+    const card = this.homey.flow.getConditionCard(this.flowCardId('is_dashboard'));
     this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
       const device: StreamDeckDevice = args.device;
@@ -307,7 +317,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   }
 
   registerChangeDashboardListener() {
-    const card = this.homey.flow.getActionCard('set_dashboard');
+    const card = this.homey.flow.getActionCard(this.flowCardId('set_dashboard'));
     this.cardListener.registerDashboardAutocompleteListenerForCard(card);
     card.registerRunListener(async (args) => {
       const device: StreamDeckDevice = args.device;

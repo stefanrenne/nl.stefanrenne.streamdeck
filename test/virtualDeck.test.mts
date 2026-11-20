@@ -213,11 +213,11 @@ describe('VirtualDeck device', () => {
 
     device.press(0, 'down')
 
-    await vi.waitFor(() => expect(card('image_button_action').trigger).toHaveBeenCalled())
-    expect(card('image_button_action').trigger).toHaveBeenCalledWith(device,
+    await vi.waitFor(() => expect(card('virtual_image_button_action').trigger).toHaveBeenCalled())
+    expect(card('virtual_image_button_action').trigger).toHaveBeenCalledWith(device,
       expect.objectContaining({ dashboard: 'Home', imageName: 'Lamp', payload: 'lamp-payload', column: 1, row: 1, item: 'A1' }),
       { action: 'down', imageId: 'img-lamp', variableId: '' })
-    expect(card('any_button_action').trigger).toHaveBeenCalled()
+    expect(card('virtual_any_button_action').trigger).toHaveBeenCalled()
   })
 
   it('detects a single press, like a real deck', async () => {
@@ -229,7 +229,7 @@ describe('VirtualDeck device', () => {
     device.press(4, 'up')
     await vi.advanceTimersByTimeAsync(500)
 
-    const actions = card('variable_button_action').trigger.mock.calls.map((call) => (call[2] as { action: string }).action)
+    const actions = card('virtual_variable_button_action').trigger.mock.calls.map((call) => (call[2] as { action: string }).action)
     expect(actions).toEqual(['down', 'up', 'single'])
   })
 
@@ -292,7 +292,7 @@ describe('VirtualDeck device', () => {
 
       await api.press({ homey: homey as never, body: { deviceId: 'virtual-1', index: 0, action: 'down' } })
 
-      await vi.waitFor(() => expect(card('image_button_action').trigger).toHaveBeenCalled())
+      await vi.waitFor(() => expect(card('virtual_image_button_action').trigger).toHaveBeenCalled())
     })
   })
 })

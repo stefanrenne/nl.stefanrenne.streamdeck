@@ -1,61 +1,35 @@
 {
-  "id": "image_button_action",
   "title": {
-    "en": "Image button action",
-    "nl": "Afbeeldingsknop actie",
-    "de": "Bildtastenaktion",
-    "fr": "Action du bouton image",
-    "it": "Azione pulsante immagine",
-    "sv": "Bildknappåtgärd",
-    "no": "Bildeknapphandling",
-    "es": "Acción del botón de imagen",
-    "da": "Billedknaphandling",
-    "ru": "Действие кнопки с изображением",
-    "pl": "Akcja przycisku obrazu",
-    "ko": "이미지 버튼 동작",
-    "ar": "إجراء زر الصورة"
+    "en": "Disabled button action",
+    "nl": "Uitgeschakelde knop actie",
+    "de": "Deaktivierte Tastenaktion",
+    "fr": "Action du bouton désactivé",
+    "it": "Azione pulsante disabilitato",
+    "sv": "Inaktiverad knappåtgärd",
+    "no": "Deaktivert knapphandling",
+    "es": "Acción del botón desactivado",
+    "da": "Deaktiveret knaphandling",
+    "ru": "Действие отключённой кнопки",
+    "pl": "Akcja wyłączonego przycisku",
+    "ko": "비활성화된 버튼 동작",
+    "ar": "إجراء الزر المعطل"
   },
-	"titleFormatted": {
-    "en": "[[image]] button [[action]]",
-    "nl": "[[image]] knop [[action]]",
-    "de": "[[image]] Taste [[action]]",
-    "fr": "Bouton image [[image]] [[action]]",
-    "it": "Pulsante [[image]] [[action]]",
-    "sv": "[[image]] knapp [[action]]",
-    "no": "[[image]] knapp [[action]]",
-    "es": "Botón [[image]] [[action]]",
-    "da": "[[image]] knap [[action]]",
-    "ru": "[[image]] кнопка [[action]]",
-    "pl": "[[image]] przycisk [[action]]",
-    "ko": "[[image]] 버튼 [[action]]",
-    "ar": "[[image]] زر [[action]]"
-	},
+  "titleFormatted": {
+    "en": "Disabled button [[action]]",
+    "nl": "Uitgeschakelde knop [[action]]",
+    "de": "Deaktivierte Taste [[action]]",
+    "fr": "Bouton désactivé [[action]]",
+    "it": "Pulsante disabilitato [[action]]",
+    "sv": "Inaktiverad knapp [[action]]",
+    "no": "Deaktivert knapp [[action]]",
+    "es": "Botón desactivado [[action]]",
+    "da": "Deaktiveret knap [[action]]",
+    "ru": "Отключённая кнопка [[action]]",
+    "pl": "Wyłączony przycisk [[action]]",
+    "ko": "비활성화된 버튼 [[action]]",
+    "ar": "الزر المعطل [[action]]"
+  },
   "args": [
-    {
-      "type": "device",
-      "name": "device",
-      "filter": "driver_id=network-dock|virtual-deck"
-    },
-    {
-      "name": "image",
-      "required": true,
-      "type": "autocomplete",
-      "title": {
-        "en": "Image",
-        "nl": "Afbeelding",
-        "de": "Bild",
-        "fr": "Image",
-        "it": "Immagine",
-        "sv": "Bild",
-        "no": "Bilde",
-        "es": "Imagen",
-        "da": "Billede",
-        "ru": "Изображение",
-        "pl": "Obraz",
-        "ko": "이미지",
-        "ar": "صورة"
-      }
-    },
     {
       "type": "dropdown",
       "name": "action",
@@ -151,44 +125,6 @@
     }
   ],
   "tokens": [
-    {
-      "type": "string",
-      "name": "dashboard",
-      "title": {
-        "en": "Dashboard",
-        "nl": "Dashboard",
-        "de": "Dashboard",
-        "fr": "Tableau de bord",
-        "it": "Dashboard",
-        "sv": "Instrumentpanel",
-        "no": "Instrumentbord",
-        "es": "Panel",
-        "da": "Dashboard",
-        "ru": "Панель",
-        "pl": "Pulpit",
-        "ko": "대시보드",
-        "ar": "لوحة التحكم"
-      }
-    },
-    {
-      "type": "string",
-      "name": "payload",
-      "title": {
-        "en": "Payload",
-        "nl": "Payload",
-        "de": "Payload",
-        "fr": "Charge utile",
-        "it": "Payload",
-        "sv": "Nyttolast",
-        "no": "Nyttelast",
-        "es": "Carga útil",
-        "da": "Nyttelast",
-        "ru": "Данные",
-        "pl": "Ładunek",
-        "ko": "페이로드",
-        "ar": "البيانات المرسلة"
-      }
-    },
     {
       "type": "number",
       "name": "column",

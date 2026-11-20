@@ -1,6 +1,6 @@
 # Flow cards
 
-App-level cards live in `.homeycompose/flow/`. The `onoff` and `dim` capabilities add Homey's standard device cards (turned on/off, brightness, and so on). All button triggers and the dashboard cards take a `device` arg (`driver_id=network-dock|virtual-deck`), so they work for a Network Dock and a virtual deck alike. The code references a card by its `id`, which isn't always the file name (`update_variable_firstLine.json` has id `update_variable_firstline`).
+App-level cards (the `update_variable*` actions) live in `.homeycompose/flow/`. The `onoff` and `dim` capabilities add Homey's standard device cards (turned on/off, brightness, and so on). The device cards (all button triggers, `changed_dashboard`, `is_dashboard` and `set_dashboard`) are templates in `.homeycompose/drivers/flow/<type>/<id>.json`, without a `device` arg. Each driver lists them in its `driver.flow.compose.json` with `$extends`, and compose adds the `device` arg with `driver_id=<driver>`. A device arg's filter takes only one driver: `driver_id=network-dock|virtual-deck` matched no device, so no device card triggered. The Network Dock keeps the original ids (existing Flows refer to them); the virtual deck's copies are `virtual_<id>` (`$id`), which `StreamDeckDevice.flowCardId` returns for a `VirtualDeck`. The run listeners are the same for both. The code references a card by its `id`, which isn't always the file name (`update_variable_firstLine.json` has id `update_variable_firstline`).
 
 ## Triggers (device trigger cards, fired from `StreamDeckDevice`)
 
@@ -39,6 +39,6 @@ The variable actions are registered in `app.mts`. They do nothing if the variabl
 
 ## Adding a card
 
-1. Add `.homeycompose/flow/<type>/<id>.json` with all 13 languages. Leave out empty `args`/`tokens` arrays, and add `device` (`driver_id=network-dock|virtual-deck`) for device cards.
+1. Add `.homeycompose/flow/<type>/<id>.json` with all 13 languages. Leave out empty `args`/`tokens` arrays. For a device card, add the template to `.homeycompose/drivers/flow/<type>/<id>.json` instead (no `device` arg), list it in both drivers' `driver.flow.compose.json` (`{ "$extends": "<id>" }` and `{ "$id": "virtual_<id>", "$extends": "<id>" }`), and look it up with `this.flowCardId('<id>')`.
 2. Register it: device cards in `StreamDeckDevice.onInit` (use `getDeviceTriggerCard` for triggers), app cards in `StreamDeckApp.onInit`. Use `CardListener` for autocomplete.
 3. Add tests (`device.test.mts` or `app.test.mts`), then update this doc and the Flow Cards section of README.md.

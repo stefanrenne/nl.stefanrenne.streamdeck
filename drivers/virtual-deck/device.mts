@@ -19,6 +19,11 @@ export type VirtualDeckEvent = { deviceId: string } & VirtualDeckChange;
  */
 export default class VirtualDeck extends StreamDeckDevice<VirtualStreamDeck> {
 
+  /** The virtual deck's device cards are its own copies, `virtual_<id>` (see driver.flow.compose.json). */
+  protected flowCardId(id: string): string {
+    return `virtual_${id}`;
+  }
+
   /**
    * onInit is called when the device is initialized.
    */

@@ -55,7 +55,7 @@ When finishing a feature, check both before committing.
 
 ## Homey Compose: never edit `app.json` directly
 
-The root `app.json` is **generated** by the Homey CLI from `.homeycompose/app.json`, `.homeycompose/flow/{actions,conditions,triggers}/*.json`, `.homeycompose/capabilities/*.json`, `.homeycompose/discovery/*.json`, `drivers/*/driver.compose.json` / `driver.settings.compose.json`, and `widgets/*/widget.compose.json`. Make manifest changes in those source files. The `api` section (the `/textToImage` route for `api.mts`) lives in `.homeycompose/app.json`. For version bumps, see [Releasing](#releasing).
+The root `app.json` is **generated** by the Homey CLI from `.homeycompose/app.json`, `.homeycompose/flow/{actions,conditions,triggers}/*.json`, the device card templates in `.homeycompose/drivers/flow/{actions,conditions,triggers}/*.json` (used by `drivers/*/driver.flow.compose.json`), `.homeycompose/capabilities/*.json`, `.homeycompose/discovery/*.json`, `drivers/*/driver.compose.json` / `driver.settings.compose.json`, and `widgets/*/widget.compose.json`. Make manifest changes in those source files. The `api` section (the `/textToImage` route for `api.mts`) lives in `.homeycompose/app.json`. For version bumps, see [Releasing](#releasing).
 
 ## Architecture
 

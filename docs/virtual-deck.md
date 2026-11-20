@@ -1,6 +1,6 @@
 # Virtual Stream Deck
 
-A Stream Deck that only exists in Homey: a device of the `virtual-deck` driver, shown and pressed in the "Virtual Stream Deck" dashboard widget. It reuses everything the Network Dock does (see [device.md](device.md)): the `onoff` / `dim` / `dashboard` capabilities, the dashboards, the button triggers with their tokens and single/double press detection, and the dashboard cards. Only the deck is different.
+A Stream Deck that only exists in Homey: a device of the `virtual-deck` driver, shown and pressed in the "Virtual Stream Deck" dashboard widget. It reuses everything the Network Dock does (see [device.md](device.md)): the `onoff` / `dim` / `dashboard` capabilities, the dashboards, the button triggers with their tokens and single/double press detection, and the dashboard cards (its own copies, `virtual_<id>`, see [flow-cards.md](flow-cards.md)). Only the deck is different.
 
 ```
 widget (public/index.html) ──POST /press──▶ widgets/virtual-deck/api.mts ──▶ VirtualDeck.press

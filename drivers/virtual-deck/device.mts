@@ -77,6 +77,8 @@ export default class VirtualDeck extends StreamDeckDevice<VirtualStreamDeck> {
     if (this.streamDeck === undefined) {
       throw new Error('Virtual Stream Deck is not ready');
     }
+    // Every request from the widget, so a press that never arrived shows as a gap in the log.
+    this.log(`widget ${action} key ${index}`);
     if (action === 'down' || action === 'up') {
       this.streamDeck.press(index, action);
       return;

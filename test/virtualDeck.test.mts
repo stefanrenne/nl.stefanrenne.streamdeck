@@ -356,6 +356,14 @@ describe('virtual deck widget page', () => {
 
   it('times single and double presses itself, with the same rules as a real deck', () => {
     expect(page).toContain("send(index, 'down');\n            detectSingleDouble(index);")
+  })
+
+  it('sends and times a press before the haptic feedback, which can throw (regression 8fcd125)', () => {
+    const handler = page.slice(page.indexOf("addEventListener('pointerdown'"), page.indexOf('const release'))
+    expect(handler.indexOf("send(index, 'down')")).toBeLessThan(handler.indexOf('hapticFeedback'))
+    expect(handler.indexOf('detectSingleDouble(index)')).toBeLessThan(handler.indexOf('hapticFeedback'))
+    expect(handler.indexOf('detectSingleDouble(index)')).toBeLessThan(handler.indexOf('setPointerCapture'))
+    expect(handler).toMatch(/try \{\s*Promise.resolve\(Homey.hapticFeedback/)
     expect(page).toMatch(/now - lastDownTime <= 250 && lastDownIndex === index/)
     expect(page).toContain("send(index, 'double')")
     expect(page).toMatch(/send\(index, 'single'\);\s*\}\s*\}, 400\)/)

@@ -182,12 +182,22 @@
 
           key.addEventListener('pointerdown', (event) => {
             event.preventDefault();
-            key.setPointerCapture?.(event.pointerId);
             pressed = true;
-            key.classList.add('pressed');
-            Homey.hapticFeedback?.();
             send(index, 'down');
             detectSingleDouble(index);
+            key.classList.add('pressed');
+            // Only extras from here: they must never stop the press itself. The haptic feedback threw
+            // on the first tap after a pause, so that 'down' was never sent and the tap never timed.
+            try {
+              key.setPointerCapture?.(event.pointerId);
+            } catch (error) {
+              console.error('setPointerCapture failed', error);
+            }
+            try {
+              Promise.resolve(Homey.hapticFeedback?.()).catch((error) => console.error('hapticFeedback failed', error));
+            } catch (error) {
+              console.error('hapticFeedback failed', error);
+            }
           });
           const release = () => {
             if (!pressed) {

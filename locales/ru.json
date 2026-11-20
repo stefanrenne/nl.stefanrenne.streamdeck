@@ -82,9 +82,6 @@
             }
         }
     },
-    "virtualDeck": {
-        "deviceName": "Виртуальный __model__ (__size__)"
-    },
     "widgets": {
         "virtualDeck": {
             "noDevice": "Выберите виртуальный Stream Deck в настройках виджета. Добавить его можно в разделе «Устройства».",

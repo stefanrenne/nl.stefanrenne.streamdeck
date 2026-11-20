@@ -82,9 +82,6 @@
             }
         }
     },
-    "virtualDeck": {
-        "deviceName": "__model__ افتراضي (__size__)"
-    },
     "widgets": {
         "virtualDeck": {
             "noDevice": "اختر Stream Deck افتراضيًا في إعدادات الأداة. يمكنك إضافة واحد من الأجهزة.",

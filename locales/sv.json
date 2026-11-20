@@ -82,9 +82,6 @@
             }
         }
     },
-    "virtualDeck": {
-        "deviceName": "Virtuellt __model__ (__size__)"
-    },
     "widgets": {
         "virtualDeck": {
             "noDevice": "Välj ett virtuellt Stream Deck i widgetinställningarna. Du kan lägga till ett under Enheter.",

@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Jimp } from 'jimp'
+import { existsSync, readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { getButtonControlSize, renderHomeyLogo } from '../lib/streamDeckAdapter.mjs'
 import { VIRTUAL_DECK_MODELS, VirtualDeckModelId, VirtualStreamDeck } from '../lib/virtualStreamDeck.mjs'
 import VirtualDeck from '../drivers/virtual-deck/device.mjs'
@@ -304,6 +306,24 @@ describe('VirtualDeckDriver', () => {
 
     expect(devices.map((device) => device.settings.model)).toEqual(['mini', 'neo', 'plus', 'mk2', 'xl'])
     expect(new Set(devices.map((device) => device.data.id)).size).toBe(5)
-    expect(devices.every((device) => device.name === 'virtualDeck.deviceName')).toBe(true)
+    expect(devices.map((device) => device.name)).toEqual(['Stream Deck Mini', 'Stream Deck Neo', 'Stream Deck +', 'Stream Deck MK.2', 'Stream Deck XL'])
+  })
+
+  it('gives every model an icon of its own that exists in the driver assets', async () => {
+    const { homey } = createFakeHomey()
+    const driver = new (VirtualDeckDriver as unknown as new (homey: FakeHomey) => InstanceType<typeof VirtualDeckDriver>)(homey)
+
+    const devices = await driver.onPairListDevices()
+
+    expect(new Set(devices.map((device) => device.icon)).size).toBe(devices.length)
+    for (const device of devices) {
+      expect(existsSync(fileURLToPath(new URL(`../drivers/virtual-deck/assets${device.icon}`, import.meta.url)))).toBe(true)
+    }
+  })
+
+  it('lets pairing pick one deck instead of adding every model', () => {
+    const compose = JSON.parse(readFileSync(fileURLToPath(new URL('../drivers/virtual-deck/driver.compose.json', import.meta.url)), 'utf8'))
+
+    expect(compose.pair.find((step: { id: string }) => step.id === 'list_devices').options).toEqual({ singular: true })
   })
 })

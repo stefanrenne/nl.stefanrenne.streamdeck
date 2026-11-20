@@ -82,9 +82,6 @@
             }
         }
     },
-    "virtualDeck": {
-        "deviceName": "Virtual __model__ (__size__)"
-    },
     "widgets": {
         "virtualDeck": {
             "noDevice": "Choose a virtual Stream Deck in the widget settings. You can add one under Devices.",

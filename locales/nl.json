@@ -82,9 +82,6 @@
             }
         }
     },
-    "virtualDeck": {
-        "deviceName": "Virtuele __model__ (__size__)"
-    },
     "widgets": {
         "virtualDeck": {
             "noDevice": "Kies een virtuele Stream Deck in de widget-instellingen. Je voegt er een toe onder Apparaten.",

@@ -1,5 +1,4 @@
 {
-  "id": "variable_button_action",
   "title": {
     "en": "Variable button action",
     "nl": "Variabel knop actie",
@@ -15,7 +14,7 @@
     "ko": "변수 버튼 동작",
     "ar": "إجراء زر المتغير"
   },
-	"titleFormatted": {
+  "titleFormatted": {
     "en": "[[variable]] button [[action]]",
     "nl": "[[variable]] knop [[action]]",
     "de": "[[variable]] Taste [[action]]",
@@ -29,13 +28,8 @@
     "pl": "[[variable]] przycisk [[action]]",
     "ko": "[[variable]] 버튼 [[action]]",
     "ar": "[[variable]] زر [[action]]"
-	},
+  },
   "args": [
-    {
-      "type": "device",
-      "name": "device",
-      "filter": "driver_id=network-dock"
-    },
     {
       "name": "variable",
       "required": true,

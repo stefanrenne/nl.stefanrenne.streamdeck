@@ -81,5 +81,11 @@
                 "textColor": "Tekstkleur"
             }
         }
+    },
+    "widgets": {
+        "virtualDeck": {
+            "noDevice": "Kies een virtuele Stream Deck in de widget-instellingen. Je voegt er een toe onder Apparaten.",
+            "notFound": "Deze virtuele Stream Deck bestaat niet meer. Kies een andere in de widget-instellingen."
+        }
     }
 }

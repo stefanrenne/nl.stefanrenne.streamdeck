@@ -175,6 +175,49 @@ describe('connecting', () => {
     await connect(new FakeStreamDeck(lcdButtons(8, 4)))
     expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 8, rows: 4 })
   })
+
+  it('never shrinks the dashboard for a smaller deck (regression ec7db59)', async () => {
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    await connect(new FakeStreamDeck(lcdButtons(4, 2)))
+    expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 5, rows: 3 })
+  })
+
+  it('shows the top-left part of a larger dashboard, by row and column', async () => {
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    const small = new FakeStreamDeck(lcdButtons(4, 2))
+    await connect(small)
+
+    // Item 8 of the 5×3 dashboard is row 2, column 3: key 6 on a 4×2 deck, not key 7.
+    const filled = small.fillKeyBuffer.mock.calls.map(([index]) => index).sort()
+    expect(filled).toEqual([0, 6])
+  })
+
+  it('two decks of different sizes on one dashboard settle instead of resizing it for each other (regression ec7db59)', async () => {
+    // The app relays settings writes as set-dashboard; every device on the dashboard reloads it.
+    settings.on('set', (key: string) => {
+      if (key.startsWith('dashboard-')) {
+        settings.emit('set-dashboard', key.slice('dashboard-'.length))
+      }
+    })
+    const writes = vi.spyOn(settings, 'set')
+    const large = new FakeStreamDeck(lcdButtons(8, 4))
+    const small = new FakeStreamDeck(lcdButtons(4, 2))
+
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    const first = device
+    await connect(large)
+    device = createDevice({ dashboard: 'd-home' })
+    await device.onInit()
+    await connect(small)
+    device = first
+
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    expect(settings.get('dashboard-d-home')).toMatchObject({ columns: 8, rows: 4 })
+    expect(writes.mock.calls.filter(([key]) => key === 'dashboard-d-home')).toHaveLength(1)
+  })
 })
 
 describe('button events', () => {
@@ -312,7 +355,7 @@ describe('dashboard flow cards and capability', () => {
 
   it('set_dashboard throws while the Stream Deck is unavailable', async () => {
     device.available = false
-    await expect(card('set_dashboard').run({ dashboard: { id: 'd-movie', name: 'Movie night' } })).rejects.toBe('Stream Deck is unavailable')
+    await expect(card('set_dashboard').run({ device, dashboard: { id: 'd-movie', name: 'Movie night' } })).rejects.toBe('Stream Deck is unavailable')
   })
 
   it('set_dashboard switches, triggers changed_dashboard and renders', async () => {
@@ -320,7 +363,7 @@ describe('dashboard flow cards and capability', () => {
     deck.fillKeyBuffer.mockClear()
     deck.clearKey.mockClear()
 
-    await card('set_dashboard').run({ dashboard: { id: 'd-movie', name: 'Movie night' } })
+    await card('set_dashboard').run({ device, dashboard: { id: 'd-movie', name: 'Movie night' } })
 
     expect(device.getCapabilityValue('dashboard')).toBe('d-movie')
     expect(card('changed_dashboard').trigger).toHaveBeenCalledWith(device, { dashboard: 'Movie night' })
@@ -328,13 +371,34 @@ describe('dashboard flow cards and capability', () => {
   })
 
   it('set_dashboard does nothing when the dashboard is already selected', async () => {
-    await card('set_dashboard').run({ dashboard: { id: 'd-home', name: 'Home' } })
+    await card('set_dashboard').run({ device, dashboard: { id: 'd-home', name: 'Home' } })
     expect(card('changed_dashboard').trigger).not.toHaveBeenCalled()
   })
 
   it('is_dashboard compares with the selected dashboard', async () => {
-    expect(await card('is_dashboard').run({ dashboard: { id: 'd-home' } })).toBe(true)
-    expect(await card('is_dashboard').run({ dashboard: { id: 'd-movie' } })).toBe(false)
+    expect(await card('is_dashboard').run({ device, dashboard: { id: 'd-home' } })).toBe(true)
+    expect(await card('is_dashboard').run({ device, dashboard: { id: 'd-movie' } })).toBe(false)
+  })
+
+  describe('with two devices, the cards act on the device in their args (regression d9685a0)', () => {
+    // The last device to initialize registers the run listener that every flow uses.
+    let other: Harness
+    beforeEach(async () => {
+      other = createDevice({ dashboard: 'd-movie', onoff: true })
+      await other.onInit()
+    })
+
+    it('is_dashboard checks the device in the args', async () => {
+      expect(await card('is_dashboard').run({ device, dashboard: { id: 'd-home' } })).toBe(true)
+      expect(await card('is_dashboard').run({ device: other, dashboard: { id: 'd-home' } })).toBe(false)
+    })
+
+    it('set_dashboard switches the device in the args', async () => {
+      await card('set_dashboard').run({ device, dashboard: { id: 'd-movie', name: 'Movie night' } })
+
+      expect(device.getCapabilityValue('dashboard')).toBe('d-movie')
+      expect(card('changed_dashboard').trigger).toHaveBeenCalledWith(device, { dashboard: 'Movie night' })
+    })
   })
 
   it('changing the dashboard capability renders it and triggers changed_dashboard', async () => {

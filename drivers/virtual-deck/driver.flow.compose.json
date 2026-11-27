@@ -1,0 +1,36 @@
+{
+  "actions": [
+    {
+      "$id": "virtual_set_dashboard",
+      "$extends": "set_dashboard"
+    }
+  ],
+  "conditions": [
+    {
+      "$id": "virtual_is_dashboard",
+      "$extends": "is_dashboard"
+    }
+  ],
+  "triggers": [
+    {
+      "$id": "virtual_any_button_action",
+      "$extends": "any_button_action"
+    },
+    {
+      "$id": "virtual_changed_dashboard",
+      "$extends": "changed_dashboard"
+    },
+    {
+      "$id": "virtual_image_button_action",
+      "$extends": "image_button_action"
+    },
+    {
+      "$id": "virtual_off_button_action",
+      "$extends": "off_button_action"
+    },
+    {
+      "$id": "virtual_variable_button_action",
+      "$extends": "variable_button_action"
+    }
+  ]
+}

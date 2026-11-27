@@ -2,6 +2,12 @@
 
 `drivers/network-dock/` has one driver, class `button`, with the capabilities `onoff`, `dim` and the custom enum `dashboard` (`.homeycompose/capabilities/dashboard.json`, a picker whose values are set at runtime).
 
+The device is split in two:
+
+- `lib/streamDeckDevice.mts` (`StreamDeckDevice<Deck>`) does everything that doesn't depend on how the deck is attached: the capabilities, the dashboards, redrawing on settings changes, button events and the dashboard cards (the sections [Dashboards](#dashboards), [Button events](#button-events) and [Brightness](#brightness) below). It draws on a `DeckSurface`, see [rendering.md](rendering.md). `deckDidConnect(deck)` takes a deck into use: it sends the brightness and draws the selected dashboard. A subclass passes key presses to `streamDeckEvent`.
+- `drivers/network-dock/device.mts` (`NetworkDock extends StreamDeckDevice<StreamDeckTcp>`) owns discovery and the TCP connection (the sections [Discovery and pairing](#discovery-and-pairing) and [Connection lifecycle](#connection-lifecycle)).
+- `drivers/virtual-deck/device.mts` (`VirtualDeck extends StreamDeckDevice<VirtualStreamDeck>`) is the deck without hardware, see [virtual-deck.md](virtual-deck.md).
+
 ## Discovery and pairing
 
 - `.homeycompose/discovery/network-dock.json`: mDNS-SD `_elg._tcp`, matching `txt.md` against `.*Network Dock.*`. The discovery id is `txt.md`.
@@ -21,7 +27,7 @@ The driver logs the discovery results on init and on every new result. The devic
 | `onDiscoveryAvailable` | `connectToAddress(getSetting('ipAddress'))` |
 | `onDiscoveryAddressChanged` | `connectToAddress(new address)`, then stores it in the `ipAddress` setting (`setSettings` doesn't call `onSettings`) |
 | `onSettings` with a changed `ipAddress` | clears the panel, `connectToAddress(new)` |
-| manager `connected` with controls | keeps the deck, `setAvailable`, subscribes to `down`/`up`/`error`/`disconnected`, writes the `name`/`columns`/`rows` settings (and `serial`/`firmware` if they can be read), then loads the selected dashboard |
+| manager `connected` with controls | keeps the deck, `setAvailable`, subscribes to `down`/`up`/`error`/`disconnected`, writes the `name`/`columns`/`rows` settings (and `serial`/`firmware` if they can be read), then `deckDidConnect` sends the brightness and loads the selected dashboard |
 | manager `connected` without controls | `setUnavailable('No Stream Deck connected to Network Dock')` if no deck was connected yet |
 | manager `error` / deck `error` | `setUnavailable(message)` |
 | deck `disconnected` | `setUnavailable('Stream Deck Disconnected')`, drops the deck |
@@ -35,8 +41,10 @@ Every listener registered with `.on` (the connection manager's, `homey.settings`
 
 - The `dashboard` capability's values are `0` ("Homey", which shows the Homey logo full-panel) plus every dashboard (`updateSelectableDashboardOptions`). They are refreshed on init and on every `set-`/`unset-dashboard`.
 - On init, if the selected dashboard no longer exists, the device switches to `0` and triggers `changed_dashboard`. The options **must** be set before the value, otherwise Homey rejects the enum value (fix 8862c09, 1.0.2).
-- `loadDashboard(id)`: `0` or an unknown id draws the Homey logo. Otherwise it draws the dashboard, and if the deck's grid differs from the stored `columns`/`rows`, it stores the deck's size (`Store.updateDashboard`).
-- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. `set_dashboard` throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
+- `detectsSingleDouble()` (default `true`) decides whether `streamDeckEvent` times single/double presses from the `down`s (`validateSingleDouble`); the virtual deck returns `false`, because its widget times them.
+- `loadDashboard(id)`: `0` or an unknown id draws the Homey logo. Otherwise it draws the dashboard. If the deck is larger than the stored `columns`/`rows`, it stores the deck's size (`Store.updateDashboard`); it never shrinks a dashboard. Decks of different sizes on one dashboard used to resize it for each other, and every write redraws every deck on it, endlessly, until the dock dropped the connection and the app ran out of memory. The sizes (3×2, 4×2, 5×3, 8×4) are ordered, so a shared dashboard settles at the largest deck, and a smaller deck shows its top-left part. Keys and presses find their item by row and column (`getDashboardItem`), not by key index.
+- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. `set_dashboard` (`selectDashboard`) throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
+- A flow card has one run listener for all devices, and every device registers it again in `onInit`, so the last one wins. The `is_dashboard` and `set_dashboard` listeners therefore act on `args.device`, never on `this` (fix of `d9685a0`). Do the same in any new device card.
 
 ## Button events
 

@@ -33,7 +33,7 @@ All user data lives in **`homey.settings`** (the app settings store). The settin
 - `getImage(id)` decodes the data URL into `imageBuffer`.
 - The `…Metadata` lists are cached separately and are re-read when a cache is invalidated or empty.
 
-**Each `Store` instance has its own cache.** The app has one, and every `NetworkDock` device has one. Nothing is shared, so invalidation goes through the settings events below.
+**Each `Store` instance has its own cache.** The app has one, and every device (`StreamDeckDevice`) has one. Nothing is shared, so invalidation goes through the settings events below.
 
 ## Invalidation chain
 
@@ -43,7 +43,7 @@ settings page / Store.setVariable
        └─ StreamDeckApp.observeSettings
             ├─ app store: invalidateVariable(id)
             └─ homey.settings.emit('set-variable', id)
-                 └─ NetworkDock: store.invalidateVariable(id), then redraw the key showing it
+                 └─ each device: store.invalidateVariable(id), then redraw the key showing it
 ```
 
 - `set-dashboard` / `unset-dashboard`: the device invalidates the dashboard, refreshes the `dashboard` capability values, and redraws if it's the selected one. If the selected one was removed, it falls back to the Homey logo.

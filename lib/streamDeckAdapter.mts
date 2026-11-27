@@ -1,7 +1,6 @@
 'use strict';
 
-import type { StreamDeckButtonControlDefinitionLcdFeedback, StreamDeckControlDefinition } from '@elgato-stream-deck/core'
-import { StreamDeckTcp } from '@elgato-stream-deck/tcp'
+import type { StreamDeck, StreamDeckButtonControlDefinitionLcdFeedback, StreamDeckControlDefinition } from '@elgato-stream-deck/core'
 import { Jimp } from 'jimp';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,16 +9,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { TextToImage } from './textToImage.mjs';
 import { Dashboard } from './storage.mjs';
 
+/** The part of a Stream Deck that the drawing needs: a real deck behind a Network Dock, or a virtual one. */
+export type DeckSurface = Pick<StreamDeck, 'CONTROLS' | 'fillKeyBuffer' | 'clearKey' | 'clearPanel' | 'fillPanelBuffer' | 'calculateFillPanelDimensions' | 'setBrightness'>;
+
 function isLcdButton(control: StreamDeckControlDefinition): control is StreamDeckButtonControlDefinitionLcdFeedback {
     return control.type === 'button' && control.feedbackType === 'lcd';
 }
 
 /** The keys that can show an image. Other controls (the Neo's RGB touch keys and LCD segment, encoders) are skipped. */
-export function getLcdButtonControls(streamDeck: StreamDeckTcp): StreamDeckButtonControlDefinitionLcdFeedback[] {
+export function getLcdButtonControls(streamDeck: DeckSurface): StreamDeckButtonControlDefinitionLcdFeedback[] {
     return streamDeck.CONTROLS.filter(isLcdButton);
 }
 
-export function getButtonControlSize(streamDeck: StreamDeckTcp) {
+/**
+ * The dashboard item on `control`, by row and column, so a deck smaller than the dashboard shows its
+ * top-left part. A control outside the dashboard (the Neo's touch keys) has none.
+ */
+export function getDashboardItem(dashboard: Dashboard, control: Pick<StreamDeckControlDefinition, 'row' | 'column'>) {
+    if (control.row >= dashboard.rows || control.column >= dashboard.columns) {
+        return undefined;
+    }
+    return dashboard.items[control.row * dashboard.columns + control.column + 1];
+}
+
+export function getButtonControlSize(streamDeck: DeckSurface) {
     return getLcdButtonControls(streamDeck).reduce((result, control) => {
         if (result.columns < (control.column + 1)) {
         result.columns = control.column + 1
@@ -33,24 +46,24 @@ export function getButtonControlSize(streamDeck: StreamDeckTcp) {
         }, {columns: 0, rows: 0, total: 0});
 }
 
-export async function renderText(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined, textColor: string, backgroundColor: string) {
+export async function renderText(streamDeck: DeckSurface, control: StreamDeckButtonControlDefinitionLcdFeedback, firstLine: string, secondLine: string | undefined, textColor: string, backgroundColor: string) {
     const image = await TextToImage.create(control.pixelSize.width, firstLine, secondLine, textColor, backgroundColor);
     await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
 }
 
-export async function renderImage(streamDeck: StreamDeckTcp, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
+export async function renderImage(streamDeck: DeckSurface, control: StreamDeckButtonControlDefinitionLcdFeedback, imageBuffer: Buffer) {
     const image = await Jimp.fromBuffer(imageBuffer).then((jimp) => {
         return jimp.resize({ w: control.pixelSize.width, h: control.pixelSize.height });
     });
     await streamDeck.fillKeyBuffer(control.index, image.bitmap.data, { format: 'rgba' });
 }
 
-export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dashboard) {
+export async function renderDashboard(streamDeck: DeckSurface, dashboard: Dashboard) {
     const controls = getLcdButtonControls(streamDeck)
 
     const actions: Promise<void>[] = []
-    for (const [i, control] of controls.entries()) {
-        const item = dashboard.items[i+1];
+    for (const control of controls) {
+        const item = getDashboardItem(dashboard, control);
         switch (item?.kind) {
         case 'variable':
         actions.push(renderText(streamDeck, control, item.firstLine, item.secondLine, item.textColor, item.backgroundColor).catch((e) => console.error('renderText failed:', e)));
@@ -65,7 +78,7 @@ export async function renderDashboard(streamDeck: StreamDeckTcp, dashboard: Dash
     await Promise.all(actions);
 }
 
-export async function renderHomeyLogo(streamDeck: StreamDeckTcp) {
+export async function renderHomeyLogo(streamDeck: DeckSurface) {
     const panelDimensions = streamDeck.calculateFillPanelDimensions();
     if (panelDimensions === null) {
     await streamDeck?.clearPanel();

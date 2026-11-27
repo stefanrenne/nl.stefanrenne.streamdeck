@@ -2,6 +2,10 @@
 
 Archive of finished [TODO.md](TODO.md) items and past fixes, newest first. Keep the context: root cause, gotchas, and how it was verified. Commit hashes refer to this repo. For how the app evolved, see [docs/history.md](docs/history.md).
 
+## 2026-11-19
+
+- **The dashboard cards acted on the wrong device with more than one deck** (since `d9685a0`). `is_dashboard` and `set_dashboard` have one run listener for every device, and each device registered its own in `onInit`, so the last device to initialize won and every flow checked or switched that device, whatever device the card was set to. The listeners now act on `args.device` (`StreamDeckDevice.selectDashboard` for the action). It went unnoticed because few people have two Network Docks; the virtual deck makes a second device common. Tests: `device.test.mts` "with two devices, the cards act on the device in their args (regression d9685a0)".
+
 ## 2026-11-06
 
 - **Release workflow: an orphan tag on every failed push** (since its first run, 2026-10-13). `Commit & Push` ran `git push origin HEAD --tags`, so the tag went up even when the ruleset refused the branch ("Changes must be made through a pull request", "Commits must have verified signatures"): `v1.2.0` and `v1.2.1` both ended up on a commit that is on no branch, and had to be deleted by hand. It now stops when the tag already exists, pushes the branch first and the tag only after that, publishes a draft release of that version as it is (notes written by hand) or else creates one with the changelog input, and passes the version and changelog through `env:` instead of expanding them inside the script. `actions/checkout` and `actions/setup-node` are on v5 (Node 24) in all three workflows. The push itself needs a token that may bypass the ruleset: `RELEASE_TOKEN` (see TODO.md). Verified by the run of 2026-11-06 12:10: the push was refused again and no tag was left behind.

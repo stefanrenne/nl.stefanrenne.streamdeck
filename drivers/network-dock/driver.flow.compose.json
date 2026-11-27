@@ -1,0 +1,29 @@
+{
+  "actions": [
+    {
+      "$extends": "set_dashboard"
+    }
+  ],
+  "conditions": [
+    {
+      "$extends": "is_dashboard"
+    }
+  ],
+  "triggers": [
+    {
+      "$extends": "any_button_action"
+    },
+    {
+      "$extends": "changed_dashboard"
+    },
+    {
+      "$extends": "image_button_action"
+    },
+    {
+      "$extends": "off_button_action"
+    },
+    {
+      "$extends": "variable_button_action"
+    }
+  ]
+}

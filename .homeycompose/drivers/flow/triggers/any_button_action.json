@@ -1,6 +1,5 @@
 {
-  "id": "any_button_action",
-	"title": {
+  "title": {
     "en": "Button action",
     "nl": "Knop actie",
     "de": "Tastenaktion",
@@ -14,8 +13,8 @@
     "pl": "Akcja przycisku",
     "ko": "버튼 동작",
     "ar": "إجراء الزر"
-	},
-	"titleFormatted": {
+  },
+  "titleFormatted": {
     "en": "Button [[action]]",
     "nl": "Knop [[action]]",
     "de": "Taste [[action]]",
@@ -29,13 +28,8 @@
     "pl": "Przycisk [[action]]",
     "ko": "버튼 [[action]]",
     "ar": "الزر [[action]]"
-	},
+  },
   "args": [
-    {
-      "type": "device",
-      "name": "device",
-      "filter": "driver_id=network-dock"
-    },
     {
       "type": "dropdown",
       "name": "action",

@@ -81,5 +81,11 @@
                 "textColor": "Textfarbe"
             }
         }
+    },
+    "widgets": {
+        "virtualDeck": {
+            "noDevice": "Wähle ein virtuelles Stream Deck in den Widget-Einstellungen. Du kannst eins unter Geräte hinzufügen.",
+            "notFound": "Dieses virtuelle Stream Deck gibt es nicht mehr. Wähle ein anderes in den Widget-Einstellungen."
+        }
     }
 }

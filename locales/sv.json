@@ -81,5 +81,11 @@
                 "textColor": "Textfärg"
             }
         }
+    },
+    "widgets": {
+        "virtualDeck": {
+            "noDevice": "Välj ett virtuellt Stream Deck i widgetinställningarna. Du kan lägga till ett under Enheter.",
+            "notFound": "Detta virtuella Stream Deck finns inte längre. Välj ett annat i widgetinställningarna."
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -7,10 +7,22 @@ const readJson = (path: string) => JSON.parse(readFileSync(join(root, path), 'ut
 
 const LANGUAGES = readdirSync(join(root, 'locales')).map((file) => file.replace(/\.json$/, '')).sort()
 
-const flowCardFiles = ['actions', 'conditions', 'triggers'].flatMap((type) =>
-  readdirSync(join(root, '.homeycompose/flow', type))
+const FLOW_TYPES = ['actions', 'conditions', 'triggers']
+const DRIVERS = ['network-dock', 'virtual-deck']
+
+// Git does not keep empty directories, so a card type without files has no directory in a fresh checkout.
+const cardFilesIn = (dir: string) => FLOW_TYPES.flatMap((type) =>
+  (existsSync(join(root, dir, type)) ? readdirSync(join(root, dir, type)) : [])
     .filter((file) => file.endsWith('.json'))
-    .map((file) => ({ type, path: join('.homeycompose/flow', type, file) })))
+    .map((file) => ({ type, id: file.replace(/\.json$/, ''), path: join(dir, type, file) })))
+
+// App cards, and the device card templates that every driver uses in its driver.flow.compose.json.
+const appCardFiles = cardFilesIn('.homeycompose/flow')
+const templateFiles = cardFilesIn('.homeycompose/drivers/flow')
+const flowCardFiles = [...appCardFiles, ...templateFiles]
+
+type DriverCard = { $id?: string, $extends: string }
+const driverCards = (driver: string): Record<string, DriverCard[]> => readJson(`drivers/${driver}/driver.flow.compose.json`)
 
 const translatedFiles = [
   ...flowCardFiles.map((entry) => entry.path),
@@ -18,6 +30,9 @@ const translatedFiles = [
   '.homeycompose/capabilities/dashboard.json',
   'drivers/network-dock/driver.compose.json',
   'drivers/network-dock/driver.settings.compose.json',
+  'drivers/virtual-deck/driver.compose.json',
+  'drivers/virtual-deck/driver.settings.compose.json',
+  'widgets/virtual-deck/widget.compose.json',
 ]
 
 /** Every object with a string `en` key is a translation; returns the ones missing a language. */
@@ -52,11 +67,64 @@ describe('compose files', () => {
 
   it('app.json is regenerated from .homeycompose (same flow card ids)', () => {
     const manifest = readJson('app.json')
-    for (const type of ['actions', 'conditions', 'triggers']) {
-      const composed = flowCardFiles.filter((entry) => entry.type === type).map((entry) => readJson(entry.path).id).sort()
+    for (const type of FLOW_TYPES) {
+      const composed = [
+        ...appCardFiles.filter((entry) => entry.type === type).map((entry) => readJson(entry.path).id),
+        ...DRIVERS.flatMap((driver) => (driverCards(driver)[type] ?? []).map((card) => card.$id ?? card.$extends)),
+      ].sort()
       const generated = (manifest.flow[type] as { id: string }[]).map((card) => card.id).sort()
       expect(generated, `flow.${type}`).toEqual(composed)
     }
+  })
+})
+
+describe('virtual deck', () => {
+  // driver_id=network-dock|virtual-deck matched no device, so no device card triggered at all.
+  it('every device card in app.json is for exactly one driver (regression 8fcd125)', () => {
+    const filters = FLOW_TYPES
+      .flatMap((type) => readJson('app.json').flow[type] as { args?: { type: string, filter?: string }[] }[])
+      .flatMap((card) => card.args ?? [])
+      .filter((arg) => arg.type === 'device')
+      .map((arg) => arg.filter)
+    expect(filters.length).toBeGreaterThan(0)
+    expect(new Set(filters)).toEqual(new Set(DRIVERS.map((driver) => `driver_id=${driver}`)))
+  })
+
+  it('the device card templates have no device argument of their own: compose adds it per driver', () => {
+    for (const entry of templateFiles) {
+      expect((readJson(entry.path).args ?? []).filter((arg: { type: string }) => arg.type === 'device'), entry.path).toEqual([])
+    }
+  })
+
+  it('the Network Dock keeps the original card ids, so existing Flows keep working', () => {
+    const cards = driverCards('network-dock')
+    for (const type of FLOW_TYPES) {
+      expect(cards[type] ?? [], type).toEqual(templateFiles.filter((entry) => entry.type === type).map((entry) => ({ $extends: entry.id })))
+    }
+  })
+
+  it('the virtual deck has every device card as virtual_<id>', () => {
+    const cards = driverCards('virtual-deck')
+    for (const type of FLOW_TYPES) {
+      expect(cards[type] ?? [], type).toEqual(templateFiles.filter((entry) => entry.type === type).map((entry) => ({ $id: `virtual_${entry.id}`, $extends: entry.id })))
+    }
+  })
+
+  it('the model setting offers every model the virtual deck knows', async () => {
+    const { VIRTUAL_DECK_MODELS } = await import('../lib/virtualStreamDeck.mjs')
+    const [setting] = readJson('drivers/virtual-deck/driver.settings.compose.json')
+    expect(setting.values.map((value: { id: string }) => value.id).sort()).toEqual(Object.keys(VIRTUAL_DECK_MODELS).sort())
+    expect(Object.keys(VIRTUAL_DECK_MODELS)).toContain(setting.value)
+  })
+
+  it.each(['public/index.html', 'preview-light.png', 'preview-dark.png', 'api.mts'])('the widget has %s', (file) => {
+    expect(readFileSync(join(root, 'widgets/virtual-deck', file)).length).toBeGreaterThan(0)
+  })
+
+  it('app.json has the widget and the driver', () => {
+    const manifest = readJson('app.json')
+    expect(Object.keys(manifest.widgets)).toEqual(['virtual-deck'])
+    expect(manifest.drivers.map((driver: { id: string }) => driver.id).sort()).toEqual(['network-dock', 'virtual-deck'])
   })
 })
 

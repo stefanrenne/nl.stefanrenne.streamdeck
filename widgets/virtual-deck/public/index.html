@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --deck-gap: 6px;
+      --deck-padding: 10px;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--homey-font-family, sans-serif);
+      color: var(--homey-text-color, #000);
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* The deck is a black device in both themes, like the real one. */
+    .deck {
+      display: grid;
+      gap: var(--deck-gap);
+      padding: var(--deck-padding);
+      border-radius: 14px;
+      background: #111;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .key {
+      position: relative;
+      aspect-ratio: 1;
+      border: 0;
+      padding: 0;
+      border-radius: 10%;
+      overflow: hidden;
+      background: #000;
+      box-shadow: inset 0 0 0 1px #2a2a2a;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 60ms ease-out;
+    }
+
+    .key img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .key.pressed {
+      transform: scale(0.94);
+    }
+
+    /* Brightness: a black layer over the keys, so 0% is a dark deck, as on a real one. */
+    .key::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: var(--deck-dimmed, 0);
+      pointer-events: none;
+    }
+
+    .message {
+      padding: 16px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/javascript">
+    function onHomeyReady(Homey) {
+      const root = document.getElementById('root');
+      const deviceId = Homey.getSettings().device?.id;
+      let state;
+      let keys = [];
+      let isReady = false;
+
+      // Presses are sent one after the other, so an 'up' never overtakes its 'down'.
+      let queue = Promise.resolve();
+      const send = (index, action) => {
+        queue = queue
+          .then(() => Homey.api('POST', '/press', { deviceId, index, action }))
+          .catch((error) => console.error('press failed', error));
+      };
+
+      // Single and double presses are timed here, where the press happens: the requests reach Homey
+      // one by one, too late and too unevenly to time them there. Same rules as a real deck
+      // (StreamDeckDevice.validateSingleDouble): a second down on the same key within 250 ms is a
+      // 'double'; otherwise a 'single' follows 400 ms after the down.
+      let lastDownTime = 0;
+      let lastDownIndex = -1;
+      const detectSingleDouble = (index) => {
+        const now = performance.now();
+        if (now - lastDownTime <= 250 && lastDownIndex === index) {
+          send(index, 'double');
+          lastDownTime = 0;
+          lastDownIndex = -1;
+        } else {
+          lastDownTime = now;
+          lastDownIndex = index;
+          setTimeout(() => {
+            if (lastDownTime > 0) {
+              send(index, 'single');
+            }
+          }, 400);
+        }
+      };
+
+      // The iframe must fit the content plus the body's padding, which Homey's widget stylesheet sets:
+      // without it the widget is too short and scrolls. Not body.scrollHeight: the body can be
+      // stretched to the iframe's height, and the widget would never shrink.
+      let lastHeight = 0;
+      const ready = () => {
+        const style = getComputedStyle(document.body);
+        const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+        const height = Math.ceil(root.getBoundingClientRect().height + padding);
+        if (!isReady) {
+          isReady = true;
+          lastHeight = height;
+          Homey.ready({ height });
+        } else if (height !== lastHeight) {
+          lastHeight = height;
+          Homey.setHeight(height);
+        }
+      };
+
+      const showMessage = (text) => {
+        state = undefined;
+        keys = [];
+        const message = document.createElement('div');
+        message.className = 'message';
+        message.textContent = text;
+        root.replaceChildren(message);
+        ready();
+      };
+
+      const setKey = (index, image) => {
+        const key = keys[index];
+        if (key === undefined) {
+          return;
+        }
+        if (image === null) {
+          key.replaceChildren();
+        } else {
+          let img = key.firstChild;
+          if (img === null) {
+            img = document.createElement('img');
+            img.alt = '';
+            key.appendChild(img);
+          }
+          img.src = image;
+        }
+      };
+
+      const setBrightness = (brightness) => {
+        root.style.setProperty('--deck-dimmed', String(1 - brightness / 100));
+      };
+
+      const render = (newState) => {
+        state = newState;
+        const deck = document.createElement('div');
+        deck.className = 'deck';
+        deck.style.gridTemplateColumns = `repeat(${state.columns}, 1fr)`;
+
+        keys = state.keys.map((_, index) => {
+          const key = document.createElement('button');
+          key.className = 'key';
+          key.type = 'button';
+          let pressed = false;
+
+          key.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            pressed = true;
+            send(index, 'down');
+            detectSingleDouble(index);
+            key.classList.add('pressed');
+            // Only extras from here: they must never stop the press itself. The haptic feedback threw
+            // on the first tap after a pause, so that 'down' was never sent and the tap never timed.
+            try {
+              key.setPointerCapture?.(event.pointerId);
+            } catch (error) {
+              console.error('setPointerCapture failed', error);
+            }
+            try {
+              Promise.resolve(Homey.hapticFeedback?.()).catch((error) => console.error('hapticFeedback failed', error));
+            } catch (error) {
+              console.error('hapticFeedback failed', error);
+            }
+          });
+          const release = () => {
+            if (!pressed) {
+              return;
+            }
+            pressed = false;
+            key.classList.remove('pressed');
+            send(index, 'up');
+          };
+          key.addEventListener('pointerup', release);
+          key.addEventListener('pointercancel', release);
+          key.addEventListener('lostpointercapture', release);
+          key.addEventListener('contextmenu', (event) => event.preventDefault());
+
+          deck.appendChild(key);
+          return key;
+        });
+
+        root.replaceChildren(deck);
+        state.keys.forEach((image, index) => setKey(index, image));
+        setBrightness(state.brightness);
+        ready();
+      };
+
+      if (deviceId === undefined) {
+        showMessage(Homey.__('widgets.virtualDeck.noDevice'));
+        return;
+      }
+
+      Homey.on('virtual-deck', (event) => {
+        if (event.deviceId !== deviceId) {
+          return;
+        }
+        switch (event.type) {
+        case 'state':
+          render(event.state);
+          break;
+        case 'key':
+          setKey(event.index, event.image);
+          break;
+        case 'brightness':
+          setBrightness(event.brightness);
+          break;
+        case 'deleted':
+          showMessage(Homey.__('widgets.virtualDeck.notFound'));
+          break;
+        }
+      });
+
+      Homey.api('GET', `/state?deviceId=${encodeURIComponent(deviceId)}`)
+        .then(render)
+        .catch(() => showMessage(Homey.__('widgets.virtualDeck.notFound')));
+
+      // The keys are square, so the height follows the width.
+      new ResizeObserver(() => {
+        if (isReady) {
+          ready();
+        }
+      }).observe(root);
+    }
+  </script>
+</body>
+</html>

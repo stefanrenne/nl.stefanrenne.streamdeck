@@ -10,7 +10,7 @@
   "dependencies": {
     "@elgato-stream-deck/node": "^7.9.0",
     "@elgato-stream-deck/tcp": "^7.9.0",
-    "jimp": "^1.7.0",
+    "jimp": "^2.0.0",
     "path": "^0.12.7"
   },
   "devDependencies": {

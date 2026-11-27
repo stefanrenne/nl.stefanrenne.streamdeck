@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -10,8 +10,9 @@ const LANGUAGES = readdirSync(join(root, 'locales')).map((file) => file.replace(
 const FLOW_TYPES = ['actions', 'conditions', 'triggers']
 const DRIVERS = ['network-dock', 'virtual-deck']
 
+// Git does not keep empty directories, so a card type without files has no directory in a fresh checkout.
 const cardFilesIn = (dir: string) => FLOW_TYPES.flatMap((type) =>
-  readdirSync(join(root, dir, type))
+  (existsSync(join(root, dir, type)) ? readdirSync(join(root, dir, type)) : [])
     .filter((file) => file.endsWith('.json'))
     .map((file) => ({ type, id: file.replace(/\.json$/, ''), path: join(dir, type, file) })))
 

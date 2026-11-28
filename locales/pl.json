@@ -29,12 +29,35 @@
                 "selectImageError": "Brak dostępnych obrazów. Możesz przesłać obraz w zakładce 'Obrazy'.",
                 "selectVariable": "Wybierz zmienną",
                 "selectVariableError": "Brak dostępnych zmiennych. Możesz utworzyć zmienną w zakładce 'Zmienne'.",
-                "displayMode": "Akcja",
+                "displayMode": "Wyświetlanie",
                 "none": "Pusty",
                 "variable": "Zmienna",
                 "image": "Obraz",
                 "save": "Zapisz",
                 "cancel": "Anuluj",
+                "navigation": {
+                    "title": "Akcja",
+                    "description": "Flow uruchamiają się zawsze. Wybierz, co Stream Deck robi dodatkowo po naciśnięciu tego przycisku.",
+                    "none": "Brak",
+                    "open": "Otwórz pulpit",
+                    "back": "Wstecz",
+                    "dashboard": "Pulpit",
+                    "noDashboards": "Nie ma innych pulpitów do otwarcia. Możesz dodać pulpit w zakładce 'Pulpity'.",
+                    "timeout": {
+                        "title": "Powrót po",
+                        "description": "Wraca do poprzedniego pulpitu, gdy przez ten czas nie naciśnięto żadnego przycisku.",
+                        "never": "Pozostaje otwarty",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Wybierz pulpit…",
+                    "missing": "usunięty pulpit",
+                    "label": {
+                        "open": "Otwiera __name__",
+                        "openReturn": "Otwiera __name__, powrót po __time__",
+                        "back": "Wraca do poprzedniego pulpitu"
+                    }
+                },
                 "payload": {
                     "title": "Ładunek",
                     "description": "Tutaj możesz zdefiniować dodatkowe dane, które zostaną przekazane do przepływu po naciśnięciu przycisku."

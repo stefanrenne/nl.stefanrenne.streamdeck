@@ -29,12 +29,35 @@
                 "selectImageError": "Ingen bilder tilgjengelig. Du kan laste opp et bilde i fanen 'Bilder'.",
                 "selectVariable": "Velg variabel",
                 "selectVariableError": "Ingen variabler tilgjengelig. Du kan opprette en variabel i fanen 'Variabler'.",
-                "displayMode": "Handling",
+                "displayMode": "Visning",
                 "none": "Tom",
                 "variable": "Variabel",
                 "image": "Bilde",
                 "save": "Lagre",
                 "cancel": "Avbryt",
+                "navigation": {
+                    "title": "Handling",
+                    "description": "Flyter kjører alltid. Velg hva Stream Deck også gjør når du trykker på denne knappen.",
+                    "none": "Ingen",
+                    "open": "Åpne dashbord",
+                    "back": "Tilbake",
+                    "dashboard": "Dashbord",
+                    "noDashboards": "Det finnes ingen andre dashbord å åpne. Du kan legge til et i fanen 'Dashbord'.",
+                    "timeout": {
+                        "title": "Tilbake etter",
+                        "description": "Går tilbake til forrige dashbord når ingen knapp har blitt trykket så lenge.",
+                        "never": "Forblir åpent",
+                        "seconds": "__count__ sek",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Velg et dashbord…",
+                    "missing": "slettet dashbord",
+                    "label": {
+                        "open": "Åpner __name__",
+                        "openReturn": "Åpner __name__, tilbake etter __time__",
+                        "back": "Går tilbake til forrige dashbord"
+                    }
+                },
                 "payload": {
                     "title": "Nyttelast",
                     "description": "Her kan du definere tilleggsdata som vil bli eksponert for en flyt når du trykker på en knapp."

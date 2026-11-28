@@ -29,12 +29,35 @@
                 "selectImageError": "No hay imágenes disponibles. Puedes subir una imagen en la pestaña 'Imágenes'.",
                 "selectVariable": "Seleccionar variable",
                 "selectVariableError": "No hay variables disponibles. Puedes crear una variable en la pestaña 'Variables'.",
-                "displayMode": "Acción",
+                "displayMode": "Visualización",
                 "none": "Vacío",
                 "variable": "Variable",
                 "image": "Imagen",
                 "save": "Guardar",
                 "cancel": "Cancelar",
+                "navigation": {
+                    "title": "Acción",
+                    "description": "Los flujos se ejecutan siempre. Elige qué hace además el Stream Deck al pulsar este botón.",
+                    "none": "Ninguna",
+                    "open": "Abrir panel",
+                    "back": "Atrás",
+                    "dashboard": "Panel",
+                    "noDashboards": "No hay otros paneles para abrir. Puedes añadir uno en la pestaña 'Paneles'.",
+                    "timeout": {
+                        "title": "Volver después de",
+                        "description": "Vuelve al panel anterior cuando no se ha pulsado ningún botón durante este tiempo.",
+                        "never": "Permanece abierto",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Elige un panel…",
+                    "missing": "panel eliminado",
+                    "label": {
+                        "open": "Abre __name__",
+                        "openReturn": "Abre __name__, vuelve después de __time__",
+                        "back": "Vuelve al panel anterior"
+                    }
+                },
                 "payload": {
                     "title": "Carga útil",
                     "description": "Aquí puedes definir datos adicionales que se expondrán a un flujo cuando pulses un botón."

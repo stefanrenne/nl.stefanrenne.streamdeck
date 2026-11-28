@@ -29,12 +29,35 @@
                 "selectImageError": "Keine Bilder verfügbar. Du kannst ein Bild im Tab 'Bilder' hochladen.",
                 "selectVariable": "Variable auswählen",
                 "selectVariableError": "Keine Variablen verfügbar. Du kannst eine Variable im Tab 'Variablen' erstellen.",
-                "displayMode": "Aktion",
+                "displayMode": "Anzeige",
                 "none": "Leer",
                 "variable": "Variable",
                 "image": "Bild",
                 "save": "Speichern",
                 "cancel": "Abbrechen",
+                "navigation": {
+                    "title": "Aktion",
+                    "description": "Flows laufen immer. Wähle, was das Stream Deck beim Drücken dieser Taste zusätzlich macht.",
+                    "none": "Keine",
+                    "open": "Dashboard öffnen",
+                    "back": "Zurück",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Es gibt keine anderen Dashboards zum Öffnen. Du kannst eines im Tab 'Dashboards' hinzufügen.",
+                    "timeout": {
+                        "title": "Zurück nach",
+                        "description": "Kehrt zum vorherigen Dashboard zurück, wenn so lange keine Taste gedrückt wurde.",
+                        "never": "Bleibt offen",
+                        "seconds": "__count__ Sek.",
+                        "minutes": "__count__ Min."
+                    },
+                    "chooseDashboard": "Dashboard wählen…",
+                    "missing": "gelöschtes Dashboard",
+                    "label": {
+                        "open": "Öffnet __name__",
+                        "openReturn": "Öffnet __name__, zurück nach __time__",
+                        "back": "Kehrt zum vorherigen Dashboard zurück"
+                    }
+                },
                 "payload": {
                     "title": "Payload",
                     "description": "Hier kannst du zusätzliche Daten definieren, die einem Flow zur Verfügung gestellt werden, wenn du eine Taste drückst."

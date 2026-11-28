@@ -236,6 +236,28 @@ describe('VirtualDeck device', () => {
     expect(actions).toEqual(['down', 'up', 'down'])
   })
 
+  it('navigates from a widget press, and the widget\'s later "single" is for the dashboard it was pressed on', async () => {
+    seedSettings(settings, {
+      dashboards: [
+        { id: 'd-home', name: 'Home', columns: 3, rows: 2, items: [
+          { type: 'empty', item: 2, payload: 'to-movie', navigation: { type: 'open', dashboardId: 'd-movie', timeout: 30 } },
+        ] },
+        { id: 'd-movie', name: 'Movie night', columns: 3, rows: 2 },
+      ],
+    })
+    const device = createDevice()
+    await device.onInit()
+
+    device.press(1, 'down')
+    await vi.waitFor(() => expect(device.getCapabilityValue('dashboard')).toBe('d-movie'))
+    device.press(1, 'up')
+    device.press(1, 'single')
+
+    await vi.waitFor(() => expect(card('virtual_any_button_action').trigger).toHaveBeenCalledTimes(3))
+    const calls = card('virtual_any_button_action').trigger.mock.calls.map(([, tokens, state]) => [(state as { action: string }).action, (tokens as { dashboard: string }).dashboard])
+    expect(calls).toEqual([['down', 'Home'], ['up', 'Home'], ['single', 'Home']])
+  })
+
   it.each(['single', 'double'])('triggers the %s the widget detected, like a real deck', async (action) => {
     const device = createDevice()
     await device.onInit()

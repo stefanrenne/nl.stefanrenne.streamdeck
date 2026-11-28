@@ -29,12 +29,35 @@
                 "selectImageError": "Aucune image disponible. Vous pouvez télécharger une image dans l'onglet 'Images'.",
                 "selectVariable": "Sélectionner une variable",
                 "selectVariableError": "Aucune variable disponible. Vous pouvez créer une variable dans l'onglet 'Variables'.",
-                "displayMode": "Action",
+                "displayMode": "Affichage",
                 "none": "Vide",
                 "variable": "Variable",
                 "image": "Image",
                 "save": "Enregistrer",
                 "cancel": "Annuler",
+                "navigation": {
+                    "title": "Action",
+                    "description": "Les flows s'exécutent toujours. Choisissez ce que fait en plus le Stream Deck lorsque vous appuyez sur ce bouton.",
+                    "none": "Aucune",
+                    "open": "Ouvrir un tableau de bord",
+                    "back": "Retour",
+                    "dashboard": "Tableau de bord",
+                    "noDashboards": "Il n'y a pas d'autre tableau de bord à ouvrir. Vous pouvez en ajouter un dans l'onglet 'Tableaux de bord'.",
+                    "timeout": {
+                        "title": "Retour après",
+                        "description": "Revient au tableau de bord précédent si aucun bouton n'a été pressé pendant cette durée.",
+                        "never": "Reste ouvert",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Choisir un tableau de bord…",
+                    "missing": "tableau de bord supprimé",
+                    "label": {
+                        "open": "Ouvre __name__",
+                        "openReturn": "Ouvre __name__, retour après __time__",
+                        "back": "Revient au tableau de bord précédent"
+                    }
+                },
                 "payload": {
                     "title": "Charge utile",
                     "description": "Vous pouvez définir ici des données supplémentaires qui seront exposées à un flux lorsque vous appuyez sur un bouton."

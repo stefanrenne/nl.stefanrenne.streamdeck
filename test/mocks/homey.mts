@@ -72,6 +72,17 @@ class Device {
     Object.assign(this.settings, settings)
   }
 
+  // The device store: like Homey, a key that was never set reads as null.
+  storeValues = new Map<string, unknown>()
+
+  getStoreValue(key: string) {
+    return this.storeValues.has(key) ? structuredClone(this.storeValues.get(key)) : null
+  }
+
+  async setStoreValue(key: string, value: unknown) {
+    this.storeValues.set(key, structuredClone(value))
+  }
+
   getSetting(key: string) {
     return this.settings[key]
   }

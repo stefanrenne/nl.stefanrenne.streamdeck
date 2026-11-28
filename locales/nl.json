@@ -9,14 +9,14 @@
         "dashboard": {
             "name": "Naam",
             "action": "Actie",
-            "add": "Dashboard Aanmaken",
+            "add": "Dashboard aanmaken",
             "editTitle": "Aanpassen",
             "copyTitle": "Kopie maken",
             "deleteTitle": "Verwijderen",
             "confirmDelete": "Weet je zeker dat je dashboard '__name__' wilt verwijderen?",
             "manage": {
-                "titleAdd": "Dashboard Aanmaken",
-                "titleEdit": "Dashboard Aanpassen",
+                "titleAdd": "Dashboard aanmaken",
+                "titleEdit": "Dashboard aanpassen",
                 "name": "Naam",
                 "displayColomns": "Kolommen",
                 "displayRows": "Rijen",
@@ -24,29 +24,52 @@
                 "cancel": "Annuleren"
             },
             "item": {
-                "title": "Kies Item",
+                "title": "Knop aanpassen",
                 "selectImage": "Selecteer afbeelding",
-                "selectImageError": "Er zijn geen afbeeldingen beschikbaar. U kunt een afbeelding uploaden via het tabblad 'Afbeeldingen'.",
-                "selectVariable": "Selecteer variabel",
-                "selectVariableError": "Er zijn geen variabelen beschikbaar. U kunt een variabele aanmaken in het tabblad 'Variabelen'.",
-                "displayMode": "Actie",
+                "selectImageError": "Er zijn nog geen afbeeldingen. Je kunt er een uploaden in het tabblad 'Afbeeldingen'.",
+                "selectVariable": "Selecteer variabele",
+                "selectVariableError": "Er zijn nog geen variabelen. Je kunt er een aanmaken in het tabblad 'Variabelen'.",
+                "displayMode": "Weergave",
                 "none": "Leeg",
-                "variable": "Variabel",
+                "variable": "Variabele",
                 "image": "Afbeelding",
                 "save": "Opslaan",
                 "cancel": "Annuleren",
+                "navigation": {
+                    "title": "Actie",
+                    "description": "Flows starten altijd. Kies wat de Stream Deck daarnaast doet als je op deze knop drukt.",
+                    "none": "Geen",
+                    "open": "Dashboard openen",
+                    "back": "Terug",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Er zijn geen andere dashboards om te openen. Je kunt er een toevoegen in het tabblad 'Dashboards'.",
+                    "timeout": {
+                        "title": "Terug na",
+                        "description": "Gaat terug naar het vorige dashboard als er zo lang geen knop is ingedrukt.",
+                        "never": "Blijft open",
+                        "seconds": "__count__ sec",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Kies een dashboard…",
+                    "missing": "verwijderd dashboard",
+                    "label": {
+                        "open": "Opent __name__",
+                        "openReturn": "Opent __name__, terug na __time__",
+                        "back": "Gaat terug naar het vorige dashboard"
+                    }
+                },
                 "payload": {
                     "title": "Payload",
-                    "description": "Hier kunt je aanvullende data invoeren die vervolgens beschikbaar zijn in een flow na het klikken op een knop."
+                    "description": "Extra gegevens die aan een flow worden doorgegeven als je op deze knop drukt."
                 }
             }
         },
         "image": {
-            "emptyError": "In dit tabblad kunt u een afbeelding uploaden. Afbeeldingen kunnen vervolgens aan posities op het stream deck dashboard worden toegewezen.",
+            "emptyError": "Upload hier een afbeelding en toon die daarna op een knop van een dashboard.",
             "title": "Afbeelding",
             "name": "Naam",
             "action": "Actie",
-            "add": "Afbeelding Uploaden",
+            "add": "Afbeelding uploaden",
             "editTitle": "Aanpassen",
             "deleteTitle": "Verwijderen",
             "confirmDelete": "Weet je zeker dat je de afbeelding '__name__' wilt verwijderen?",
@@ -58,19 +81,19 @@
             }
         },
         "variable": {
-            "emptyError": "In dit tabblad kunt u een variabele aanmaken. Variabelen zijn knoppen met één of twee tekstregels, en deze tekstregels kunnen worden bijgewerkt vanuit een Honeyflow.",
-            "title": "Variabel",
+            "emptyError": "Maak hier een variabele aan: een knop met één of twee regels tekst die een flow kan bijwerken.",
+            "title": "Variabele",
             "name": "Naam",
             "action": "Actie",
-            "add": "Variabel aanmaken",
+            "add": "Variabele aanmaken",
             "editTitle": "Aanpassen",
             "deleteTitle": "Verwijderen",
-            "confirmDelete": "Weet je zeker dat je de variabel '__name__' wilt verwijderen?",
+            "confirmDelete": "Weet je zeker dat je de variabele '__name__' wilt verwijderen?",
             "manage": {
-                "titleAdd": "Variabel Aanmaken",
-                "titleEdit": "Variabel Aanpassen",
+                "titleAdd": "Variabele aanmaken",
+                "titleEdit": "Variabele aanpassen",
                 "inputName": "Naam",
-                "inputNameHint": "Unieke naam die gebruikt wordt om de variabel vanuit een flow bij te werken.",
+                "inputNameHint": "Unieke naam waarmee een flow de variabele bijwerkt.",
                 "save": "Opslaan",
                 "cancel": "Annuleren",
                 "inputLines": "Tekst die weergegeven moet worden",

@@ -29,12 +29,35 @@
                 "selectImageError": "Ingen billeder tilgængelige. Du kan uploade et billede under fanen 'Billeder'.",
                 "selectVariable": "Vælg variabel",
                 "selectVariableError": "Ingen variabler tilgængelige. Du kan oprette en variabel under fanen 'Variabler'.",
-                "displayMode": "Handling",
+                "displayMode": "Visning",
                 "none": "Tom",
                 "variable": "Variabel",
                 "image": "Billede",
                 "save": "Gem",
                 "cancel": "Annuller",
+                "navigation": {
+                    "title": "Handling",
+                    "description": "Flows kører altid. Vælg, hvad Stream Deck også gør, når du trykker på denne knap.",
+                    "none": "Ingen",
+                    "open": "Åbn dashboard",
+                    "back": "Tilbage",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Der er ingen andre dashboards at åbne. Du kan tilføje et under fanen 'Dashboards'.",
+                    "timeout": {
+                        "title": "Tilbage efter",
+                        "description": "Går tilbage til det forrige dashboard, når der ikke er trykket på en knap så længe.",
+                        "never": "Forbliver åbent",
+                        "seconds": "__count__ sek.",
+                        "minutes": "__count__ min."
+                    },
+                    "chooseDashboard": "Vælg et dashboard…",
+                    "missing": "slettet dashboard",
+                    "label": {
+                        "open": "Åbner __name__",
+                        "openReturn": "Åbner __name__, tilbage efter __time__",
+                        "back": "Går tilbage til det forrige dashboard"
+                    }
+                },
                 "payload": {
                     "title": "Nyttelast",
                     "description": "Her kan du definere yderligere data, der vil blive eksponeret for et flow, når du trykker på en knap."

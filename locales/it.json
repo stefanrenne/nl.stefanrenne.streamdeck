@@ -29,12 +29,35 @@
                 "selectImageError": "Nessuna immagine disponibile. Puoi caricare un'immagine nella scheda 'Immagini'.",
                 "selectVariable": "Seleziona variabile",
                 "selectVariableError": "Nessuna variabile disponibile. Puoi creare una variabile nella scheda 'Variabili'.",
-                "displayMode": "Azione",
+                "displayMode": "Visualizzazione",
                 "none": "Vuoto",
                 "variable": "Variabile",
                 "image": "Immagine",
                 "save": "Salva",
                 "cancel": "Annulla",
+                "navigation": {
+                    "title": "Azione",
+                    "description": "I flow vengono sempre eseguiti. Scegli cosa fa in più lo Stream Deck quando premi questo pulsante.",
+                    "none": "Nessuna",
+                    "open": "Apri dashboard",
+                    "back": "Indietro",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Non ci sono altre dashboard da aprire. Puoi aggiungerne una nella scheda 'Dashboard'.",
+                    "timeout": {
+                        "title": "Torna dopo",
+                        "description": "Torna alla dashboard precedente se nessun pulsante è stato premuto per questo tempo.",
+                        "never": "Resta aperta",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Scegli una dashboard…",
+                    "missing": "dashboard eliminata",
+                    "label": {
+                        "open": "Apre __name__",
+                        "openReturn": "Apre __name__, torna dopo __time__",
+                        "back": "Torna alla dashboard precedente"
+                    }
+                },
                 "payload": {
                     "title": "Payload",
                     "description": "Qui puoi definire dati aggiuntivi che verranno esposti a un flusso quando premi un pulsante."

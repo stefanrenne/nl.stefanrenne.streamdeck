@@ -43,8 +43,20 @@ Every listener registered with `.on` (the connection manager's, `homey.settings`
 - On init, if the selected dashboard no longer exists, the device switches to `0` and triggers `changed_dashboard`. The options **must** be set before the value, otherwise Homey rejects the enum value (fix 8862c09, 1.0.2).
 - `detectsSingleDouble()` (default `true`) decides whether `streamDeckEvent` times single/double presses from the `down`s (`validateSingleDouble`); the virtual deck returns `false`, because its widget times them.
 - `loadDashboard(id)`: `0` or an unknown id draws the Homey logo. Otherwise it draws the dashboard. If the deck is larger than the stored `columns`/`rows`, it stores the deck's size (`Store.updateDashboard`); it never shrinks a dashboard. Decks of different sizes on one dashboard used to resize it for each other, and every write redraws every deck on it, endlessly, until the dock dropped the connection and the app ran out of memory. The sizes (3×2, 4×2, 5×3, 8×4) are ordered, so a shared dashboard settles at the largest deck, and a smaller deck shows its top-left part. Keys and presses find their item by row and column (`getDashboardItem`), not by key index.
-- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. `set_dashboard` (`selectDashboard`) throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
+- Switching: the capability listener (from the device UI) and the `set_dashboard` action both load the dashboard and trigger `changed_dashboard` with its name. Both end any [navigation](#navigation), as does the fallback to `0` when the selected dashboard is deleted (`loadEmptyDashboardOptions`). `set_dashboard` (`selectDashboard`) throws `'Stream Deck is unavailable'` while the device is unavailable, and does nothing if the dashboard is already selected.
 - A flow card has one run listener for all devices, and every device registers it again in `onInit`, so the last one wins. The `is_dashboard` and `set_dashboard` listeners therefore act on `args.device`, never on `this` (fix of `d9685a0`). Do the same in any new device card.
+
+## Navigation
+
+A key can have a `navigation` (set in the settings page, see [data-model.md](data-model.md)). It runs on the key's `down` while the deck is on, next to the key's Flow triggers, which still fire as usual:
+
+- **`open`** pushes the current dashboard, with the timeout it was shown with, onto the history, and shows the target (`showDashboard`: capability value, `changed_dashboard`, draw). It's ignored when the target no longer exists or is already shown. With a `timeout` above 0, the device goes back after that many seconds **without a key press**: every `down` while the deck is on restarts the timer (`startNavigationTimer`, with `homey.setTimeout`). With `0`, the dashboard stays until a `back` key or another switch.
+- **`back`** pops the history, skipping dashboards that were deleted since, and shows that dashboard with the timeout it had, so a chain of temporary dashboards unwinds one at a time. Without history it does nothing.
+- The history holds at most 20 entries, so a loop of `open` keys can't grow it without end.
+- A dashboard chosen any other way (`set_dashboard`, the capability in the device UI, the fallback to `0`) is not temporary: it clears the history and stops the timer (`clearNavigation`).
+- The state (`{ history: [{ dashboardId, timeout }], timeout }`) is kept in the device store under `navigation`, read with `toNavigationState` in `onInit`. After a restart on a temporary dashboard, its timer starts again with the full timeout.
+
+A `down` that navigates has switched dashboards before its `up`, `single` or `double` arrives. So each event uses the dashboard of the key's last `down` (`dashboardForEvent`, keyed by control index), and `validateSingleDouble` passes that dashboard to the `single`/`double` it fires. A second press counts as a double only on the same key **and** the same dashboard. For the virtual deck, whose widget sends `single`/`double` itself after the `up`, the same map applies.
 
 ## Button events
 

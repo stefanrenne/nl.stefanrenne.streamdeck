@@ -29,12 +29,35 @@
                 "selectImageError": "Inga bilder tillgängliga. Du kan ladda upp en bild i fliken 'Bilder'.",
                 "selectVariable": "Välj variabel",
                 "selectVariableError": "Inga variabler tillgängliga. Du kan skapa en variabel i fliken 'Variabler'.",
-                "displayMode": "Åtgärd",
+                "displayMode": "Visning",
                 "none": "Tom",
                 "variable": "Variabel",
                 "image": "Bild",
                 "save": "Spara",
                 "cancel": "Avbryt",
+                "navigation": {
+                    "title": "Åtgärd",
+                    "description": "Flöden körs alltid. Välj vad Stream Deck också gör när du trycker på den här knappen.",
+                    "none": "Ingen",
+                    "open": "Öppna instrumentpanel",
+                    "back": "Tillbaka",
+                    "dashboard": "Instrumentpanel",
+                    "noDashboards": "Det finns inga andra instrumentpaneler att öppna. Du kan lägga till en på fliken 'Instrumentpaneler'.",
+                    "timeout": {
+                        "title": "Tillbaka efter",
+                        "description": "Går tillbaka till föregående instrumentpanel när ingen knapp har tryckts in så länge.",
+                        "never": "Förblir öppen",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Välj en instrumentpanel…",
+                    "missing": "borttagen instrumentpanel",
+                    "label": {
+                        "open": "Öppnar __name__",
+                        "openReturn": "Öppnar __name__, tillbaka efter __time__",
+                        "back": "Går tillbaka till föregående instrumentpanel"
+                    }
+                },
                 "payload": {
                     "title": "Nyttolast",
                     "description": "Här kan du definiera ytterligare data som exponeras för ett flöde när du trycker på en knapp."

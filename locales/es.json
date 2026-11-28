@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Acción",
                     "description": "Opcional: lo que hace el Stream Deck al pulsar este botón, además de iniciar sus flujos.",
-                    "none": "Control por flujo",
+                    "none": "Controlable por flujo",
                     "open": "Abrir panel",
                     "back": "Atrás",
                     "dashboard": "Panel",

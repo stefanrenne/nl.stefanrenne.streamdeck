@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Handling",
                     "description": "Valgfrit: hvad Stream Deck gør, når du trykker på denne knap, ud over at starte dens flows.",
-                    "none": "Flow-styring",
+                    "none": "Styrbar via flow",
                     "open": "Åbn dashboard",
                     "back": "Tilbage",
                     "dashboard": "Dashboard",

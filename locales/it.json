@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Azione",
                     "description": "Facoltativo: cosa fa lo Stream Deck quando premi questo pulsante, oltre ad avviare i suoi flow.",
-                    "none": "Controllo tramite flow",
+                    "none": "Controllabile tramite flow",
                     "open": "Apri dashboard",
                     "back": "Indietro",
                     "dashboard": "Dashboard",

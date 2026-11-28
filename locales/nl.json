@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Actie",
                     "description": "Optioneel: wat de Stream Deck doet als je op deze knop drukt, naast het starten van de flows.",
-                    "none": "Flow-besturing",
+                    "none": "Bestuurbaar via Flow",
                     "open": "Dashboard openen",
                     "back": "Terug",
                     "dashboard": "Dashboard",

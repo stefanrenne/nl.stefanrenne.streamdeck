@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Akcja",
                     "description": "Opcjonalnie: co robi Stream Deck po naciśnięciu tego przycisku, oprócz uruchomienia jego flow.",
-                    "none": "Sterowanie przez flow",
+                    "none": "Sterowalny przez flow",
                     "open": "Otwórz pulpit",
                     "back": "Wstecz",
                     "dashboard": "Pulpit",

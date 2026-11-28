@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Action",
                     "description": "Optional: what the Stream Deck does when you press this button, next to running its flows.",
-                    "none": "Flow control",
+                    "none": "Flow controllable",
                     "open": "Open dashboard",
                     "back": "Back",
                     "dashboard": "Dashboard",

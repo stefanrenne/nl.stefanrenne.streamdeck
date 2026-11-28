@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Handling",
                     "description": "Valgfritt: hva Stream Deck gjør når du trykker på denne knappen, i tillegg til å starte flytene.",
-                    "none": "Flytstyring",
+                    "none": "Styrbar via flyt",
                     "open": "Åpne dashbord",
                     "back": "Tilbake",
                     "dashboard": "Dashbord",

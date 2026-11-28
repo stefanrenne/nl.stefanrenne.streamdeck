@@ -15,7 +15,7 @@ Test version: [Stream Deck | Homey](https://homey.app/a/nl.stefanrenne.streamdec
 Organise your buttons into multiple named dashboards and switch between them from a Homey Flow. Build a "Morning" dashboard, a "Movie Night" layout, or any setup that fits your routine — then let Homey switch them automatically based on time, presence, or any other trigger.
 
 **Navigation Between Dashboards**<br/>
-Turn any button into a menu key in the dashboard editor. *Open dashboard* shows another dashboard and can return to the previous one by itself after a number of seconds without a button press; *Back* returns to the dashboard you came from. Build a lighting sub-menu that closes itself, without writing a single Flow. The button still runs its flows as usual.
+Turn any button into a menu key: in the dashboard editor, a button has a *Display* (empty, variable or image) and an optional *Action*. *Open dashboard* shows another dashboard and can return to the previous one by itself after a number of seconds without a button press; *Back* returns to the dashboard you came from. Build a lighting sub-menu that closes itself, without writing a single Flow. The button still runs its flows as usual.
 
 **Custom Images**<br/>
 Upload your own JPG or PNG images and assign them to buttons. Select multiple images at once during upload. Every button gets a clear, personalised icon.

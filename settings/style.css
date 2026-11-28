@@ -82,9 +82,11 @@ td.center {
 .homey-button-danger-shadow.full {
     width: 100%;
 }
+/* Wraps to a next line when the labels don't fit, as on a phone with longer translations. */
 .allignedradio {
-    display: grid;
-    grid-template-columns: auto auto auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
     width: 100%; 
 }
 .allignedradio label.homey-form-radio {

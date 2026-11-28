@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "작업",
                     "description": "선택 사항: 이 버튼을 누르면 플로우 실행과 함께 Stream Deck이 수행하는 동작입니다.",
-                    "none": "없음",
+                    "none": "플로우 제어",
                     "open": "대시보드 열기",
                     "back": "뒤로",
                     "dashboard": "대시보드",

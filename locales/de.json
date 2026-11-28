@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Aktion",
                     "description": "Optional: was das Stream Deck beim Drücken dieser Taste macht, zusätzlich zum Starten der Flows.",
-                    "none": "Keine",
+                    "none": "Flow-Steuerung",
                     "open": "Dashboard öffnen",
                     "back": "Zurück",
                     "dashboard": "Dashboard",

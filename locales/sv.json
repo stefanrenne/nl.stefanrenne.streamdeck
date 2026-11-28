@@ -38,7 +38,7 @@
                 "navigation": {
                     "title": "Åtgärd",
                     "description": "Valfritt: vad Stream Deck gör när du trycker på den här knappen, utöver att starta dess flöden.",
-                    "none": "Ingen",
+                    "none": "Flödesstyrning",
                     "open": "Öppna instrumentpanel",
                     "back": "Tillbaka",
                     "dashboard": "Instrumentpanel",

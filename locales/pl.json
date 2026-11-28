@@ -37,15 +37,25 @@
                 "cancel": "Anuluj",
                 "navigation": {
                     "title": "Akcja",
-                    "description": "Opcjonalnie: co robi Stream Deck po naciśnięciu tego przycisku, oprócz uruchomienia jego flow.",
-                    "none": "Sterowalny przez flow",
+                    "description": "Flow uruchamiają się zawsze. Wybierz, co Stream Deck robi dodatkowo po naciśnięciu tego przycisku.",
+                    "none": "Brak",
                     "open": "Otwórz pulpit",
                     "back": "Wstecz",
                     "dashboard": "Pulpit",
                     "noDashboards": "Nie ma innych pulpitów do otwarcia. Możesz dodać pulpit w zakładce 'Pulpity'.",
                     "timeout": {
-                        "title": "Powrót po (sekundach)",
-                        "description": "Wraca do poprzedniego pulpitu, gdy przez ten czas nie naciśnięto żadnego przycisku. 0 pozostawia pulpit otwarty."
+                        "title": "Powrót po",
+                        "description": "Wraca do poprzedniego pulpitu, gdy przez ten czas nie naciśnięto żadnego przycisku.",
+                        "never": "Pozostaje otwarty",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Wybierz pulpit…",
+                    "missing": "usunięty pulpit",
+                    "label": {
+                        "open": "Otwiera __name__",
+                        "openReturn": "Otwiera __name__, powrót po __time__",
+                        "back": "Wraca do poprzedniego pulpitu"
                     }
                 },
                 "payload": {

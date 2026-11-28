@@ -1,5 +1,8 @@
+/* The description under a label. 13px keeps it above the 11pt minimum on a phone. */
 label.homey-form-label span {
- font-size: 10px;   
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
 }
 td a {
     cursor: pointer;
@@ -292,26 +295,34 @@ tr.is-loading td.text::before {
 tr.is-loading td.action2 a, tr.is-loading td.action3 a {
     display: none;
 }
-/* A key with a navigation shows a small marker in its top-right corner in the dashboard editor. */
+/* A key with a navigation shows a strip with its destination ("→ Lights", "← Back"; showNavigationLabel),
+   in the dashboard editor and in the item editor's preview. Black on near-white reads on any key. */
 .deck-item.navigationOpen, .deck-item.navigationBack {
     position: relative;
 }
 .deck-item.navigationOpen::before, .deck-item.navigationBack::before {
+    content: attr(data-navigation-label);
     position: absolute;
-    top: 3px;
-    right: 3px;
-    min-width: 18px;
-    height: 18px;
-    line-height: 18px;
-    border-radius: 9px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    font-size: 12px;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 1px 4px;
+    border-radius: 0 0 5px 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 15px;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
 }
-.deck-item.navigationOpen::before {
-    content: '\2192';
+.deck-item:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
-.deck-item.navigationBack::before {
-    content: '\2190';
+#saveDashboardItem:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

@@ -159,9 +159,9 @@
         <div id="navigationOpen" class="hidden">
           <label class="homey-form-label" for="navigationDashboard" data-i18n="settings.dashboard.item.navigation.dashboard"></label>
           <select class="homey-form-select" id="navigationDashboard"></select>
-          <p id="navigationDashboardError" class="hidden" data-i18n="settings.dashboard.item.navigation.noDashboards"></p>
+          <p id="navigationDashboardError" class="error hidden" data-i18n="settings.dashboard.item.navigation.noDashboards"></p>
           <label class="homey-form-label" for="navigationTimeout"><p style="margin: 0;" data-i18n="settings.dashboard.item.navigation.timeout.title"></p><span data-i18n="settings.dashboard.item.navigation.timeout.description"></span></label>
-          <input class="homey-form-input" id="navigationTimeout" type="number" min="0" step="1" value="0"/>
+          <select class="homey-form-select" id="navigationTimeout"></select>
         </div>
       </fieldset>
 
@@ -463,17 +463,18 @@
             $createDashboardItemDisplay.classList.remove("actionNone");
           }
         });
-        document.getElementById("navigationType").addEventListener('change', () => {
-          showNavigationOptions();
-        });
+        for (const id of ["navigationType", "navigationDashboard", "navigationTimeout"]) {
+          document.getElementById(id).addEventListener('change', () => {
+            showNavigationOptions();
+          });
+        }
         $saveItemButton.addEventListener("click", async () => {
+          if ($saveItemButton.disabled) {
+            return;
+          }
           const $dashboardItem = document.getElementById("deckItem" + $createDashboardItemDisplay.dataset.id);
           $dashboardItem.dataset.payload = document.getElementById("payload").value.trim().replace(/"/g, '\\x22').replace(/'/g, '\\x27');
-          writeNavigation($dashboardItem, {
-            type: document.getElementById("navigationType").value,
-            dashboardId: document.getElementById("navigationDashboard").value,
-            timeout: document.getElementById("navigationTimeout").value
-          });
+          writeNavigation($dashboardItem, readNavigationForm());
           if ($createDashboardItemDisplay.classList.contains("actionImage")) {
             $dashboardItem.classList.add("actionImage");
             $dashboardItem.classList.remove("actionVariable");
@@ -518,21 +519,85 @@
         $item.dataset.navigationTimeout = isOpen ? String(Math.max(0, Math.round(Number(navigation.timeout) || 0))) : '0';
         $item.classList.toggle('navigationOpen', type === 'open');
         $item.classList.toggle('navigationBack', type === 'back');
+        showNavigationLabel($item);
+      }
+
+      // The item editor's navigation fields, in the shape writeNavigation takes.
+      function readNavigationForm() {
+        return {
+          type: document.getElementById("navigationType").value,
+          dashboardId: document.getElementById("navigationDashboard").value,
+          timeout: document.getElementById("navigationTimeout").value
+        };
+      }
+
+      // "30 sec", "2 min" or "Stays open"; a timeout that isn't whole minutes stays in seconds.
+      function formatTimeout(seconds) {
+        if (seconds <= 0) {
+          return Homey.__('settings.dashboard.item.navigation.timeout.never');
+        }
+        if (seconds % 60 === 0) {
+          return Homey.__('settings.dashboard.item.navigation.timeout.minutes', { count: seconds / 60 });
+        }
+        return Homey.__('settings.dashboard.item.navigation.timeout.seconds', { count: seconds });
+      }
+
+      // A key with a navigation shows a strip with its destination ("→ Lights", "← Back"), and
+      // says the same to a screen reader. Reads the key's data-navigation-* attributes.
+      function showNavigationLabel($item) {
+        const type = $item.dataset.navigationType;
+        const isRtl = getComputedStyle($item).direction === 'rtl';
+        const forward = isRtl ? '←' : '→';
+        const backward = isRtl ? '→' : '←';
+        var strip = '';
+        var description = '';
+        if (type === 'open') {
+          const name = cachedDashboards.find((metadata) => metadata.id === $item.dataset.navigationDashboardId)?.name ?? Homey.__('settings.dashboard.item.navigation.missing');
+          const timeout = Number($item.dataset.navigationTimeout) || 0;
+          strip = forward + ' ' + name;
+          description = (timeout > 0)
+            ? Homey.__('settings.dashboard.item.navigation.label.openReturn', { name: name, time: formatTimeout(timeout) })
+            : Homey.__('settings.dashboard.item.navigation.label.open', { name: name });
+        } else if (type === 'back') {
+          strip = backward + ' ' + Homey.__('settings.dashboard.item.navigation.back');
+          description = Homey.__('settings.dashboard.item.navigation.label.back');
+        }
+        $item.dataset.navigationLabel = strip;
+        const keyName = $item.querySelector('p')?.textContent ?? '';
+        $item.setAttribute('aria-label', (description !== '') ? keyName + ', ' + description : keyName);
+        $item.title = description;
       }
 
       function showNavigationOptions() {
         const isOpen = document.getElementById("navigationType").value === 'open';
-        const hasDashboards = document.getElementById("navigationDashboard").options.length > 0;
+        const $dashboard = document.getElementById("navigationDashboard");
+        const hasDashboards = $dashboard.options.length > 1;
         document.getElementById("navigationOpen").classList.toggle("hidden", !isOpen);
-        document.getElementById("navigationDashboard").classList.toggle("hidden", !hasDashboards);
+        $dashboard.classList.toggle("hidden", !hasDashboards);
         document.getElementById("navigationDashboardError").classList.toggle("hidden", hasDashboards);
+
+        // Opening a dashboard needs one to open; Save waits until it's chosen.
+        const $saveItemButton = document.getElementById("saveDashboardItem");
+        $saveItemButton.disabled = isOpen && $dashboard.value === '';
+
+        // The preview key shows the same strip as the key in the grid will.
+        writeNavigation($createDashboardItemDisplay, readNavigationForm());
       }
 
       // Fills the item editor's navigation fields. Every dashboard but the one being edited can be opened.
       async function selectNavigation(navigation) {
         const $dashboard = document.getElementById("navigationDashboard");
         $dashboard.innerHTML = "";
-        const dashboards = (await getDashboardsFromStore()).filter((metadata) => metadata.id !== $deck.dataset.id);
+        const dashboards = (await getDashboardsFromStore())
+          .filter((metadata) => metadata.id !== $deck.dataset.id)
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        // An 'open' without a (still existing) dashboard shows this until another one is picked.
+        const $placeholder = document.createElement('option');
+        $placeholder.value = '';
+        $placeholder.disabled = true;
+        $placeholder.textContent = Homey.__('settings.dashboard.item.navigation.chooseDashboard');
+        $dashboard.appendChild($placeholder);
         for (const metadata of dashboards) {
           const $option = document.createElement('option');
           $option.value = metadata.id;
@@ -540,10 +605,25 @@
           $dashboard.appendChild($option);
         }
 
-        // An 'open' whose dashboard was deleted shows as an 'open' without a choice, to pick another one.
+        // The usual timeouts, plus the key's own when it's another value.
+        const timeout = (navigation?.type === 'open') ? Math.max(0, Math.round(Number(navigation.timeout) || 0)) : 0;
+        const $timeout = document.getElementById("navigationTimeout");
+        $timeout.innerHTML = "";
+        const timeouts = [0, 10, 30, 60, 120, 300];
+        if (!timeouts.includes(timeout)) {
+          timeouts.push(timeout);
+          timeouts.sort((a, b) => a - b);
+        }
+        for (const seconds of timeouts) {
+          const $option = document.createElement('option');
+          $option.value = String(seconds);
+          $option.textContent = formatTimeout(seconds);
+          $timeout.appendChild($option);
+        }
+
         document.getElementById("navigationType").value = navigation?.type ?? 'none';
-        $dashboard.value = (navigation?.type === 'open' && dashboards.some((metadata) => metadata.id === navigation.dashboardId)) ? navigation.dashboardId : (dashboards[0]?.id ?? '');
-        document.getElementById("navigationTimeout").value = (navigation?.type === 'open') ? String(navigation.timeout) : '0';
+        $dashboard.value = (navigation?.type === 'open' && dashboards.some((metadata) => metadata.id === navigation.dashboardId)) ? navigation.dashboardId : '';
+        $timeout.value = String(timeout);
         showNavigationOptions();
       }
 
@@ -649,6 +729,15 @@
             $item.dataset.variableId = "";
           }
 
+          // A key works as a button for the keyboard and screen readers too; showNavigationLabel names it.
+          $item.setAttribute('role', 'button');
+          $item.tabIndex = 0;
+          $item.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              $item.click();
+            }
+          });
           $item.addEventListener('click', async () => {
             const imageId = $item.classList.contains("actionImage") ? $item.dataset.imageId : undefined;
             const variableId = $item.classList.contains("actionVariable") ? $item.dataset.variableId : undefined;
@@ -665,6 +754,7 @@
           const item = $deck.children[i];
           if (i < numberItems) {
             item.querySelector('p').innerHTML = deckDefaultText(i, columns);
+            showNavigationLabel(item);
             item.classList.remove("hidden");
           } else {
             item.classList.add("hidden");

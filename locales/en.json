@@ -9,26 +9,26 @@
         "dashboard": {
             "name": "Name",
             "action": "Action",
-            "add": "Create Dashboard",
+            "add": "Create dashboard",
             "editTitle": "Edit",
-            "copyTitle": "Create Copy",
+            "copyTitle": "Create copy",
             "deleteTitle": "Delete",
             "confirmDelete": "Are you sure you want to delete dashboard '__name__'?",
             "manage": {
-                "titleAdd": "Create Dashboard",
-                "titleEdit": "Edit Dashboard",
+                "titleAdd": "Create dashboard",
+                "titleEdit": "Edit dashboard",
                 "name": "Name",
-                "displayColomns": "Display Columns",
-                "displayRows": "Display Rows",
+                "displayColomns": "Columns",
+                "displayRows": "Rows",
                 "save": "Save",
                 "cancel": "Cancel"
             },
             "item": {
-                "title": "Select Item",
-                "selectImage": "Select Image",
-                "selectImageError": "No images available, you can upload a image in the 'Images' tab.",
-                "selectVariable": "Select Variable",
-                "selectVariableError": "No variables available, you can create a variable in the 'Variables' tab.",
+                "title": "Edit button",
+                "selectImage": "Select image",
+                "selectImageError": "There are no images yet. You can upload one in the 'Images' tab.",
+                "selectVariable": "Select variable",
+                "selectVariableError": "There are no variables yet. You can create one in the 'Variables' tab.",
                 "displayMode": "Display",
                 "none": "Empty",
                 "variable": "Variable",
@@ -37,29 +37,39 @@
                 "cancel": "Cancel",
                 "navigation": {
                     "title": "Action",
-                    "description": "Optional: what the Stream Deck does when you press this button, next to running its flows.",
-                    "none": "Flow controllable",
+                    "description": "Flows always run. Choose what the Stream Deck also does when you press this button.",
+                    "none": "None",
                     "open": "Open dashboard",
                     "back": "Back",
                     "dashboard": "Dashboard",
                     "noDashboards": "There are no other dashboards to open. You can add one in the 'Dashboards' tab.",
                     "timeout": {
-                        "title": "Return after (seconds)",
-                        "description": "Goes back to the previous dashboard when no button has been pressed for this long. 0 keeps the dashboard open."
+                        "title": "Return after",
+                        "description": "Goes back to the previous dashboard when no button has been pressed for this long.",
+                        "never": "Stays open",
+                        "seconds": "__count__ sec",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Choose a dashboard…",
+                    "missing": "deleted dashboard",
+                    "label": {
+                        "open": "Opens __name__",
+                        "openReturn": "Opens __name__, returns after __time__",
+                        "back": "Goes back to the previous dashboard"
                     }
                 },
                 "payload": {
                     "title": "Payload",
-                    "description": "Here you can define additional data that will then be exposed to a flow when you tap a button."
+                    "description": "Extra data that is passed to a flow when you press this button."
                 }
             }
         },
         "image": {
-            "emptyError": "In this tab you can upload a image, images can then be assigned to stream deck dashboard positions.",
+            "emptyError": "Upload an image here, then show it on a button of a dashboard.",
             "title": "Image",
             "name": "Name",
             "action": "Action",
-            "add": "Upload Image",
+            "add": "Upload image",
             "editTitle": "Edit",
             "deleteTitle": "Delete",
             "confirmDelete": "Are you sure you want to delete the image '__name__'?",
@@ -71,25 +81,25 @@
             }
         },
         "variable": {
-            "emptyError": "In this tab you can create a variable, variables are buttons with one or two lines of text, and those text lines can be updated from a honey flow.",
+            "emptyError": "Create a variable here: a button with one or two lines of text that a flow can update.",
             "title": "Variable",
             "name": "Name",
             "action": "Action",
-            "add": "Create Variable",
+            "add": "Create variable",
             "editTitle": "Edit",
             "deleteTitle": "Delete",
             "confirmDelete": "Are you sure you want to delete the variable '__name__'?",
             "manage": {
-                "titleAdd": "Create Variable",
-                "titleEdit": "Edit Variable",
+                "titleAdd": "Create variable",
+                "titleEdit": "Edit variable",
                 "inputName": "Name",
                 "inputNameHint": "Unique name used to update the variable from a flow",
                 "save": "Save",
                 "cancel": "Cancel",
                 "inputLines": "Text to be displayed",
-                "inputLineHint": "This lines can also be changed from a flow",
-                "inputFirstLine": "First line text",
-                "inputSecondLine": "Optionele second line text",
+                "inputLineHint": "A flow can change these lines too",
+                "inputFirstLine": "First line",
+                "inputSecondLine": "Second line (optional)",
                 "backgroundColor": "Background color",
                 "textColor": "Text color"
             }

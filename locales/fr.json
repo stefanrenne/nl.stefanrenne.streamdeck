@@ -37,15 +37,25 @@
                 "cancel": "Annuler",
                 "navigation": {
                     "title": "Action",
-                    "description": "Facultatif : ce que fait le Stream Deck lorsque vous appuyez sur ce bouton, en plus de lancer ses flows.",
-                    "none": "Contrôlable par flow",
+                    "description": "Les flows s'exécutent toujours. Choisissez ce que fait en plus le Stream Deck lorsque vous appuyez sur ce bouton.",
+                    "none": "Aucune",
                     "open": "Ouvrir un tableau de bord",
                     "back": "Retour",
                     "dashboard": "Tableau de bord",
                     "noDashboards": "Il n'y a pas d'autre tableau de bord à ouvrir. Vous pouvez en ajouter un dans l'onglet 'Tableaux de bord'.",
                     "timeout": {
-                        "title": "Retour après (secondes)",
-                        "description": "Revient au tableau de bord précédent si aucun bouton n'a été pressé pendant cette durée. 0 garde le tableau de bord ouvert."
+                        "title": "Retour après",
+                        "description": "Revient au tableau de bord précédent si aucun bouton n'a été pressé pendant cette durée.",
+                        "never": "Reste ouvert",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Choisir un tableau de bord…",
+                    "missing": "tableau de bord supprimé",
+                    "label": {
+                        "open": "Ouvre __name__",
+                        "openReturn": "Ouvre __name__, retour après __time__",
+                        "back": "Revient au tableau de bord précédent"
                     }
                 },
                 "payload": {

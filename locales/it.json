@@ -37,15 +37,25 @@
                 "cancel": "Annulla",
                 "navigation": {
                     "title": "Azione",
-                    "description": "Facoltativo: cosa fa lo Stream Deck quando premi questo pulsante, oltre ad avviare i suoi flow.",
-                    "none": "Controllabile tramite flow",
+                    "description": "I flow vengono sempre eseguiti. Scegli cosa fa in più lo Stream Deck quando premi questo pulsante.",
+                    "none": "Nessuna",
                     "open": "Apri dashboard",
                     "back": "Indietro",
                     "dashboard": "Dashboard",
                     "noDashboards": "Non ci sono altre dashboard da aprire. Puoi aggiungerne una nella scheda 'Dashboard'.",
                     "timeout": {
-                        "title": "Torna dopo (secondi)",
-                        "description": "Torna alla dashboard precedente se nessun pulsante è stato premuto per questo tempo. Con 0 la dashboard resta aperta."
+                        "title": "Torna dopo",
+                        "description": "Torna alla dashboard precedente se nessun pulsante è stato premuto per questo tempo.",
+                        "never": "Resta aperta",
+                        "seconds": "__count__ s",
+                        "minutes": "__count__ min"
+                    },
+                    "chooseDashboard": "Scegli una dashboard…",
+                    "missing": "dashboard eliminata",
+                    "label": {
+                        "open": "Apre __name__",
+                        "openReturn": "Apre __name__, torna dopo __time__",
+                        "back": "Torna alla dashboard precedente"
                     }
                 },
                 "payload": {

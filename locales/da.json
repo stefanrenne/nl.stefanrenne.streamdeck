@@ -35,6 +35,19 @@
                 "image": "Billede",
                 "save": "Gem",
                 "cancel": "Annuller",
+                "navigation": {
+                    "title": "Navigation",
+                    "description": "Hvad Stream Deck gør, når du trykker på denne knap, ud over at starte dens flows.",
+                    "none": "Ingen",
+                    "open": "Åbn dashboard",
+                    "back": "Tilbage",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Der er ingen andre dashboards at åbne. Du kan tilføje et under fanen 'Dashboards'.",
+                    "timeout": {
+                        "title": "Tilbage efter (sekunder)",
+                        "description": "Går tilbage til det forrige dashboard, når der ikke er trykket på en knap så længe. 0 holder dashboardet åbent."
+                    }
+                },
                 "payload": {
                     "title": "Nyttelast",
                     "description": "Her kan du definere yderligere data, der vil blive eksponeret for et flow, når du trykker på en knap."

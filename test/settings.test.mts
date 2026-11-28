@@ -19,6 +19,13 @@ describe('settings page', () => {
     expect(dashboardData?.text).toContain("'rows': Number(rows)")
   })
 
+  it('stores each key\'s navigation with the dashboard', () => {
+    // The format lib/storage.mts reads (toDashboardNavigation): { type: 'open', dashboardId, timeout } or { type: 'back' }.
+    expect(page).toContain('navigation: readNavigation(item),')
+    expect(page).toContain("return { type: 'back' };")
+    expect(page).toContain("return { type: 'open', dashboardId: $item.dataset.navigationDashboardId, timeout: Number($item.dataset.navigationTimeout) || 0 };")
+  })
+
   it('stores only id and name in the variables list', () => {
     // The full variable (with its base64 sample) belongs in variable-<id> only.
     const listWrites = lines.filter(({ text }) => text.includes("Homey.set('variables'"))

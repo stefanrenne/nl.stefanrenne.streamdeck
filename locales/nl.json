@@ -35,6 +35,19 @@
                 "image": "Afbeelding",
                 "save": "Opslaan",
                 "cancel": "Annuleren",
+                "navigation": {
+                    "title": "Navigatie",
+                    "description": "Wat de Stream Deck doet als je op deze knop drukt, naast het starten van de flows.",
+                    "none": "Geen",
+                    "open": "Dashboard openen",
+                    "back": "Terug",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Er zijn geen andere dashboards om te openen. Je kunt er een toevoegen in het tabblad 'Dashboards'.",
+                    "timeout": {
+                        "title": "Terug na (seconden)",
+                        "description": "Gaat terug naar het vorige dashboard als er zo lang geen knop is ingedrukt. Bij 0 blijft het dashboard open."
+                    }
+                },
                 "payload": {
                     "title": "Payload",
                     "description": "Hier kunt je aanvullende data invoeren die vervolgens beschikbaar zijn in een flow na het klikken op een knop."

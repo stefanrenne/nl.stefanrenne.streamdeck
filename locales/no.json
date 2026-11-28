@@ -35,6 +35,19 @@
                 "image": "Bilde",
                 "save": "Lagre",
                 "cancel": "Avbryt",
+                "navigation": {
+                    "title": "Navigasjon",
+                    "description": "Hva Stream Deck gjør når du trykker på denne knappen, i tillegg til å starte flytene.",
+                    "none": "Ingen",
+                    "open": "Åpne dashbord",
+                    "back": "Tilbake",
+                    "dashboard": "Dashbord",
+                    "noDashboards": "Det finnes ingen andre dashbord å åpne. Du kan legge til et i fanen 'Dashbord'.",
+                    "timeout": {
+                        "title": "Tilbake etter (sekunder)",
+                        "description": "Går tilbake til forrige dashbord når ingen knapp har blitt trykket så lenge. 0 holder dashbordet åpent."
+                    }
+                },
                 "payload": {
                     "title": "Nyttelast",
                     "description": "Her kan du definere tilleggsdata som vil bli eksponert for en flyt når du trykker på en knapp."

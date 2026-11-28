@@ -13,10 +13,11 @@ All user data lives in **`homey.settings`** (the app settings store). The settin
 | `variables` | settings page | `[{ id, name }]` (`toMetadata` in the settings page). Installs saved by older versions may still hold the whole variable here, including `sample`, until the list is next written; `Store` and the settings page only read `id` and `name` from it. |
 | `variable-<id>` | settings page, `Store.setVariable` (flow cards) | `{ firstLine, secondLine, textColor, backgroundColor, sample }` |
 
-`StoredDashboardItem` is `{ type: 'empty' | 'image' | 'variable', item, imageId?, variableId?, payload }`:
+`StoredDashboardItem` is `{ type: 'empty' | 'image' | 'variable', item, imageId?, variableId?, payload, navigation? }`:
 
 - `item` is the **1-based key position**, in row-major order (`index + 1` of the deck's `CONTROLS`). Key names in the UI and the `item` token are a row letter plus a column number: item 1 is `A1`, and item 8 on a 5-column deck is `B3`.
 - `payload` is free text. The settings page escapes `"` as `\x22` and `'` as `\x27`, and `Store.getDashboard` unescapes them.
+- `navigation` is what the key does on the deck when it's pressed: `{ type: 'open', dashboardId, timeout }` (`timeout` in whole seconds; `0` keeps the dashboard open) or `{ type: 'back' }`. Missing means none. Any kind of item can have one. See [device.md](device.md#navigation).
 - `columns` / `rows` are one of 8×4, 5×3, 4×2, 3×2, stored as numbers by the settings page (`Number(...)` on the picker values) and `Store.updateDashboard`. Older settings pages stored strings (`"5"`); `Store.getDashboard` converts with `Number()`, and the settings page rewrites a dashboard as numbers the next time it's saved.
 - Dashboards from before 1.1.6 had `displayMode` (6/8/15/32) instead of `columns`/`rows`. The settings page migrates them when it loads. If it hasn't, the device writes the deck's size on the next load.
 
@@ -26,7 +27,7 @@ All user data lives in **`homey.settings`** (the app settings store). The settin
 
 `Store` is a read-through cache: `getDashboard`, `getImage` and `getVariable` read settings on the first call and then serve from memory until they're invalidated.
 
-- `getDashboard(id)` resolves each item into a `DashboardItem`: `{ kind: 'image', imageBuffer, … }`, `{ kind: 'variable', firstLine, secondLine, textColor, backgroundColor, … }` or `{ kind: 'empty', payload }`. An item whose image or variable no longer exists becomes `empty` but keeps its payload. `items` always has keys 1–32, defaulting to empty. `usedVariableIds` lists the variables shown on it.
+- `getDashboard(id)` resolves each item into a `DashboardItem`: `{ kind: 'image', imageBuffer, … }`, `{ kind: 'variable', firstLine, secondLine, textColor, backgroundColor, … }` or `{ kind: 'empty', payload }`. An item whose image or variable no longer exists becomes `empty` but keeps its payload and navigation. `toDashboardNavigation` turns the stored `navigation` into `{ kind: 'open', dashboardId, timeout }` or `{ kind: 'back' }`; a missing, negative or non-numeric `timeout` becomes `0`, and anything else (an unknown type, an `open` without a dashboard) means no navigation, so the item has no `navigation` key. The target dashboard isn't checked here (a cached dashboard isn't invalidated when its target is deleted); the device checks it on the press. `items` always has keys 1–32, defaulting to empty. `usedVariableIds` lists the variables shown on it.
 - The Homey SDK docs don't say whether `settings.get` returns `undefined` or `null` for a missing key, so `Store` checks the stored data with `== null` (both). A dashboard item that points at an image without data becomes an empty item, and a dashboard without data is `undefined`.
 - `getVariable(id)` defaults the colours to `#ffffff` on `#000000` and maps an empty `secondLine` to `undefined`. `setVariable` stores `undefined` as `''`.
 - `setVariable` and `updateDashboard` write the setting and then invalidate their own cache (`invalidateVariable` / `invalidateDashboard`), so the writing `Store` sees the new value without waiting for the settings relay.

@@ -35,6 +35,19 @@
                 "image": "Image",
                 "save": "Enregistrer",
                 "cancel": "Annuler",
+                "navigation": {
+                    "title": "Navigation",
+                    "description": "Ce que fait le Stream Deck lorsque vous appuyez sur ce bouton, en plus de lancer ses flows.",
+                    "none": "Aucune",
+                    "open": "Ouvrir un tableau de bord",
+                    "back": "Retour",
+                    "dashboard": "Tableau de bord",
+                    "noDashboards": "Il n'y a pas d'autre tableau de bord à ouvrir. Vous pouvez en ajouter un dans l'onglet 'Tableaux de bord'.",
+                    "timeout": {
+                        "title": "Retour après (secondes)",
+                        "description": "Revient au tableau de bord précédent si aucun bouton n'a été pressé pendant cette durée. 0 garde le tableau de bord ouvert."
+                    }
+                },
                 "payload": {
                     "title": "Charge utile",
                     "description": "Vous pouvez définir ici des données supplémentaires qui seront exposées à un flux lorsque vous appuyez sur un bouton."

@@ -35,6 +35,19 @@
                 "image": "이미지",
                 "save": "저장",
                 "cancel": "취소",
+                "navigation": {
+                    "title": "탐색",
+                    "description": "이 버튼을 누르면 플로우 실행과 함께 Stream Deck이 수행하는 동작입니다.",
+                    "none": "없음",
+                    "open": "대시보드 열기",
+                    "back": "뒤로",
+                    "dashboard": "대시보드",
+                    "noDashboards": "열 수 있는 다른 대시보드가 없습니다. '대시보드' 탭에서 추가할 수 있습니다.",
+                    "timeout": {
+                        "title": "돌아가기 시간(초)",
+                        "description": "이 시간 동안 버튼을 누르지 않으면 이전 대시보드로 돌아갑니다. 0이면 대시보드가 계속 열려 있습니다."
+                    }
+                },
                 "payload": {
                     "title": "페이로드",
                     "description": "버튼을 누를 때 플로우에 전달될 추가 데이터를 여기서 정의할 수 있습니다."

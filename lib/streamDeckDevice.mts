@@ -1,6 +1,6 @@
 import Homey, { FlowCardTriggerDevice } from 'homey';
 import type { StreamDeckButtonControlDefinition } from '@elgato-stream-deck/core'
-import { Dashboard, Store } from './storage.mjs';
+import { Dashboard, DashboardNavigation, Store } from './storage.mjs';
 import { CardListener } from './cardListener.mjs';
 import { DeckSurface, getButtonControlSize, getDashboardItem, getLcdButtonControls, renderText, renderDashboard, renderHomeyLogo } from './streamDeckAdapter.mjs';
 import { map } from './helpers.mjs';
@@ -17,6 +17,16 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   protected cardListener = new CardListener(this.homey, this.store);
   protected streamDeck: Deck | undefined;
   private dashboard: Dashboard | undefined;
+
+  /**
+   * The dashboards that were left by an `open` navigation, newest last, each with the timeout it
+   * was shown with, and the timeout of the dashboard shown now (0: it stays). Kept in the device
+   * store, so a restart in the middle of a temporary dashboard still returns. See docs/device.md.
+   */
+  private navigation: NavigationState = { history: [], timeout: 0 };
+  private navigationTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The dashboard of each key's last 'down', so its 'up'/'single'/'double' belong to the same dashboard. */
+  private pressedDashboards = new Map<number, Dashboard | undefined>();
 
   private onOffButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('off_button_action'));
   private onImageButtonAction: FlowCardTriggerDevice = this.homey.flow.getDeviceTriggerCard(this.flowCardId('image_button_action'));
@@ -48,7 +58,10 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     this.registerChangeDashboardListener();
 
     await this.updateSelectableDashboardOptions();
+    this.navigation = toNavigationState(this.getStoreValue(NAVIGATION_STORE_KEY));
     await this.validateSelectedDashboardOption();
+    // After a restart on a temporary dashboard, its timeout starts again.
+    this.startNavigationTimer();
 
     this.homey.settings.on('set-dashboard', this.guard('set-dashboard', async (id: string) => {
       this.store.invalidateDashboard(id);
@@ -113,6 +126,7 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     });
 
     this.registerCapabilityListener('dashboard', async (id: string) => {
+      await this.clearNavigation();
       await this.loadDashboard(id);
       const dashboardName = (id === this.cardListener.emptyDashboard.id) ? this.cardListener.emptyDashboard.name : this.store.getDashboard(id)?.name
       if (dashboardName) {
@@ -211,29 +225,37 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   private lastKeyPressTime: number = 0;
   private lastKeyPressIndex: number = 0;
   // isTurnedOn is the state at the press, so a 'single'/'double' goes to the same cards as its 'down'.
-  validateSingleDouble(control: StreamDeckButtonControlDefinition, isTurnedOn: boolean) {
+  private lastKeyPressDashboardId: string | undefined;
+  // isTurnedOn is the state at the press, so a 'single'/'double' goes to the same cards as its 'down'.
+  // dashboard is the one the press was on: a navigation key has already switched to another one.
+  validateSingleDouble(control: StreamDeckButtonControlDefinition, isTurnedOn: boolean, dashboard: Dashboard | undefined = this.dashboard) {
     const thisKeyPressTime = new Date().getTime();
-    if (thisKeyPressTime - this.lastKeyPressTime <= 250 && this.lastKeyPressIndex == control.index+1) {
-      this.streamDeckEvent('double', isTurnedOn, control).catch((e) => console.error('double event failed:', e));
+    if (thisKeyPressTime - this.lastKeyPressTime <= 250 && this.lastKeyPressIndex == control.index+1 && this.lastKeyPressDashboardId === dashboard?.id) {
+      this.streamDeckEvent('double', isTurnedOn, control, dashboard).catch((e) => console.error('double event failed:', e));
       this.lastKeyPressTime = 0;
       this.lastKeyPressIndex = 0;
     } else {
       this.lastKeyPressTime = thisKeyPressTime;
       this.lastKeyPressIndex = control.index+1;
+      this.lastKeyPressDashboardId = dashboard?.id;
       // homey.setTimeout is cleared when the app unloads, so no 'single' fires after that.
       this.homey.setTimeout(() => {
         if (this.lastKeyPressTime > 0) {
-          this.streamDeckEvent('single', isTurnedOn, control).catch((e) => console.error('single event failed:', e));
+          this.streamDeckEvent('single', isTurnedOn, control, dashboard).catch((e) => console.error('single event failed:', e));
         }
       }, 400);
     }
   }
 
-  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: boolean, control: StreamDeckButtonControlDefinition) {
+  /**
+   * `dashboard` is the dashboard the press belongs to. By default a 'down' uses the one shown now, and
+   * the 'up', 'single' and 'double' after it use that same one, even when the 'down' navigated away.
+   */
+  async streamDeckEvent(event: 'up' | 'down' | 'single' | 'double', isTurnedOn: boolean, control: StreamDeckButtonControlDefinition, dashboard: Dashboard | undefined = this.dashboardForEvent(event, control)) {
 
-    const button = map(this.dashboard, (dashboard) => getDashboardItem(dashboard, control));
+    const button = map(dashboard, (dashboard) => getDashboardItem(dashboard, control));
     const state = { action: event, variableId: '', imageId: '' }
-    const tokens = { dashboard: this.dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
+    const tokens = { dashboard: dashboard?.name ?? '', imageName: '', textFirstLine: '', textSecondLine: '', payload: button?.payload ?? '', column: control.column + 1, row: control.row + 1, item: String.fromCharCode(64 + control.row + 1) + String(control.column + 1) }
 
     if (!isTurnedOn) {
       if (event === 'down' && this.detectsSingleDouble()) {
@@ -244,16 +266,24 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
       return
     }
 
-    if (button === undefined || this.dashboard?.name === undefined) {
+    if (button === undefined || dashboard?.name === undefined) {
       this.log(event + ' empty dashboard button');
       return
     }
 
     if (event === 'down' && this.detectsSingleDouble()) {
-      this.validateSingleDouble(control, true);
+      this.validateSingleDouble(control, true, dashboard);
     }
 
     const actions: Promise<void>[] = []
+
+    if (event === 'down') {
+      // A press on a temporary dashboard keeps it open for another full timeout.
+      this.startNavigationTimer();
+      if (button.navigation !== undefined) {
+        actions.push(this.navigate(button.navigation));
+      }
+    }
 
     switch (button.kind) {
     case 'variable':
@@ -276,6 +306,14 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
     actions.push(this.onAnyButtonAction.trigger(this, tokens, state));
 
     await Promise.all(actions);
+  }
+
+  /** The dashboard of the press an event belongs to; a 'down' starts a new press on the shown dashboard. */
+  private dashboardForEvent(event: 'up' | 'down' | 'single' | 'double', control: StreamDeckButtonControlDefinition): Dashboard | undefined {
+    if (event === 'down' || !this.pressedDashboards.has(control.index)) {
+      this.pressedDashboards.set(control.index, this.dashboard);
+    }
+    return this.pressedDashboards.get(control.index);
   }
 
   /**
@@ -307,6 +345,8 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
   }
 
   async loadEmptyDashboardOptions() {
+      await this.clearNavigation();
+
       // set the first dashboard as new dashboard
       await this.setCapabilityValue('dashboard', this.cardListener.emptyDashboard.id);
 
@@ -345,13 +385,132 @@ export default class StreamDeckDevice<Deck extends DeckSurface = DeckSurface> ex
       throw 'Stream Deck is unavailable';
     }
 
+    // A dashboard chosen by a Flow is not temporary, and isn't left with 'back'.
+    await this.clearNavigation();
+
     const selectedDashboardId: string | undefined = await this.getCapabilityValue('dashboard');
     if (selectedDashboardId === dashboardId) {
       // value not changed
       return;
     }
+    await this.showDashboard(dashboardId, dashboardName);
+  }
+
+  /** Selects, triggers `changed_dashboard` for, and draws a dashboard, without touching the navigation. */
+  private async showDashboard(dashboardId: string, dashboardName: string) {
     await this.setCapabilityValue('dashboard', dashboardId);
     await this.onDashboardChanged.trigger(this, { 'dashboard': dashboardName });
     await this.loadDashboard(dashboardId);
   }
+
+  /** The name of a dashboard that can be selected, or undefined when it no longer exists. */
+  private selectableDashboardName(id: string): string | undefined {
+    if (id === this.cardListener.emptyDashboard.id) {
+      return this.cardListener.emptyDashboard.name;
+    }
+    return this.store.getDashboardMetadata().find((metadata) => metadata.id === id)?.name;
+  }
+
+  /** Carries out a key's navigation (see `DashboardNavigation`). */
+  async navigate(navigation: DashboardNavigation) {
+    if (navigation.kind === 'back') {
+      await this.navigateBack();
+      return;
+    }
+
+    const currentId: string = this.getCapabilityValue('dashboard') ?? this.cardListener.emptyDashboard.id;
+    const name = this.selectableDashboardName(navigation.dashboardId);
+    if (name === undefined || navigation.dashboardId === currentId) {
+      this.log(`navigation to ${navigation.dashboardId} ignored: ${name === undefined ? 'no such dashboard' : 'already shown'}`);
+      return;
+    }
+
+    this.navigation = {
+      history: [...this.navigation.history, { dashboardId: currentId, timeout: this.navigation.timeout }].slice(-MAX_NAVIGATION_HISTORY),
+      timeout: navigation.timeout,
+    };
+    await this.saveNavigation();
+    this.startNavigationTimer();
+    await this.showDashboard(navigation.dashboardId, name);
+  }
+
+  /** Returns to the dashboard the current one was opened from. Does nothing without one. */
+  async navigateBack() {
+    const history = [...this.navigation.history];
+    let entry = history.pop();
+    // Skip dashboards that were deleted since.
+    while (entry !== undefined && this.selectableDashboardName(entry.dashboardId) === undefined) {
+      entry = history.pop();
+    }
+    if (entry === undefined) {
+      this.log('navigation back ignored: no previous dashboard');
+      await this.clearNavigation();
+      return;
+    }
+
+    this.navigation = { history, timeout: entry.timeout };
+    await this.saveNavigation();
+    this.startNavigationTimer();
+    await this.showDashboard(entry.dashboardId, this.selectableDashboardName(entry.dashboardId) ?? '');
+  }
+
+  /** (Re)starts the timer that returns from a temporary dashboard, or stops it for one that stays. */
+  private startNavigationTimer() {
+    if (this.navigationTimer !== undefined) {
+      this.homey.clearTimeout(this.navigationTimer);
+      this.navigationTimer = undefined;
+    }
+    if (this.navigation.timeout <= 0 || this.navigation.history.length === 0) {
+      return;
+    }
+    // homey.setTimeout is cleared when the app unloads; the stored state restarts it on init.
+    this.navigationTimer = this.homey.setTimeout(() => {
+      this.navigationTimer = undefined;
+      this.log('navigation timeout');
+      this.navigateBack().catch((e) => this.log('navigation timeout failed: ' + e));
+    }, this.navigation.timeout * 1000);
+  }
+
+  /** Forgets the navigation history: the current dashboard is no longer temporary. */
+  private async clearNavigation() {
+    if (this.navigation.history.length === 0 && this.navigation.timeout === 0 && this.navigationTimer === undefined) {
+      return;
+    }
+    this.navigation = { history: [], timeout: 0 };
+    this.startNavigationTimer();
+    await this.saveNavigation();
+  }
+
+  private async saveNavigation() {
+    await this.setStoreValue(NAVIGATION_STORE_KEY, this.navigation)
+      .catch((e: unknown) => this.log('saving the navigation failed: ' + e));
+  }
 };
+
+const NAVIGATION_STORE_KEY = 'navigation';
+/** More than enough for any real menu, and keeps a loop of 'open' keys from growing the store. */
+const MAX_NAVIGATION_HISTORY = 20;
+
+interface NavigationEntry {
+  dashboardId: string;
+  timeout: number;
+}
+
+interface NavigationState {
+  history: NavigationEntry[];
+  timeout: number;
+}
+
+const toTimeout = (value: unknown) => (typeof value === 'number' && Number.isFinite(value) && value > 0) ? value : 0;
+
+/** The stored navigation state, or an empty one for anything else (nothing stored yet). */
+export function toNavigationState(value: unknown): NavigationState {
+  const stored = (typeof value === 'object' && value !== null) ? value as Partial<Record<keyof NavigationState, unknown>> : {};
+  const history = Array.isArray(stored.history) ? stored.history : [];
+  return {
+    history: history
+      .filter((entry): entry is { dashboardId: string, timeout?: unknown } => typeof entry?.dashboardId === 'string')
+      .map((entry) => ({ dashboardId: entry.dashboardId, timeout: toTimeout(entry.timeout) })),
+    timeout: toTimeout(stored.timeout),
+  };
+}

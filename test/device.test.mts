@@ -409,6 +409,195 @@ describe('dashboard flow cards and capability', () => {
   })
 })
 
+describe('dashboard navigation', () => {
+  // Keys by position on the 5x3 deck: item 1 is CONTROLS[0], item 2 is CONTROLS[1], ...
+  const key = (item: number) => deck.CONTROLS[item - 1]
+  const selected = () => device.getCapabilityValue('dashboard')
+  const changedTo = () => card('changed_dashboard').trigger.mock.calls.map(([, tokens]) => (tokens as { dashboard: string }).dashboard)
+  const storeValues = () => (device as unknown as { storeValues: Map<string, unknown> }).storeValues
+
+  beforeEach(async () => {
+    seedSettings(settings, {
+      images: [{ id: 'img-lamp', name: 'Lamp' }],
+      dashboards: [
+        { id: 'd-home', name: 'Home', items: [
+          { type: 'image', item: 1, imageId: 'img-lamp', payload: 'lamp-payload' },
+          { type: 'empty', item: 2, payload: 'to-movie', navigation: { type: 'open', dashboardId: 'd-movie', timeout: 30 } },
+          { type: 'empty', item: 3, payload: '', navigation: { type: 'open', dashboardId: 'd-menu', timeout: 0 } },
+          { type: 'empty', item: 4, payload: '', navigation: { type: 'open', dashboardId: 'd-deleted', timeout: 30 } },
+          { type: 'empty', item: 5, payload: '', navigation: { type: 'back' } },
+        ] },
+        { id: 'd-movie', name: 'Movie night', items: [
+          { type: 'empty', item: 1, payload: '', navigation: { type: 'back' } },
+        ] },
+        { id: 'd-menu', name: 'Menu', items: [
+          { type: 'empty', item: 1, payload: '', navigation: { type: 'back' } },
+          { type: 'empty', item: 2, payload: '', navigation: { type: 'open', dashboardId: 'd-movie', timeout: 10 } },
+        ] },
+      ],
+    })
+    device = createDevice({ dashboard: 'd-home', onoff: true })
+    await device.onInit()
+    await connect(deck)
+  })
+
+  it('an "open" key switches to its dashboard, triggers changed_dashboard and draws it', async () => {
+    deck.clearKey.mockClear()
+    await press('down', key(2))
+
+    expect(selected()).toBe('d-movie')
+    expect(changedTo()).toEqual(['Movie night'])
+    expect(deck.clearedKeys()).toHaveLength(15)
+  })
+
+  it('the key still fires its flows, and its up belongs to the dashboard it was pressed on', async () => {
+    await press('down', key(2))
+    await press('up', key(2))
+
+    const calls = card('any_button_action').trigger.mock.calls.map(([, tokens, state]) => [(state as { action: string }).action, (tokens as { dashboard: string, payload: string }).dashboard, (tokens as { payload: string }).payload])
+    expect(calls).toEqual([['down', 'Home', 'to-movie'], ['up', 'Home', 'to-movie']])
+  })
+
+  it('returns to the previous dashboard after the timeout', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+
+    await vi.advanceTimersByTimeAsync(29_000)
+    expect(selected()).toBe('d-movie')
+    await vi.advanceTimersByTimeAsync(1_000)
+    expect(selected()).toBe('d-home')
+    expect(changedTo()).toEqual(['Movie night', 'Home'])
+  })
+
+  it('a press on the temporary dashboard starts the timeout again', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+    await vi.advanceTimersByTimeAsync(20_000)
+    await press('down', key(7))
+    await vi.advanceTimersByTimeAsync(20_000)
+    expect(selected()).toBe('d-movie')
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(selected()).toBe('d-home')
+  })
+
+  it('a "back" key returns at once and stops the timeout', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+    await press('down', key(1))
+    expect(selected()).toBe('d-home')
+
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(changedTo()).toEqual(['Movie night', 'Home'])
+  })
+
+  it('a timeout of 0 keeps the dashboard open', async () => {
+    vi.useFakeTimers()
+    await press('down', key(3))
+    await vi.advanceTimersByTimeAsync(3_600_000)
+    expect(selected()).toBe('d-menu')
+  })
+
+  it('goes back one dashboard at a time, each with the timeout it was opened with', async () => {
+    vi.useFakeTimers()
+    await press('down', key(3)) // Home → Menu, stays
+    await press('down', key(2)) // Menu → Movie night, 10 s
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(selected()).toBe('d-menu')
+
+    await vi.advanceTimersByTimeAsync(3_600_000)
+    expect(selected()).toBe('d-menu')
+
+    await press('down', key(1))
+    expect(selected()).toBe('d-home')
+  })
+
+  it('"back" without a previous dashboard does nothing', async () => {
+    await press('down', key(5))
+    expect(selected()).toBe('d-home')
+    expect(card('changed_dashboard').trigger).not.toHaveBeenCalled()
+  })
+
+  it('ignores an "open" of a dashboard that no longer exists', async () => {
+    await press('down', key(4))
+    expect(selected()).toBe('d-home')
+    expect(card('changed_dashboard').trigger).not.toHaveBeenCalled()
+  })
+
+  it('does not navigate while the deck is turned off', async () => {
+    device.capabilityValues.set('onoff', false)
+    await press('down', key(2))
+    expect(selected()).toBe('d-home')
+  })
+
+  it('a dashboard chosen by a Flow ends the navigation: no timeout, and nothing to go back to', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+    await card('set_dashboard').run({ device, dashboard: { id: 'd-menu', name: 'Menu' } })
+
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(selected()).toBe('d-menu')
+    await press('down', key(1))
+    expect(selected()).toBe('d-menu')
+  })
+
+  it('choosing a dashboard on the device ends the navigation', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+    await device.capabilityListeners.get('dashboard')?.('d-menu')
+    await device.setCapabilityValue('dashboard', 'd-menu')
+
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(selected()).toBe('d-menu')
+  })
+
+  it('stores the navigation in the device store', async () => {
+    await press('down', key(2))
+    expect(storeValues().get('navigation')).toEqual({ history: [{ dashboardId: 'd-home', timeout: 0 }], timeout: 30 })
+    await press('down', key(1))
+    expect(storeValues().get('navigation')).toEqual({ history: [], timeout: 0 })
+  })
+
+  /** A device that starts on Movie night with `navigation` in its store, as after a restart. */
+  const restart = async (navigation: unknown) => {
+    device = createDevice({ dashboard: 'd-movie', onoff: true })
+    storeValues().set('navigation', navigation)
+    deck = new FakeStreamDeck(lcdButtons(5, 3))
+    await device.onInit()
+    await connect(deck)
+  }
+
+  it('after a restart on a temporary dashboard, still returns after the timeout', async () => {
+    // The timer starts in onInit. Movie night has no images, so drawing it doesn't need real timers.
+    vi.useFakeTimers()
+    await restart({ history: [{ dashboardId: 'd-home', timeout: 0 }], timeout: 30 })
+
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(selected()).toBe('d-home')
+  })
+
+  it('"back" skips dashboards that were deleted since', async () => {
+    await restart({ history: [{ dashboardId: 'd-menu', timeout: 0 }, { dashboardId: 'd-deleted', timeout: 0 }], timeout: 0 })
+
+    await press('down', key(1))
+    expect(selected()).toBe('d-menu')
+  })
+
+  it('ignores a stored navigation it can\'t read', async () => {
+    await restart('garbage')
+    await press('down', key(1))
+    expect(selected()).toBe('d-movie')
+  })
+
+  it('a "single" after navigating is still for the key on the dashboard it was pressed on', async () => {
+    vi.useFakeTimers()
+    await press('down', key(2))
+    await vi.advanceTimersByTimeAsync(400)
+
+    const single = card('any_button_action').trigger.mock.calls.find(([, , state]) => (state as { action: string }).action === 'single')
+    expect(single?.[1]).toMatchObject({ dashboard: 'Home', payload: 'to-movie' })
+  })
+})
+
 describe('reacting to settings changes', () => {
   beforeEach(async () => {
     device = createDevice({ dashboard: 'd-home', onoff: true })

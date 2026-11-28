@@ -35,6 +35,19 @@
                 "image": "Bild",
                 "save": "Spara",
                 "cancel": "Avbryt",
+                "navigation": {
+                    "title": "Navigering",
+                    "description": "Vad Stream Deck gör när du trycker på den här knappen, utöver att starta dess flöden.",
+                    "none": "Ingen",
+                    "open": "Öppna instrumentpanel",
+                    "back": "Tillbaka",
+                    "dashboard": "Instrumentpanel",
+                    "noDashboards": "Det finns inga andra instrumentpaneler att öppna. Du kan lägga till en på fliken 'Instrumentpaneler'.",
+                    "timeout": {
+                        "title": "Tillbaka efter (sekunder)",
+                        "description": "Går tillbaka till föregående instrumentpanel när ingen knapp har tryckts in så länge. 0 håller instrumentpanelen öppen."
+                    }
+                },
                 "payload": {
                     "title": "Nyttolast",
                     "description": "Här kan du definiera ytterligare data som exponeras för ett flöde när du trycker på en knapp."

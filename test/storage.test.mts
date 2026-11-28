@@ -129,6 +129,47 @@ describe('dashboards', () => {
     expect(store.getDashboard('d')?.items[4]).toEqual({ kind: 'empty', payload: 'kept' })
   })
 
+  describe('navigation', () => {
+    const itemsWith = (navigation: unknown) => {
+      seedSettings(settings, {
+        images: [{ id: 'img', name: 'Lamp' }],
+        dashboards: [{ id: 'n', name: 'Nav', items: [
+          { type: 'image', item: 1, imageId: 'img', payload: '', navigation },
+          { type: 'empty', item: 2, payload: '', navigation },
+        ] }],
+      })
+      const dashboard = store.getDashboard('n')
+      return [dashboard?.items[1], dashboard?.items[2]]
+    }
+
+    it('resolves "open" with its dashboard and timeout, on any kind of item', () => {
+      const [image, empty] = itemsWith({ type: 'open', dashboardId: 'd-other', timeout: 30 })
+      expect(image).toMatchObject({ kind: 'image', navigation: { kind: 'open', dashboardId: 'd-other', timeout: 30 } })
+      expect(empty).toEqual({ kind: 'empty', payload: '', navigation: { kind: 'open', dashboardId: 'd-other', timeout: 30 } })
+    })
+
+    it('resolves "back"', () => {
+      expect(itemsWith({ type: 'back' })[0]?.navigation).toEqual({ kind: 'back' })
+    })
+
+    it('reads a missing, negative or non-numeric timeout as 0 (stay)', () => {
+      for (const timeout of [undefined, -5, 'soon', null]) {
+        store = createStore(homey)
+        expect(itemsWith({ type: 'open', dashboardId: 'x', timeout })[0]?.navigation).toEqual({ kind: 'open', dashboardId: 'x', timeout: 0 })
+      }
+      store = createStore(homey)
+      expect(itemsWith({ type: 'open', dashboardId: 'x', timeout: '15' })[0]?.navigation).toEqual({ kind: 'open', dashboardId: 'x', timeout: 15 })
+    })
+
+    it('ignores no navigation, an unknown type and an "open" without a dashboard', () => {
+      for (const navigation of [undefined, null, { type: 'sideways' }, { type: 'open' }, { type: 'open', dashboardId: '' }]) {
+        store = createStore(homey)
+        const [image] = itemsWith(navigation)
+        expect(image).not.toHaveProperty('navigation')
+      }
+    })
+  })
+
   describe('when homey.settings.get returns null for a missing key (regression 355019a)', () => {
     it('treats a deleted image as missing instead of crashing', () => {
       settings.values.set('image-deleted', null)

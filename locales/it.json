@@ -35,6 +35,19 @@
                 "image": "Immagine",
                 "save": "Salva",
                 "cancel": "Annulla",
+                "navigation": {
+                    "title": "Navigazione",
+                    "description": "Cosa fa lo Stream Deck quando premi questo pulsante, oltre ad avviare i suoi flow.",
+                    "none": "Nessuna",
+                    "open": "Apri dashboard",
+                    "back": "Indietro",
+                    "dashboard": "Dashboard",
+                    "noDashboards": "Non ci sono altre dashboard da aprire. Puoi aggiungerne una nella scheda 'Dashboard'.",
+                    "timeout": {
+                        "title": "Torna dopo (secondi)",
+                        "description": "Torna alla dashboard precedente se nessun pulsante è stato premuto per questo tempo. Con 0 la dashboard resta aperta."
+                    }
+                },
                 "payload": {
                     "title": "Payload",
                     "description": "Qui puoi definire dati aggiuntivi che verranno esposti a un flusso quando premi un pulsante."

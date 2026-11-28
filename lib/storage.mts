@@ -30,9 +30,19 @@ export interface Dashboard {
 
 export type DashboardItem = DashboardEmptyItem | DashboardImageItem | DashboardVariableItem;
 
+/**
+ * What pressing a key does on the deck itself, next to firing its Flow triggers. `open` shows another
+ * dashboard and, when `timeout` (seconds) is above 0, returns to the previous one once no key has been
+ * pressed for that long. `back` returns to the dashboard the current one was opened from.
+ */
+export type DashboardNavigation =
+    | { readonly kind: 'open', readonly dashboardId: string, readonly timeout: number }
+    | { readonly kind: 'back' };
+
 export interface DashboardEmptyItem {
     readonly kind: 'empty';
     readonly payload: string;
+    readonly navigation?: DashboardNavigation;
 }
 
 export interface DashboardImageItem {
@@ -41,6 +51,7 @@ export interface DashboardImageItem {
     readonly payload: string;
     readonly imageId: string;
     readonly imageBuffer: Buffer;
+    readonly navigation?: DashboardNavigation;
 }
 
 export interface DashboardVariableItem {
@@ -52,6 +63,7 @@ export interface DashboardVariableItem {
     readonly secondLine: string | undefined;
     readonly textColor: string;
     readonly backgroundColor: string;
+    readonly navigation?: DashboardNavigation;
 }
 
 export interface Metadata {
@@ -80,6 +92,28 @@ interface StoredDashboardItem {
     imageId: string | undefined;
     variableId: string | undefined;
     payload: string;
+    navigation?: StoredNavigation | null;
+}
+
+interface StoredNavigation {
+    type?: unknown;
+    dashboardId?: unknown;
+    timeout?: unknown;
+}
+
+/** The navigation of a stored item: undefined for none, and for anything the settings page doesn't write. */
+export function toDashboardNavigation(stored: StoredNavigation | null | undefined): DashboardNavigation | undefined {
+    if (stored == null) {
+        return undefined;
+    }
+    if (stored.type === 'back') {
+        return { kind: 'back' };
+    }
+    if (stored.type === 'open' && typeof stored.dashboardId === 'string' && stored.dashboardId !== '') {
+        const timeout = Number(stored.timeout);
+        return { kind: 'open', dashboardId: stored.dashboardId, timeout: (Number.isFinite(timeout) && timeout > 0) ? timeout : 0 };
+    }
+    return undefined;
 }
 
 export class Store {
@@ -148,11 +182,14 @@ export class Store {
         const defaultItems: { [item: number] : DashboardItem; } = Object.fromEntries(Array.from({length: 32}, (_, i) => [i + 1, { kind: 'empty', payload: '' }]));
         const items: { [item: number] : DashboardItem; } = data.items.reduce((result, row) => {
             const payload = row.payload.replace(/\\x22/g, '"').replace(/\\x27/g, '\'');
+            const navigation = toDashboardNavigation(row.navigation);
+            // Only set when there is one, so an item without navigation has no `navigation` key at all.
+            const extra = (navigation === undefined) ? {} : { navigation };
 
             if (row.type === 'image' && row.imageId !== undefined) {
                 const image = this.getImage(row.imageId);
                 if (image !== undefined) {
-                    result[row.item] = { kind: 'image', name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer };
+                    result[row.item] = { kind: 'image', name: image.name, payload: payload, imageId: row.imageId, imageBuffer: image.imageBuffer, ...extra };
                     return result;
                 }
             }
@@ -161,12 +198,12 @@ export class Store {
                 const variable = this.getVariable(row.variableId);
                 if (variable !== undefined) {
                     usedVariableIds.push(variable.id);
-                    result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine, textColor: variable.textColor, backgroundColor: variable.backgroundColor };
+                    result[row.item] = { kind: 'variable', name: variable.name, payload: payload, variableId: variable.id, firstLine: variable.firstLine, secondLine: variable.secondLine, textColor: variable.textColor, backgroundColor: variable.backgroundColor, ...extra };
                     return result;
                 }
             }
 
-            result[row.item] = { kind: 'empty', payload: payload };
+            result[row.item] = { kind: 'empty', payload: payload, ...extra };
             return result;
         }, defaultItems);
 

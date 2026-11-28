@@ -35,6 +35,19 @@
                 "image": "Imagen",
                 "save": "Guardar",
                 "cancel": "Cancelar",
+                "navigation": {
+                    "title": "Navegación",
+                    "description": "Lo que hace el Stream Deck al pulsar este botón, además de iniciar sus flujos.",
+                    "none": "Ninguna",
+                    "open": "Abrir panel",
+                    "back": "Atrás",
+                    "dashboard": "Panel",
+                    "noDashboards": "No hay otros paneles para abrir. Puedes añadir uno en la pestaña 'Paneles'.",
+                    "timeout": {
+                        "title": "Volver después de (segundos)",
+                        "description": "Vuelve al panel anterior cuando no se ha pulsado ningún botón durante este tiempo. Con 0 el panel permanece abierto."
+                    }
+                },
                 "payload": {
                     "title": "Carga útil",
                     "description": "Aquí puedes definir datos adicionales que se expondrán a un flujo cuando pulses un botón."
